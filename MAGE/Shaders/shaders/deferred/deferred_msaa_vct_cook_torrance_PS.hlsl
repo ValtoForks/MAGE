@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------------------
 // Engine Includes
 //-----------------------------------------------------------------------------
+#define BRDF_FUNCTION CookTorranceBRDF
 #define MSAA
-#define BRDFxCOS_COMPONENT CookTorranceBRDFxCos
 #include "deferred\deferred.hlsli"

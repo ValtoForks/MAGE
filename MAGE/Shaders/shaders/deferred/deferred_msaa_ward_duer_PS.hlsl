@@ -1,10 +1,10 @@
 //-----------------------------------------------------------------------------
 // Engine Includes
 //-----------------------------------------------------------------------------
-#define MSAA
-#define BRDFxCOS_COMPONENT CookTorranceBRDFxCos
-#define BRDF_F_COMPONENT   F_None
-#define BRDF_D_COMPONENT   D_WardDuer
-#define BRDF_V_COMPONENT   V_Ward
+#define BRDF_FUNCTION   CookTorranceBRDF
+#define BRDF_D_FUNCTION D_WardDuer
+#define BRDF_F_FUNCTION F_None
+#define BRDF_V_FUNCTION V_Ward
 #define DISABLE_VCT
+#define MSAA
 #include "deferred\deferred.hlsli"

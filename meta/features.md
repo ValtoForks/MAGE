@@ -35,11 +35,11 @@
   * .VAR   (Variable Script) **[MAGE Dedicated Format]**
 
 ### Rendering
-* AA
+* AA (for HDR, normal and depth buffer)
   * No AA
-  * FXAA
-  * MSAA
-  * SSAA
+  * FXAA (using Max3 tone mapping)
+  * MSAA (using Max3 tone mapping)
+  * SSAA (using Max3 tone mapping)
 * BRDFs (single BRDF/camera)
   * Lambertian
   * Cook-Torrance, Frostbite:
@@ -47,18 +47,19 @@
      * G|V component: Implicit, Ward, Neumann, Ashikhmin-Premoze, Kelemann, Cook Torrance, (Correlated) GGX, Smith GGX, Smith Schlick-GGX, Smith Beckmann, Smith Schlick-Beckmann
      * F component: None, Schlick, Cook-Torrance
 * Color spaces
-  * All separate colors and textures with color data are expressed in sRGB space.
-  * All light calculations are performed in linear space.
-  * sRGB colors are converted from gamma to linear space by the CPU (*Frostbite*).
-  * sRGB textures are converted from gamma to linear space by the GPU hardware support (ensures correct filtering and blending).
-  * Optional custom gamma correction before presenting (i.e. brightness adjustment)
+  * All separate colors and textures with color data are expressed in sRGB color space.
+  * All calculations are performed in linear color space.
+  * sRGB colors are converted from gamma to linear color space by the CPU (*Frostbite*).
+  * sRGB textures are converted from gamma to linear color space by the GPU hardware (ensures correct filtering and blending).
+  * Optional, custom gamma correction before presenting (i.e. brightness adjustment)
 * Culling
-  * Non-hierarchical light and object
+  * Non-hierarchical light and object culling
 * Depth buffer
   * Standard Z-depth
   * Reversed Z-depth
   * 32bit float for depth buffer
   * 16bit unorm|32bit float for shadow (cube) maps
+* (Temporal) Dithering
 * Lighting
   * Optional light interaction for materials
   * Single pass for all lights (incl. shadow mapping)
@@ -66,18 +67,22 @@
   * Physically-based and smooth distance attenuation (*Frostbite*)
   * Exponential fog with custom density (avoids popping artifacts)
   * HDR
+  * Direct and indirect illumination (voxel cone tracing).
 * Normal Mapping
   * Tangent-space (without relying on precomputed tangents and bitangents)
   * ~~Object-space~~ (*not supported any more*)
 * Post-processing
   * Depth-of-field
+  * Tone Mapping
+    * AA resolving (SSAA, MSAA, FXAA): Max3 (*Reinhard is more expensive, but is invertible as well.*)
+    * Back buffer: None, ACES Filmic, Max3, Reinhard, Uncharted
 * Render Layers (multiple render layers/camera)
   * Bounding volumes
-  * Wireframe
+  * Wireframes
 * Render Modes (single render mode/camera)
   * Forward
   * Deferred
-  * Various material and component visualizations
+  * False Color, Voxel Grid, Solid, etc.
 * Shadow Mapping
   * Optional occluding behavior for models
   * Support for both opaque and transparent models
@@ -87,11 +92,8 @@
 * Sky Domes
   * Non-uniform stretching in looking direction
 * Sprites
-* Tone Mapping
-  * AA resolving (SSAA, MSAA, FXAA): Max3
-  * Back buffer: ACES, Reinhard, Uncharted
 * Transparency
-  * ~~Alpha-to-Coverage~~ (*not supported any more*)
+  * ~~Alpha-to-Coverage~~ (*not integrated any more*)
   * Single layer Alpha Blending
 
 ### Resource Management
@@ -99,21 +101,17 @@
 * Models
 * Shaders: Vertex, Domain, Hull, Geometry, Pixel, Compute
 * Textures
-* Variables Scripts
 
 ### Scene
 * Camera
   * Orthographic
   * Perspective
-* Fog
-  * Linear
 * Light
   * Ambient
   * Directional
   * Omni (with or without shadow cube mapping)
   * Spot (with or without shadow mapping)
 * Model
-* Sky
 * Sprite
   * Image
   * Text

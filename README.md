@@ -18,20 +18,12 @@
 ## About
 
 <p align="center"><img src="https://github.com/matt77hias/MAGE-Meta/blob/master/res/Example.png"></p>
-
-<p align="center">
-<img src="https://github.com/matt77hias/MAGE-Meta/blob/master/res/Example 2.png" width="214">
-<img src="https://github.com/matt77hias/MAGE-Meta/blob/master/res/Example 3.png" width="214">
-<img src="https://github.com/matt77hias/MAGE-Meta/blob/master/res/Example 4.png" width="214">
-<img src="https://github.com/matt77hias/MAGE-Meta/blob/master/res/Example 5.png" width="214">
-</p>
-
-<p align="center"><img src="https://github.com/matt77hias/MAGE-Meta/blob/master/res/Architecture/Pipeline.png"></p>
+<p align="center"><img src="https://github.com/matt77hias/MAGE-Meta/blob/master/res/Example 2.png" width="436"><img src="https://github.com/matt77hias/MAGE-Meta/blob/master/res/Example 3.png" width="436"></p>
 
 **License**: Currently, MAGE is licensed under a [No License](https://raw.githubusercontent.com/matt77hias/MAGE/master/LICENSE.txt), since we do not allow diverging from the base version yet in this early stage of development.  
 
 ## Development
-* **Platform**: (minimum) Windows 10 32 Bit and 64 Bit (Windows API + Direct3D 11)
+* **Platform**: Windows 10 32 Bit and 64 Bit (Windows API + Direct3D 11)
 * **Engine Programming Language**: ISO C++ Latest Draft Standard (> C++17)
 * **Shading Model**: Shader Model 5.0
 * **Scripting Language**: ISO C++ Latest Draft Standard (> C++17)
@@ -41,16 +33,19 @@
   * dinput8.lib
   * dxguid.lib
   * (d3dcompiler.lib)
-* **Compiler**: MSVC++ 15.5.5
+* **Compiler**: MSVC++ 15.6.6
 * **IDE**: Visual Studio 2017
+* **GPU Debuggers/Profilers**:
+  * NVidia Nsight 5.5
+  * RenderDoc v1.0
 
 ## Use
 
 ### How to build the sample project?
-1. Open the Solution file `MAGE\MAGE\MAGE.sln` in Visual Studio 2015 (or higher).
+1. Open the Solution file `MAGE\MAGE\MAGE.sln` in Visual Studio 2017 (or higher).
 2. Build the Solution (Platform: `x64|x86`, Configuration: `Debug|Release`).
-3. Reposition the [assets directory](https://github.com/matt77hias/MAGE-Assets) and all of its contents to the `MAGE\MAGE\FPS\bin\<Platform>\<Configuration>\assets` directory. This is required for running the .exe from inside and outside Visual Studio.
-4. Run `MAGE\MAGE\FPS\bin\<Platform>\<Configuration>\FPS.exe` from inside or outside Visual Studio.
+3. Reposition the [assets directory](https://github.com/matt77hias/MAGE-Assets) and all of its contents to the `MAGE\MAGE\Demo\bin\<Platform>\<Configuration>\assets` directory. This is required for running the .exe from inside and outside Visual Studio.
+4. Run `MAGE\MAGE\Demo\bin\<Platform>\<Configuration>\Demo.exe` from inside or outside Visual Studio.
 5. Have fun! 
 
 Sample scene - buttons:

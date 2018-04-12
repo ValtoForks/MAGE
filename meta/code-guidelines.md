@@ -9,6 +9,8 @@ MEYERS S.: *Effective C++, 3th Edition*, Addison-Wesley Professional, 2005.
 
 MEYERS S.: *Effective Modern C++*, 1st Edition, O'Reilly Media, 2004.
 
+STROUSTRUP B., SUTTER H.: [*C++ Core Guidelines*](https://github.com/isocpp/CppCoreGuidelines/blob/master/CppCoreGuidelines.md), 2018.
+
 ## Specific
 
 ### Built-in types
@@ -56,7 +58,7 @@ Enumerate all member variables in the initializer list of constructors in order.
 * Do not use `new`, `new[]`, `delete`, `delete[]`.
 * Use `MakeUnique` for assigning to `UniquePtr`.
 * Use `MakeShared` for assigning to `SharedPtr` in case the data does not require custom allocaters.
-* Use `MakeAllocatedShared` for assigning to `SharedPtr` in case the data requires custom allocaters (i.e. inherits `AlignedData`).
+* Use `MakeAllocatedShared` for assigning to `SharedPtr` in case the data requires custom allocaters and/or deallocation needs to happen as early as possible.
 
 ### Smart pointers
 * Use `SharedPtr`, `UniquePtr` and `ComPtr` (`memory\memory.hpp`) to express ownership.

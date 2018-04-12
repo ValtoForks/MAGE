@@ -42,11 +42,17 @@ BREDIKHIN E.: [*C++17*](https://www.viva64.com/en/b/0533/), 2017.
 
 CORENTIN B.: [Undefining the C++ Pre-processor](https://medium.com/@corentin.jabot/undefining-the-c-pre-processor-c4eeb3d06e1f), 2018.
 
+CPPDEPEND TEAM: [What made John Carmack a legend in C++ programming? And which lessons to learn from him when adopting the new standards?](http://cppdepend.com/blog/?p=744), 2018.
+
 FREE SOFTWARE FOUNDACTION INC.: [*Vague Linkage*](https://gcc.gnu.org/onlinedocs/gcc/Vague-Linkage.html), 2017.
 
 FREE SOFTWARE FOUNDACTION INC.: [*Where’s the Template?*](https://gcc.gnu.org/onlinedocs/gcc/Template-Instantiation.html), 2017.
 
 GOLDSBOROUGH P.: [*Internal and External Linkage in C++*](http://www.goldsborough.me/c/c++/linker/2016/03/30/19-34-25-internal_and_external_linkage_in_c++/), 2016.
+
+GOOGLE INC.: [*Google C++ Style Guide*](https://google.github.io/styleguide/cppguide.html), 2018.
+
+HALDAR D.: [C++ 11 Auto: How to use and avoid abuse](http://www.acodersjourney.com/2016/02/c-11-auto/), 2016.
 
 JOSUTTIS N.: [*The Nightmare of Move Semantics for Trivial Classes*](https://www.youtube.com/watch?v=PNRju6_yn3o), *CppCon 2017*, 2017.
 
@@ -54,11 +60,15 @@ KAY J.: [*An Introduction to Reflection in C++*](http://jackieokay.com/2017/04/1
 
 KAY J.: [*Fun with Reflection in C++*](http://jackieokay.com/2017/05/06/reflection2.html), 2017.
 
+KNATTEN A. S.: [*lvalues, rvalues, glvalues, prvalues, xvalues, help!*](https://blog.knatten.org/2018/03/09/lvalues-rvalues-glvalues-prvalues-xvalues-help/), 2018.
+
 KRZEMIEŃSKI A.: [*noexcept destructors*](https://akrzemi1.wordpress.com/2013/08/20/noexcept-destructors/), 2013.
 
 MEYERS S.: *Effective C++*, 3th Edition, Addison-Wesley Professional, 2005.
 
 MEYERS S.: *Effective Modern C++*, 1st Edition, O'Reilly Media, 2004.
+
+MÜLLER J.: [Guidelines For Rvalue References In APIs](https://foonathan.net/blog/2018/03/26/rvalue-references-api-guidelines.html), 2018.
 
 MÜLLER J.: [Lazy evaluation of function arguments in C++](http://foonathan.net/blog/2017/06/27/lazy-evaluation.html), 2017.
 
@@ -66,13 +76,19 @@ PRESHING J.: [*A Flexible Reflection System in C++: Part 1*](http://preshing.com
 
 PRESHING J.: [*A Flexible Reflection System in C++: Part 2*](http://preshing.com/20180124/a-flexible-reflection-system-in-cpp-part-2/), 2018.
 
+STROUSTRUP B., SUTTER H.: [*C++ Core Guidelines*](https://github.com/isocpp/CppCoreGuidelines/blob/master/CppCoreGuidelines.md), 2018.
+
 WILLIAMS A.: [Locks, Mutexes, and Semaphores: Types of Synchronization Objects](https://www.justsoftwaresolutions.co.uk/threading/locks-mutexes-semaphores.html), 2014.
 
 ### Color Spaces
 
 A.M.P.A.S.: [*Academy Color Encoding System Developer Resources*](https://github.com/ampas/aces-dev), 2011.
 
+ERICSON C.: [*Converting RGB to LogLuv in a fragment shader*](http://realtimecollisiondetection.net/blog/?p=15), 2007.
+
 HABLE J.: [*Linear-Space Lighting (i.e. Gamma)*](http://filmicworlds.com/blog/linear-space-lighting-i-e-gamma/), 2010.
+
+PETTINEO M.: [*LogLuv Encoding for HDR*](https://mynameismjp.wordpress.com/2008/12/12/logluv-encoding-for-hdr/), 2008.
 
 REINALTER S.: [*Gamma-correct rendering*](https://blog.molecular-matters.com/2011/11/21/gamma-correct-rendering/), 2011.
 
@@ -156,11 +172,17 @@ FEINSTEIN D.: *HLSL Development Cookbook*, 1st Edition, Packt Publishing, 2013.
 
 GRUEN H.: [*Constant Buffers without Constant Pain*](https://developer.nvidia.com/content/constant-buffers-without-constant-pain-0), 2015.
 
+HARGREAVES S.: [*For best performance, use DXGI flip model*](https://blogs.msdn.microsoft.com/directx/2018/04/09/dxgi-flip-model/), 2018.
+
 LUNA F.: *Introduction to 3D Game Programming with DirectX 11*, 1st Edition, Mercury Learning & Information, 2012.
 
 MICROSOFT CORP.: [*Direct3D 11 Graphics*](https://msdn.microsoft.com/en-us/library/windows/desktop/ff476080(v=vs.85).aspx).
 
+MICROSOFT CORP.: [*DXGI flip model*](https://msdn.microsoft.com/en-us/library/windows/desktop/hh706346(v=vs.85).aspx).
+
 MOULIN M.: [*Reducing Shader Binding Dependencies*](https://matt77hias.github.io/blog/hlsl/2017/09/07/reducing-shader-binding-dependencies.html), 2017.
+
+NVIDIA GAMEWORKS: [DX12 Do's And Don'ts](https://developer.nvidia.com/dx12-dos-and-donts), s.d.
 
 RASTERTEK: [*DirectX 11 Tutorials*](http://www.rastertek.com/tutdx11.html).
 
@@ -169,6 +191,8 @@ RASTERTEK: [*DirectX 11 Tutorials - Series 2*](http://www.rastertek.com/tutdx11s
 TAKESHIGE M.: [*The Basics of GPU Voxelization*](https://developer.nvidia.com/content/basics-gpu-voxelization), 2015.
 
 TURÁNSKI J.: [*Abuse the immediate constant buffer*](https://turanszkij.wordpress.com/2016/11/13/abuse-the-immediate-constant-buffer/), 2016.
+
+YUSOV E.: [Designing A Modern Cross-Platform Graphics Library](https://www.gamedev.net/articles/programming/graphics/designing-a-modern-cross-platform-graphics-library-r4807/), 2017.
 
 ZINK J., PETTINEO M., HOXLEY J.: *Practical Rendering and Computation with Direct3D 11*, 1st Edition, A K Peters/CRC Press, 2011.
 
@@ -190,6 +214,8 @@ MOULIN M.: [*NDC To Projection To View Space*](https://matt77hias.github.io/blog
 
 UPCHURCH P., DESBRUN M.: *Tightening the Precision of Perspective Rendering*, *J. Graphics Tools* 12, 2012.
 
+WANG T.: [*Integer Hash Function*](https://gist.github.com/badboy/6267743), 1997.
+
 ### PBR and BRDFs
 
 BECKMANN P., SPIZZICHINO A.: *The scattering of electromagnetic waves from rough surfaces*, *Proceedings of the IEEE* 52, 11, 1964.
@@ -199,6 +225,10 @@ BLINN J. F.: *Models of Light Reflection for Computer Synthesized Pictures*, *SI
 BURLEY B.: *Physically Based Shading at Disney*, *SIGGRAPH 2012 Course: Practical Physically Based Shading in Film and Game Production*, 2012.
 
 COOK R. L., TORRANCE K. E.: *A Reflectance Model for Computer Graphics*, *ACM Trans. Graph.* 1, 1, 1982.
+
+COURRÈGES A.: [*GTA V - Graphics Study - Part 1: Dissecting a Frame*](http://www.adriancourreges.com/blog/2015/11/02/gta-v-graphics-study/), 2015.
+
+COURRÈGES A.: [*GTA V - Graphics Study - Part 2: Level of Detail*](http://www.adriancourreges.com/blog/2015/11/02/gta-v-graphics-study-part-2/), 2015.
 
 CRASSIN C., NEYRET F., SAINZ M., GREEN S., EISEMANN E.: Interactive Indirect Illumination Using Voxel Cone Tracing, *Computer Graphics Forum (Proceedings of Pacific Graphics 2011)* 30, 7 (2011).
 
@@ -264,6 +294,8 @@ YEUNG S.: [*Implementing Voxel Cone Tracing*](http://simonstechblog.blogspot.be/
 
 ### Post-processing
 
+COURRÈGES A.: [*GTA V - Graphics Study - Part 3: Post Processing Effects*](http://www.adriancourreges.com/blog/2015/11/02/gta-v-graphics-study-part-3/), 2015.
+
 INTEL: [*Compute Shader HDR and Bloom*](https://software.intel.com/en-us/articles/compute-shader-hdr-and-bloom), 2012.
 
 JIMENEZ J.: Next Generation Post Processing in Call of Duty Advanced Warfare, *SIGGRAPH 2014 Course: Advances in Real-Time Rendering in Games*, 2014.
@@ -305,6 +337,8 @@ WILSON J.: [*PBR Texture Conversion*](https://www.marmoset.co/posts/pbr-texture-
 ### Tone Mapping
 
 DRAGO F., MYSZKOWSKI K., ANNEN T., CHIBA N.: *Adaptive Logarithmic Mapping For Displaying High Contrast Scenes*, *Computer Graphics Forum* 22, 3, 2003.
+
+DUIKER RESEARCH CORP.: [*Filmic Tonemapping and Color In Games*](http://duikerresearch.com/2015/09/filmic-tonemapping-ea-2006/), 2006.
 
 HABLE J.: [*Filmic Tonemapping Operators*](http://filmicworlds.com/blog/filmic-tonemapping-operators/), 2010.
 
@@ -348,18 +382,23 @@ THOMPSON A.: [*Archetype System 2.0*](http://www.ademolathompson.com/archetypesy
 Uses:
 * [DirectXMath](https://github.com/Microsoft/DirectXMath) [[License](https://github.com/Microsoft/DirectXMath/blob/master/LICENSE)]
 * [DirectXTex](https://github.com/Microsoft/DirectXTex) [[License](https://github.com/Microsoft/DirectXTex/blob/master/LICENSE)]
-* FXAA 3.11 [[License](https://github.com/matt77hias/MAGE/blob/master/MAGE/MAGE/shaders/aa/fxaa3_11.hlsli)]
+* FXAA 3.11 [[License](https://github.com/matt77hias/MAGE/blob/master/MAGE/Shaders/shaders/aa/fxaa3_11.hlsli)]
+* [GSL](https://github.com/Microsoft/GSL) [[License](https://github.com/Microsoft/GSL/blob/master/LICENSE)]
 * [ImGui](https://github.com/ocornut/imgui) [[License](https://github.com/ocornut/imgui/blob/master/LICENSE.txt)]
-  * [stb](https://github.com/nothings/stb) [[License](https://creativecommons.org/share-your-work/public-domain/cc0/)]
+* [stb](https://github.com/nothings/stb) [[License](https://creativecommons.org/share-your-work/public-domain/cc0/)]
 
 ## Contributors
 * [Matthias Moulin](https://github.com/matt77hias)
+* [Baldur Karlsson](https://github.com/baldurk)
+* [Naiwen Xie（谢乃闻)](https://github.com/sienaiwun)
 
 ## Thanks
 * [Adam Miles](https://github.com/AdamJMiles)
 * Adam_42
 * Ademola Thompson
+* All8Up
 * AthosVG
+* [Baldur Karlsson](https://github.com/baldurk)
 * [Brooke Hodgman](https://github.com/hodgman)
 * [Chuck Walbourn](https://github.com/walbourn)
 * [Eric Richards](https://github.com/ericrrichards)
@@ -368,6 +407,7 @@ Uses:
 * Infinisearch
 * [János Turánszki](https://github.com/turanszkij)
 * JoeJ
+* Krypt0n
 * [Krzysztof Narkowicz](https://github.com/knarkowicz)
 * L. Spiro
 * [Maarten Tegelaers](https://github.com/BeardedPlatypus)
@@ -376,11 +416,11 @@ Uses:
 * Maxest
 * [Mike Lewis](https://github.com/apoch)
 * Mike2343
-* [Naiwen Xie](https://github.com/sienaiwun)
+* [Naiwen Xie（谢乃闻)](https://github.com/sienaiwun)
 * [Nathan Reed](https://github.com/Reedbeta)
 * [Nicolas Silvagni](https://github.com/galop1n)
 * [Roald Frederickx](https://github.com/RoaldFre)
+* SoldierOfLight
 * Styves
+* [Vilem Otte](https://github.com/Zgragselus)
 * Zipster
-* [GameDev.net](https://www.gamedev.net/) community
-* [Computer Graphics StackExchange](https://computergraphics.stackexchange.com/) community

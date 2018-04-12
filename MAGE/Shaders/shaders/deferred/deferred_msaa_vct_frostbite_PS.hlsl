@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------------------
 // Engine Includes
 //-----------------------------------------------------------------------------
+#define BRDF_FUNCTION FrostbiteBRDF
 #define MSAA
-#define BRDFxCOS_COMPONENT FrostbiteBRDFxCos
 #include "deferred\deferred.hlsli"

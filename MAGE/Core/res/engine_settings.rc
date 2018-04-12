@@ -1,0 +1,2 @@
+#include "engine_settings.hpp"
+IDI_APPLICATION_ICON	ICON	"mage.ico"

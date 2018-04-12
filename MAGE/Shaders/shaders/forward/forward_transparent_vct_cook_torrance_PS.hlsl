@@ -1,7 +1,7 @@
 //-----------------------------------------------------------------------------
 // Engine Includes
 //-----------------------------------------------------------------------------
-#define ENABLE_TRANSPARENCY
-#define BRDFxCOS_COMPONENT CookTorranceBRDFxCos
+#define BRDF_FUNCTION CookTorranceBRDF
 #define DISABLE_TSNM
+#define ENABLE_TRANSPARENCY
 #include "forward\forward.hlsli"

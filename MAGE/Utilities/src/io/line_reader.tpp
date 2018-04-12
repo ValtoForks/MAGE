@@ -15,7 +15,7 @@
 namespace mage {
 
 	template< typename DataT >
-	inline const DataT LineReader::Read() {
+	const DataT LineReader::Read() {
 		DataT result;
 		const auto token_result = mage::Read< DataT >(nullptr, 
 			                                          &m_context, 
@@ -43,7 +43,8 @@ namespace mage {
 	}
 
 	template< typename DataT >
-	[[nodiscard]] inline bool LineReader::Contains() const {
+	[[nodiscard]]
+	inline bool LineReader::Contains() const {
 		return mage::Contains< DataT >(m_context, GetDelimiters().c_str()) 
 			   == TokenResult::Valid;
 	}
