@@ -20,13 +20,13 @@ namespace mage::rendering {
 	#pragma region
 
 	ShadowMapBuffer::ShadowMapBuffer(ID3D11Device& device,
-		                             size_t nb_shadow_maps, 
-		                             const U32x2& resolution, 
+									 std::size_t nb_shadow_maps,
+		                             const U32x2& resolution,
 		                             DepthFormat format)
-		: m_format(format), 
+		: m_format(format),
 		m_viewport(resolution),
-		m_rasterizer_state(), 
-		m_dsvs(), 
+		m_rasterizer_state(),
+		m_dsvs(),
 		m_srv() {
 
 		// Setup the rasterizer state.
@@ -37,41 +37,42 @@ namespace mage::rendering {
 
 	ShadowMapBuffer::ShadowMapBuffer(
 		ShadowMapBuffer&& buffer) noexcept = default;
-	
+
 	ShadowMapBuffer::~ShadowMapBuffer() = default;
-	
+
 	ShadowMapBuffer& ShadowMapBuffer
 		::operator=(ShadowMapBuffer&& buffer) noexcept = default;
 
 	void ShadowMapBuffer::SetupRasterizerState(ID3D11Device& device) {
 		const HRESULT result = CreateCullCounterClockwiseRasterizerState(
-			                       device, 
-			                       m_rasterizer_state.ReleaseAndGetAddressOf(),
-			                       MAGE_DEFAULT_DEPTH_BIAS, 
+			                       device,
+			                       NotNull< ID3D11RasterizerState** >(
+									   m_rasterizer_state.ReleaseAndGetAddressOf()),
+			                       MAGE_DEFAULT_DEPTH_BIAS,
 			                       MAGE_DEFAULT_SLOPE_SCALED_DEPTH_BIAS,
 			                       MAGE_DEFAULT_DEPTH_BIAS_CLAMP);
-		ThrowIfFailed(result, "Rasterizer state creation failed: %08X.", result);
+		ThrowIfFailed(result, "Rasterizer state creation failed: {:08X}.", result);
 	}
 
 	void ShadowMapBuffer::SetupShadowMapBuffer(ID3D11Device& device,
-		                                       size_t nb_shadow_maps) {
+											   std::size_t nb_shadow_maps) {
 
 		switch (m_format) {
-		
+
 		case DepthFormat::D16: {
-			SetupShadowMapArray(device, 
-				                nb_shadow_maps, 
-				                DXGI_FORMAT_R16_TYPELESS, 
-				                DXGI_FORMAT_D16_UNORM, 
+			SetupShadowMapArray(device,
+				                nb_shadow_maps,
+				                DXGI_FORMAT_R16_TYPELESS,
+				                DXGI_FORMAT_D16_UNORM,
 				                DXGI_FORMAT_R16_UNORM);
 			break;
 		}
-		
+
 		default: {
-			SetupShadowMapArray(device, 
-				                nb_shadow_maps, 
-				                DXGI_FORMAT_R32_TYPELESS, 
-				                DXGI_FORMAT_D32_FLOAT, 
+			SetupShadowMapArray(device,
+				                nb_shadow_maps,
+				                DXGI_FORMAT_R32_TYPELESS,
+				                DXGI_FORMAT_D32_FLOAT,
 				                DXGI_FORMAT_R32_FLOAT);
 			break;
 		}
@@ -79,9 +80,9 @@ namespace mage::rendering {
 	}
 
 	void ShadowMapBuffer::SetupShadowMapArray(ID3D11Device& device,
-		                                      size_t nb_shadow_maps, 
+											  std::size_t nb_shadow_maps,
 		                                      DXGI_FORMAT texture_format,
-		                                      DXGI_FORMAT dsv_format, 
+		                                      DXGI_FORMAT dsv_format,
 		                                      DXGI_FORMAT srv_format) {
 		// Clear the DSV vector.
 		m_dsvs.clear();
@@ -90,10 +91,10 @@ namespace mage::rendering {
 
 		// Create the texture descriptor.
 		D3D11_TEXTURE2D_DESC texture_desc = {};
-		texture_desc.BindFlags        = D3D11_BIND_DEPTH_STENCIL 
+		texture_desc.BindFlags        = D3D11_BIND_DEPTH_STENCIL
 			                          | D3D11_BIND_SHADER_RESOURCE;
-		texture_desc.Width            = resolution.m_x;
-		texture_desc.Height           = resolution.m_y;
+		texture_desc.Width            = resolution[0];
+		texture_desc.Height           = resolution[1];
 		texture_desc.MipLevels        = 1u;
 		texture_desc.ArraySize        = static_cast< U32 >(nb_shadow_maps);
 		texture_desc.Format           = texture_format;
@@ -101,20 +102,20 @@ namespace mage::rendering {
 		// GPU:    read +    write
 		// CPU: no read + no write
 		texture_desc.Usage            = D3D11_USAGE_DEFAULT;
-		
+
 		ComPtr< ID3D11Texture2D > texture;
 
 		// Create the texture.
 		{
 			const HRESULT result = device.CreateTexture2D(
 				&texture_desc, nullptr, texture.ReleaseAndGetAddressOf());
-			ThrowIfFailed(result, "Texture 2D creation failed: %08X.", result);
+			ThrowIfFailed(result, "Texture 2D creation failed: {:08X}.", result);
 		}
 
 		// Create the DSVs.
 		{
 			// Resize the DSV vector.
-			m_dsvs.resize(texture_desc.ArraySize);
+			m_dsvs.resize(static_cast< std::size_t >(texture_desc.ArraySize));
 
 			// Create the DSV descriptor.
 			D3D11_DEPTH_STENCIL_VIEW_DESC dsv_desc = {};
@@ -128,7 +129,7 @@ namespace mage::rendering {
 
 				const HRESULT result = device.CreateDepthStencilView(
 					texture.Get(), &dsv_desc, m_dsvs[i].ReleaseAndGetAddressOf());
-				ThrowIfFailed(result, "DSV creation failed: %08X.", result);
+				ThrowIfFailed(result, "DSV creation failed: {:08X}.", result);
 			}
 		}
 
@@ -144,10 +145,10 @@ namespace mage::rendering {
 			// Create the SRV for all texture elements.
 			const HRESULT result = device.CreateShaderResourceView(
 				texture.Get(), &srv_desc, m_srv.ReleaseAndGetAddressOf());
-			ThrowIfFailed(result, "SRV creation failed: %08X.", result);
+			ThrowIfFailed(result, "SRV creation failed: {:08X}.", result);
 		}
 	}
-	
+
 	#pragma endregion
 
 	//-------------------------------------------------------------------------
@@ -156,13 +157,13 @@ namespace mage::rendering {
 	#pragma region
 
 	ShadowCubeMapBuffer::ShadowCubeMapBuffer(ID3D11Device& device,
-		                                     size_t nb_shadow_cube_maps, 
-											 const U32x2& resolution, 
+											 std::size_t nb_shadow_cube_maps,
+											 const U32x2& resolution,
 		                                     DepthFormat format)
 		: m_format(format),
 		m_viewport(resolution),
-		m_rasterizer_state(), 
-		m_dsvs(), 
+		m_rasterizer_state(),
+		m_dsvs(),
 		m_srv() {
 
 		// Setup the rasterizer state.
@@ -181,32 +182,33 @@ namespace mage::rendering {
 
 	void ShadowCubeMapBuffer::SetupRasterizerState(ID3D11Device& device) {
 		const HRESULT result = CreateCullCounterClockwiseRasterizerState(
-			                       device, 
-			                       m_rasterizer_state.ReleaseAndGetAddressOf(),
+			                       device,
+			                       NotNull< ID3D11RasterizerState** >(
+									   m_rasterizer_state.ReleaseAndGetAddressOf()),
 			                       MAGE_DEFAULT_DEPTH_BIAS,
 			                       MAGE_DEFAULT_SLOPE_SCALED_DEPTH_BIAS,
 			                       MAGE_DEFAULT_DEPTH_BIAS_CLAMP);
-		ThrowIfFailed(result, "Rasterizer state creation failed: %08X.", result);
+		ThrowIfFailed(result, "Rasterizer state creation failed: {:08X}.", result);
 	}
 
 	void ShadowCubeMapBuffer::SetupShadowCubeMapBuffer(ID3D11Device& device,
-		                                               size_t nb_shadow_cube_maps) {
+													   std::size_t nb_shadow_cube_maps) {
 		switch (m_format) {
-		
+
 		case DepthFormat::D16: {
-			SetupShadowCubeMapArray(device, 
+			SetupShadowCubeMapArray(device,
 				                    nb_shadow_cube_maps,
-				                    DXGI_FORMAT_R16_TYPELESS, 
-				                    DXGI_FORMAT_D16_UNORM, 
+				                    DXGI_FORMAT_R16_TYPELESS,
+				                    DXGI_FORMAT_D16_UNORM,
 				                    DXGI_FORMAT_R16_UNORM);
 			break;
 		}
-		
+
 		default: {
-			SetupShadowCubeMapArray(device, 
+			SetupShadowCubeMapArray(device,
 				                    nb_shadow_cube_maps,
-				                    DXGI_FORMAT_R32_TYPELESS, 
-				                    DXGI_FORMAT_D32_FLOAT, 
+				                    DXGI_FORMAT_R32_TYPELESS,
+				                    DXGI_FORMAT_D32_FLOAT,
 				                    DXGI_FORMAT_R32_FLOAT);
 			break;
 		}
@@ -214,9 +216,9 @@ namespace mage::rendering {
 	}
 
 	void ShadowCubeMapBuffer::SetupShadowCubeMapArray(ID3D11Device& device,
-		                                              size_t nb_shadow_cube_maps, 
+													  std::size_t nb_shadow_cube_maps,
 		                                              DXGI_FORMAT texture_format,
-		                                              DXGI_FORMAT dsv_format, 
+		                                              DXGI_FORMAT dsv_format,
 		                                              DXGI_FORMAT srv_format) {
 		// Clear the DSV vector.
 		m_dsvs.clear();
@@ -225,11 +227,11 @@ namespace mage::rendering {
 
 		// Create the texture descriptor.
 		D3D11_TEXTURE2D_DESC texture_desc = {};
-		texture_desc.BindFlags        = D3D11_BIND_DEPTH_STENCIL 
+		texture_desc.BindFlags        = D3D11_BIND_DEPTH_STENCIL
 			                          | D3D11_BIND_SHADER_RESOURCE;
 		texture_desc.MiscFlags        = D3D11_RESOURCE_MISC_TEXTURECUBE;
-		texture_desc.Width            = resolution.m_x;
-		texture_desc.Height           = resolution.m_y;
+		texture_desc.Width            = resolution[0];
+		texture_desc.Height           = resolution[1];
 		texture_desc.MipLevels        = 1u;
 		texture_desc.ArraySize        = 6u * static_cast< U32 >(nb_shadow_cube_maps);
 		texture_desc.Format           = texture_format;
@@ -239,18 +241,18 @@ namespace mage::rendering {
 		texture_desc.Usage            = D3D11_USAGE_DEFAULT;
 
 		ComPtr< ID3D11Texture2D > texture;
-		
+
 		// Create the texture.
 		{
 			const HRESULT result = device.CreateTexture2D(
 				&texture_desc, nullptr, texture.ReleaseAndGetAddressOf());
-			ThrowIfFailed(result, "Texture 2D creation failed: %08X.", result);
+			ThrowIfFailed(result, "Texture 2D creation failed: {:08X}.", result);
 		}
 
 		// Create the DSVs.
 		{
 			// Resize the DSV vector.
-			m_dsvs.resize(texture_desc.ArraySize);
+			m_dsvs.resize(static_cast< std::size_t >(texture_desc.ArraySize));
 
 			// Create the DSV descriptor.
 			D3D11_DEPTH_STENCIL_VIEW_DESC dsv_desc = {};
@@ -264,7 +266,7 @@ namespace mage::rendering {
 
 				const HRESULT result = device.CreateDepthStencilView(
 					texture.Get(), &dsv_desc, m_dsvs[i].ReleaseAndGetAddressOf());
-				ThrowIfFailed(result, "DSV creation failed: %08X.", result);
+				ThrowIfFailed(result, "DSV creation failed: {:08X}.", result);
 			}
 		}
 
@@ -280,7 +282,7 @@ namespace mage::rendering {
 			// Create the SRV for all texture elements.
 			const HRESULT result = device.CreateShaderResourceView(
 				texture.Get(), &srv_desc, m_srv.ReleaseAndGetAddressOf());
-			ThrowIfFailed(result, "SRV creation failed: %08X.", result);
+			ThrowIfFailed(result, "SRV creation failed: {:08X}.", result);
 		}
 	}
 

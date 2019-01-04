@@ -34,7 +34,7 @@ namespace mage {
 	 @return		The current local system date as a string.
 	 */
 	[[nodiscard]]
-	const wstring GetLocalSystemDateAsString();
+	const std::wstring GetLocalSystemDateAsString();
 
 	/**
 	 Returns the current local system time as a string.
@@ -42,7 +42,7 @@ namespace mage {
 	 @return		The current local system time as a string.
 	 */
 	[[nodiscard]]
-	const wstring GetLocalSystemTimeAsString();
+	const std::wstring GetLocalSystemTimeAsString();
 
 	/**
 	 Returns the current local system date and time as a string.
@@ -50,9 +50,9 @@ namespace mage {
 	 @return		The current local system date and time as a string.
 	 */
 	[[nodiscard]]
-	const wstring GetLocalSystemDateAndTimeAsString();
+	const std::wstring GetLocalSystemDateAndTimeAsString();
 
-	struct SystemClock final {
+	struct SystemClock {
 		using rep        = U64;
 		using period     = std::ratio< 1, 10'000'000 >;
 		using duration   = std::chrono::duration< rep, period >;
@@ -71,7 +71,7 @@ namespace mage {
 	//-------------------------------------------------------------------------
 	#pragma region
 
-	struct CoreClock final {
+	struct CoreClock {
 		using rep        = U64;
 		using period     = std::ratio< 1, 10'000'000 >;
 		using duration   = std::chrono::duration< rep, period >;
@@ -83,7 +83,7 @@ namespace mage {
 		static const time_point now() noexcept;
 	};
 
-	struct KernelModeCoreClock final {
+	struct KernelModeCoreClock {
 		using rep        = U64;
 		using period     = std::ratio< 1, 10'000'000 >;
 		using duration   = std::chrono::duration< rep, period >;
@@ -95,7 +95,7 @@ namespace mage {
 		static const time_point now() noexcept;
 	};
 
-	struct UserModeCoreClock final {
+	struct UserModeCoreClock {
 		using rep        = U64;
 		using period     = std::ratio< 1, 10'000'000 >;
 		using duration   = std::chrono::duration< rep, period >;
@@ -107,7 +107,7 @@ namespace mage {
 		static const time_point now() noexcept;
 	};
 
-	struct CoreClockPerCore final {
+	struct CoreClockPerCore {
 		using rep        = U64;
 		using period     = std::ratio< 1, 10'000'000 >;
 		using duration   = std::chrono::duration< rep, period >;
@@ -119,7 +119,7 @@ namespace mage {
 		static const time_point now() noexcept;
 	};
 
-	struct KernelModeCoreClockPerCore final {
+	struct KernelModeCoreClockPerCore {
 		using rep        = U64;
 		using period     = std::ratio< 1, 10'000'000 >;
 		using duration   = std::chrono::duration< rep, period >;
@@ -131,7 +131,7 @@ namespace mage {
 		static const time_point now() noexcept;
 	};
 
-	struct UserModeCoreClockPerCore final {
+	struct UserModeCoreClockPerCore {
 		using rep        = U64;
 		using period     = std::ratio< 1, 10'000'000 >;
 		using duration   = std::chrono::duration< rep, period >;

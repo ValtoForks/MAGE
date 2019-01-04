@@ -29,12 +29,12 @@ namespace mage {
 	/**
 	 A class of nodes.
 	 */
-	class alignas(16) Node final {
+	class alignas(16) Node {
 
 	public:
 
 		//---------------------------------------------------------------------
-		// Type Declarations and Definitions
+		// Class Member Types
 		//---------------------------------------------------------------------
 
 		/**
@@ -57,7 +57,7 @@ namespace mage {
 		 @param[in]		name
 						The name of the node.
 		 */
-		explicit Node(string name = "");
+		explicit Node(std::string name = "");
 
 		/**
 		 Constructs a node from the given node.
@@ -89,7 +89,7 @@ namespace mage {
 
 		 @param[in]		node
 						A reference to the node to copy.
-		 @return		A reference to the copy of the given node (i.e. this 
+		 @return		A reference to the copy of the given node (i.e. this
 						node).
 		 */
 		Node& operator=(const Node& node) = delete;
@@ -116,7 +116,7 @@ namespace mage {
 		Transform& GetTransform() noexcept {
 			return m_transform;
 		}
-		
+
 		/**
 		 Returns the transform of this node.
 
@@ -140,7 +140,7 @@ namespace mage {
 		bool HasParent() const noexcept {
 			return bool(m_parent);
 		}
-		
+
 		/**
 		 Returns the parent of this node.
 
@@ -150,26 +150,28 @@ namespace mage {
 		NodePtr GetParent() const noexcept {
 			return m_parent;
 		}
-		
+
 		/**
 		 Returns the number of childs of this node.
 
 		 @return		The number of childs of this node.
 		 */
 		[[nodiscard]]
-		size_t GetNumberOfChilds() const noexcept {
-			return m_childs.size();
+		std::size_t GetNumberOfChilds() const noexcept {
+			using std::size;
+			return size(m_childs);
 		}
-		
+
 		/**
 		 Checks whether this node contains childs.
 
-		 @return		@c true if this node contains at least one child. 
+		 @return		@c true if this node contains at least one child.
 						@c false otherwise.
 		 */
 		[[nodiscard]]
 		bool ContainsChilds() const {
-			return !m_childs.empty();
+			using std::empty;
+			return !empty(m_childs);
 		}
 
 		/**
@@ -177,13 +179,16 @@ namespace mage {
 
 		 @param[in]		node
 						A pointer to the node.
-		 @return		@c true if this node contains the given node as a 
+		 @return		@c true if this node contains the given node as a
 						child. @c false otherwise.
 		 */
 		[[nodiscard]]
 		bool ContainsChild(ProxyPtr< const Node > node) const {
-			return std::find(m_childs.begin(), m_childs.end(), node) 
-				   != m_childs.end();
+			using std::cbegin;
+			using std::cend;
+
+			return std::find(cbegin(m_childs), cend(m_childs), node)
+				   != cend(m_childs);
 		}
 
 		/**
@@ -211,25 +216,25 @@ namespace mage {
 		 Traverses all childs of this node.
 
 		 @tparam		ActionT
-						An action to perform on all childs of this node. The 
+						An action to perform on all childs of this node. The
 						action must accept @c Node& values.
 		 @param[in]		action
 						The action.
 		 */
 		template< typename ActionT >
-		void ForEachChild(ActionT action) const;
-		
+		void ForEachChild(ActionT&& action) const;
+
 		/**
 		 Traverses all descendants (childs included) of this node.
 
 		 @tparam		ActionT
-						An action to perform on all descendants of this node. 
+						An action to perform on all descendants of this node.
 						The action must accept @c Node& values.
 		 @param[in]		action
 						The action.
 		 */
 		template< typename ActionT >
-		void ForEachDescendant(ActionT action) const;
+		void ForEachDescendant(ActionT&& action) const;
 
 		//---------------------------------------------------------------------
 		// Member Methods: Components
@@ -240,7 +245,7 @@ namespace mage {
 
 		 @tparam		ComponentT
 						The component type.
-		 @return		@c true if this node contains at least one component 
+		 @return		@c true if this node contains at least one component
 						of the given type. @c false otherwise.
 		 */
 		template< typename ComponentT >
@@ -250,12 +255,13 @@ namespace mage {
 		/**
 		 Checks whether this node contains components.
 
-		 @return		@c true if this node contains at least one component. 
+		 @return		@c true if this node contains at least one component.
 						@c false otherwise.
 		 */
 		[[nodiscard]]
 		bool ContainsComponents() const noexcept {
-			return !m_components.empty();
+			using std::empty;
+			return !empty(m_components);
 		}
 
 		/**
@@ -264,8 +270,9 @@ namespace mage {
 		 @return		The number of components of this node.
 		 */
 		[[nodiscard]]
-		size_t GetNumberOfComponents() const noexcept {
-			return m_components.size();
+		std::size_t GetNumberOfComponents() const noexcept {
+			using std::size;
+			return size(m_components);
 		}
 
 		/**
@@ -273,21 +280,21 @@ namespace mage {
 
 		 @tparam		ComponentT
 						The component type.
-		 @return		The number of components of the given type of this 
+		 @return		The number of components of the given type of this
 						node.
 		 */
 		template< typename ComponentT >
 		[[nodiscard]]
-		size_t GetNumberOf() const noexcept;
+		std::size_t GetNumberOf() const noexcept;
 
 		/**
 		 Returns the first component of the given type of this node.
 
 		 @tparam		ComponentT
 						The component type.
-		 @return		@c nullptr if this node has no component of the given 
+		 @return		@c nullptr if this node has no component of the given
 						type.
-		 @return		A pointer to the first component of the given type of 
+		 @return		A pointer to the first component of the given type of
 						this node.
 		 */
 		template< typename ComponentT >
@@ -299,9 +306,9 @@ namespace mage {
 
 		 @tparam		ComponentT
 						The component type.
-		 @return		@c nullptr if this node has no component of the given 
+		 @return		@c nullptr if this node has no component of the given
 						type.
-		 @return		A pointer to the first component of the given type of 
+		 @return		A pointer to the first component of the given type of
 						this node.
 		 */
 		template< typename ComponentT >
@@ -313,7 +320,7 @@ namespace mage {
 
 		 @tparam		ComponentT
 						The component type.
-		 @return		A vector containing all components of the given type of 
+		 @return		A vector containing all components of the given type of
 						this node.
 		 */
 		template< typename ComponentT >
@@ -325,7 +332,7 @@ namespace mage {
 
 		 @tparam		ComponentT
 						The component type.
-		 @return		A vector containing all components of the given type of 
+		 @return		A vector containing all components of the given type of
 						this node.
 		 */
 		template< typename ComponentT >
@@ -349,14 +356,14 @@ namespace mage {
 		 @tparam		ComponentT
 						The component type.
 		 @tparam		ActionT
-						An action to perform on all components of the given 
-						type of this node. 
+						An action to perform on all components of the given
+						type of this node.
 						The action must accept @c ComponentT& values.
 		 @param[in]		action
 						The action.
 		 */
 		template< typename ComponentT, typename ActionT >
-		void ForEach(ActionT action);
+		void ForEach(ActionT&& action);
 
 		/**
 		 Traverses all components of the given type of this node.
@@ -364,38 +371,38 @@ namespace mage {
 		 @tparam		ComponentT
 						The component type.
 		 @tparam		ActionT
-						An action to perform on all components of the given 
-						type of this node. 
+						An action to perform on all components of the given
+						type of this node.
 						The action must accept @c const @c ComponentT& values.
 		 @param[in]		action
 						The action.
 		 */
 		template< typename ComponentT, typename ActionT >
-		void ForEach(ActionT action) const;
+		void ForEach(ActionT&& action) const;
 
 		/**
 		 Traverses all components of this node.
 
 		 @tparam		ActionT
-						An action to perform on all components of this node. 
+						An action to perform on all components of this node.
 						The action must accept @c Component& values.
 		 @param[in]		action
 						The action.
 		 */
 		template< typename ActionT >
-		void ForEachComponent(ActionT action);
+		void ForEachComponent(ActionT&& action);
 
 		/**
 		 Traverses all components of this node.
 
 		 @tparam		ActionT
-						An action to perform on all components of this node. 
+						An action to perform on all components of this node.
 						The action must accept @c const @c Component& values.
 		 @param[in]		action
 						The action.
 		 */
 		template< typename ActionT >
-		void ForEachComponent(ActionT action) const;
+		void ForEachComponent(ActionT&& action) const;
 
 		//---------------------------------------------------------------------
 		// Member Methods: State
@@ -413,7 +420,7 @@ namespace mage {
 
 		/**
 		 Sets the state of this node to the given state.
-		
+
 		 @param[in]		state
 						The state.
 		 */
@@ -446,10 +453,10 @@ namespace mage {
 		/**
 		 Returns the name of this node.
 
-		 @return		A reference to the name of this node.
+		 @return		The name of this node.
 		 */
 		[[nodiscard]]
-		const string& GetName() const noexcept {
+		const std::string_view GetName() const noexcept {
 			return m_name;
 		}
 
@@ -459,7 +466,7 @@ namespace mage {
 		 @param[in]		name
 						The name.
 		 */
-		void SetName(string name) noexcept {
+		void SetName(std::string name) noexcept {
 			m_name = std::move(name);
 		}
 
@@ -501,7 +508,7 @@ namespace mage {
 		//---------------------------------------------------------------------
 
 		/**
-		 A multimap containing pointers to the components of this node as 
+		 A multimap containing pointers to the components of this node as
 		 values with their associated type as key.
 		 */
 		std::unordered_multimap< std::type_index, ComponentPtr > m_components;
@@ -532,7 +539,7 @@ namespace mage {
 		/**
 		 The name of this node.
 		 */
-		string m_name;
+		std::string m_name;
 	};
 }
 

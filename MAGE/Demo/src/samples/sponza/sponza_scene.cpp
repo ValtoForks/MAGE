@@ -21,6 +21,7 @@
 #include "editor_script.hpp"
 #include "stats_script.hpp"
 #include "switch_scene_script.hpp"
+#include "voxel_grid_anchor_script.hpp"
 
 #pragma endregion
 
@@ -38,7 +39,7 @@ namespace mage {
 
 	void SponzaScene::Load([[maybe_unused]] Engine& engine) {
 		using namespace rendering;
-		
+
 		const auto& rendering_manager = engine.GetRenderingManager();
 		const auto& display_config    = rendering_manager.GetDisplayConfiguration();
 		auto& rendering_world         = rendering_manager.GetWorld();
@@ -49,7 +50,13 @@ namespace mage {
 		// Resources
 		//---------------------------------------------------------------------
 		MeshDescriptor< VertexPositionNormalTexture > mesh_desc(true, true);
-		
+
+		const auto teapot_model_desc
+			= rendering_factory.GetOrCreate< ModelDescriptor >(
+				L"assets/models/teapot/teapot.mdl", mesh_desc);
+		const auto plane_model_desc
+			= rendering_factory.GetOrCreate< ModelDescriptor >(
+				L"assets/models/plane/plane.obj", mesh_desc);
 		const auto sponza_model_desc
 			= rendering_factory.GetOrCreate< ModelDescriptor >(
 				L"assets/models/sponza/sponza.mdl",    mesh_desc);
@@ -67,7 +74,7 @@ namespace mage {
 		const auto camera = rendering_world.Create< PerspectiveCamera >();
 		camera->GetSettings().GetFog().SetDensity(0.001f);
 		camera->GetSettings().GetSky().SetTexture(sky_texture);
-		
+
 		const auto camera_node = Create< Node >("Player");
 		camera_node->Add(camera);
 		camera_node->GetTransform().SetTranslationY(2.0f);
@@ -75,13 +82,19 @@ namespace mage {
 		//---------------------------------------------------------------------
 		// Models
 		//---------------------------------------------------------------------
+		const auto teapot_node = Import(engine, *teapot_model_desc);
+		teapot_node->GetTransform().SetScale(30.0f);
+		
+		const auto plane_node = Import(engine, *plane_model_desc);
+		plane_node->GetTransform().SetScale(30.0f);
+
 		const auto sponza_node = Import(engine, *sponza_model_desc);
 		sponza_node->GetTransform().SetScale(10.0f);
 		sponza_node->GetTransform().SetTranslationY(2.1f);
-		
+
 		const auto tree_node = Import(engine, *tree_model_desc_tree);
 		tree_node->GetTransform().AddTranslationY(1.0f);
-		
+
 		//---------------------------------------------------------------------
 		// Lights
 		//---------------------------------------------------------------------
@@ -89,11 +102,23 @@ namespace mage {
 		omni_light->SetRange(5.0f);
 		omni_light->SetIntensity(4.0f);
 		omni_light->EnableShadows();
-		
+
 		const auto omni_light_node = Create< Node >("Omni Light");
 		omni_light_node->Add(omni_light);
 		omni_light_node->GetTransform().SetTranslationY(2.0f);
-		
+
+		/*
+		const auto directional_light = rendering_world.Create< DirectionalLight >();
+		directional_light->SetRange(5.0f);
+		directional_light->SetIrradiance(4.0f);
+		directional_light->EnableShadows();
+
+		const auto directional_light_node = Create< Node >("Directional Light");
+		directional_light_node->Add(directional_light);
+		directional_light_node->GetTransform().SetRotationX(XM_PIDIV2);
+		directional_light_node->GetTransform().SetTranslationY(2.0f);
+		*/
+
 		const auto spot_light = rendering_world.Create< SpotLight >();
 		spot_light->SetRange(5.0f);
 		spot_light->SetAngularCutoff(1.0f, 0.5f);
@@ -122,10 +147,11 @@ namespace mage {
 		//---------------------------------------------------------------------
 		Create< script::SwitchSceneScript< SibenikScene > >();
 		Create< script::EditorScript >();
-		
+
 		camera_node->Add(Create< script::StatsScript >());
 		camera_node->Add(Create< script::MouseLookScript >());
 		camera_node->Add(Create< script::CharacterMotorScript >());
+		//camera_node->Add(Create< script::VoxelGridAnchorScript >());
 		tree_node->Add(Create< script::RotationScript >());
 	}
 }

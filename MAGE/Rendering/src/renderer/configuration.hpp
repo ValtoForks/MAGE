@@ -31,23 +31,23 @@ namespace mage::rendering {
 	};
 
 	[[nodiscard]]
-	constexpr AntiAliasing RetrieveAntiAliasing(size_t desc) noexcept {
+	constexpr AntiAliasing RetrieveAntiAliasing(std::size_t desc) noexcept {
 
 		switch (desc) {
-		
-		case static_cast< size_t >(AntiAliasing::FXAA):
+
+		case static_cast< std::size_t >(AntiAliasing::FXAA):
 			return AntiAliasing::FXAA;
-		case static_cast< size_t >(AntiAliasing::MSAA_2x):
+		case static_cast< std::size_t >(AntiAliasing::MSAA_2x):
 			return AntiAliasing::MSAA_2x;
-		case static_cast< size_t >(AntiAliasing::MSAA_4x):
+		case static_cast< std::size_t >(AntiAliasing::MSAA_4x):
 			return AntiAliasing::MSAA_4x;
-		case static_cast< size_t >(AntiAliasing::MSAA_8x):
+		case static_cast< std::size_t >(AntiAliasing::MSAA_8x):
 			return AntiAliasing::MSAA_8x;
-		case static_cast< size_t >(AntiAliasing::SSAA_2x):
+		case static_cast< std::size_t >(AntiAliasing::SSAA_2x):
 			return AntiAliasing::SSAA_2x;
-		case static_cast< size_t >(AntiAliasing::SSAA_3x):
+		case static_cast< std::size_t >(AntiAliasing::SSAA_3x):
 			return AntiAliasing::SSAA_3x;
-		case static_cast< size_t >(AntiAliasing::SSAA_4x):
+		case static_cast< std::size_t >(AntiAliasing::SSAA_4x):
 			return AntiAliasing::SSAA_4x;
 		default:
 			return AntiAliasing::None;
@@ -102,7 +102,7 @@ namespace mage::rendering {
 	 @c None,
 	 @c Forward,
 	 @c Deferred,
-	 @c Solid,            
+	 @c Solid,
 	 @c VoxelGrid,
 	 @c FalseColor_BaseColor,
 	 @c FalseColor_BaseColorCoefficient,
@@ -127,8 +127,8 @@ namespace mage::rendering {
 		None = 0,
 		Forward,
 		Deferred,
-		Solid,            
-		
+		Solid,
+
 		// Voxelization visualization
 		VoxelGrid,
 
@@ -185,22 +185,20 @@ namespace mage::rendering {
 	#endif
 
 	/**
-	 An enumeration of the different Bidirectional Reflection Distribution 
+	 An enumeration of the different Bidirectional Reflection Distribution
 	 Functions (BRDFs).
 
 	 This contains:
 	 @c Lambertian,
 	 @c BlinnPhong,
-	 @c CookTorrance,
-	 @c Frostbite, and
-	 @c WardDuer.
+	 @c CookTorrance, and
+	 @c Frostbite.
 	 */
 	enum class BRDF : U8 {
 		Lambertian = 0,
 		BlinnPhong,
 		CookTorrance,
-		Frostbite,
-		WardDuer
+		Frostbite
 	};
 
 	#pragma endregion
@@ -212,9 +210,9 @@ namespace mage::rendering {
 
 	/**
 	 An enumeration of the different false colors.
-	 
+
 	 This contains:
-	 
+
 	 @c ConstantColor,
 	 @c ConstantColorTexture,
 	 @c BaseColor,

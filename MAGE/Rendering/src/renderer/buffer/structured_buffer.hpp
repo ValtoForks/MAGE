@@ -18,26 +18,26 @@ namespace mage::rendering {
 	/**
 	 A class of structured buffers.
 
-	 @tparam		DataT
+	 @tparam		T
 					The data type.
 	 */
-	template< typename DataT >
-	class StructuredBuffer final {
+	template< typename T >
+	class StructuredBuffer {
 
 	public:
 
 		/**
 		 Constructs a structured buffer.
 
-		 @param[in]		device
+		 @param[in,out]	device
 						A reference to the device.
 		 @param[in]		capacity
 						The initial capacity.
 		 @throws		Exception
 						Failed to setup this structured buffer.
 		 */
-		explicit StructuredBuffer(ID3D11Device& device, size_t capacity);
-		
+		explicit StructuredBuffer(ID3D11Device& device, std::size_t capacity);
+
 		/**
 		 Constructs a structured buffer from the given structured buffer.
 
@@ -61,7 +61,7 @@ namespace mage::rendering {
 
 		//---------------------------------------------------------------------
 		// Assignment Operators
-		//---------------------------------------------------------------------	
+		//---------------------------------------------------------------------
 
 		/**
 		 Copies the given structured buffer to this structured buffer.
@@ -78,7 +78,7 @@ namespace mage::rendering {
 
 		 @param[in]		buffer
 						A reference to the structured buffer to move.
-		 @return		A reference to the moved structured buffer (i.e. this 
+		 @return		A reference to the moved structured buffer (i.e. this
 						structured buffer).
 		 */
 		StructuredBuffer& operator=(StructuredBuffer&& buffer) noexcept = default;
@@ -93,7 +93,7 @@ namespace mage::rendering {
 		 @return		The size of this structured buffer.
 		 */
 		[[nodiscard]]
-		size_t size() const noexcept {
+		std::size_t size() const noexcept {
 			return m_size;
 		}
 
@@ -103,14 +103,14 @@ namespace mage::rendering {
 		 @return		The capacity of this structured buffer.
 		 */
 		[[nodiscard]]
-		size_t capacity() const noexcept {
+		std::size_t capacity() const noexcept {
 			return m_capacity;
 		}
 
 		/**
 		 Updates the data of this structured buffer with the given data.
 
-		 @param[in]		device_context
+		 @param[in,out]	device_context
 						A reference to the device context.
 		 @param[in]		data
 						A reference to a vector containing the data elements.
@@ -118,31 +118,31 @@ namespace mage::rendering {
 						Failed to update the data.
 		 */
 		void UpdateData(ID3D11DeviceContext& device_context,
-			            const AlignedVector< DataT >& data);
+						const AlignedVector< T >& data);
 
 		/**
 		 Returns the shader resource view of this structured buffer.
 
-		 @return		A pointer to the shader resource view of this 
+		 @return		A reference to the shader resource view of this
 						structured buffer.
 		 */
 		[[nodiscard]]
-		NotNull< ID3D11ShaderResourceView* > Get() const noexcept {
-			return m_buffer_srv.Get();
+		ID3D11ShaderResourceView& Get() const noexcept {
+			return *m_buffer_srv.Get();
 		}
 
 		/**
 		 Binds this structured buffer.
 
-		 @pre			@a slot < 
+		 @pre			@a slot <
 						@c D3D11_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT.
 		 @tparam		PipelineStageT
 						The pipeline stage type.
-		 @param[in]		device_context
+		 @param[in,out]	device_context
 						A reference to the device context.
 		 @param[in]		slot
-						The index into the device's zero-based array to set 
-						the shader resource view to (ranges from 0 to 
+						The index into the device's zero-based array to set
+						the shader resource view to (ranges from 0 to
 						@c D3D11_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT - 1).
 		 */
 		template< typename PipelineStageT >
@@ -153,19 +153,19 @@ namespace mage::rendering {
 		//---------------------------------------------------------------------
 		// Member Methods
 		//---------------------------------------------------------------------
-		
+
 		/**
-		 Sets up the resource buffer and shader resource view of this 
+		 Sets up the resource buffer and shader resource view of this
 		 structured buffer.
 
-		 @param[in]		device
+		 @param[in,out]	device
 						A reference to the device.
 		 @param[in]		capacity
 						The capacity.
 		 @throws		Exception
 						Failed to setup this structured buffer.
 		 */
-		void SetupStructuredBuffer(ID3D11Device& device, size_t capacity);
+		void SetupStructuredBuffer(ID3D11Device& device, std::size_t capacity);
 
 		//---------------------------------------------------------------------
 		// Member Variables
@@ -182,16 +182,16 @@ namespace mage::rendering {
 		ComPtr< ID3D11ShaderResourceView > m_buffer_srv;
 
 		/**
-		 The number of available slots for storing data elements in the current 
+		 The number of available slots for storing data elements in the current
 		 buffer resource of this structured buffer (i.e. the capacity).
 		 */
-		size_t m_capacity;
+		std::size_t m_capacity;
 
 		/**
-		 The number of used slots for storing data elements in the current buffer 
+		 The number of used slots for storing data elements in the current buffer
 		 resource of this structured buffer (i.e. the size).
 		 */
-		size_t m_size;
+		std::size_t m_size;
 	};
 }
 

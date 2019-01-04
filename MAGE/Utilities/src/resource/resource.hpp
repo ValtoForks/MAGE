@@ -5,7 +5,7 @@
 //-----------------------------------------------------------------------------
 #pragma region
 
-#include "type\types.hpp"
+#include "exception\exception.hpp"
 
 #pragma endregion
 
@@ -35,7 +35,7 @@ namespace mage {
 		 @param[in]		guid
 						The globally unique identifier.
 		 */
-		explicit Resource(wstring guid) noexcept;
+		explicit Resource(std::wstring guid) noexcept;
 
 		/**
 		 Constructs a resource from the given resource.
@@ -88,42 +88,29 @@ namespace mage {
 		/**
 		 Returns the globally unique identifier of this resource.
 
-		 @return		A reference to the globally unique identifier of this
-						resource.
+		 @return		The globally unique identifier of this resource.
 		 */
 		[[nodiscard]]
-		const wstring& GetGuid() const noexcept {
+		const std::wstring_view GetGuid() const noexcept {
 			return m_guid;
 		}
 
 		/**
-		 Returns the filename of this resource.
+		 Checks whether this resource represents a file resource.
 
-		 @pre			This resource represents a file resource.
-		 @return		A reference to the filename of this resource.
+		 @return		@c true if this resource represents a file resource.
+						@c false otherwise.
 		 */
 		[[nodiscard]]
-		const wstring& GetFilename() const noexcept {
-			return GetGuid();
-		}
-
-		/**
-		 Returns the name of this resource.
-
-		 @pre			This resource represents a file resource.
-		 @return		The name of this resource.
-		 */
-		[[nodiscard]]
-		const wstring GetName() const;
+		bool IsFileResource() const;
 
 		/**
 		 Returns the path of this resource.
 
-		 @pre			This resource represents a file resource.
 		 @return		The path of this resource.
 		 */
 		[[nodiscard]]
-		const wstring GetPath() const;
+		const std::filesystem::path GetPath() const;
 
 	private:
 
@@ -134,7 +121,7 @@ namespace mage {
 		/**
 		 The globally unique identifier of this resource.
 		 */
-		wstring m_guid;
+		std::wstring m_guid;
 	};
 }
 

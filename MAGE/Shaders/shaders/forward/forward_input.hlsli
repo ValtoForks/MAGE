@@ -11,10 +11,7 @@
 // Engine Includes
 //-----------------------------------------------------------------------------
 #include "global.hlsli"
-
-#ifndef DISABLE_TSNM
-	#include "normal_mapping.hlsli"
-#endif // DISABLE_TSNM
+#include "normal.hlsli"
 
 //-----------------------------------------------------------------------------
 // Constant Buffers
@@ -25,23 +22,39 @@ CBUFFER(Model, SLOT_CBUFFER_MODEL) {
 	// Member Variables: Transformations
 	//-------------------------------------------------------------------------
 
-	// The object-to-world transformation matrix.
+	/**
+	 The object-to-world transformation matrix.
+	 */
 	float4x4 g_object_to_world         : packoffset(c0);
-	// The object-to-world inverse transpose transformation matrix
-	// = The normal-to-world transformation matrix.
+
+	/**
+	 The object-to-world inverse transpose transformation matrix
+	 = the normal-to-world transformation matrix.
+	 */
 	float4x4 g_normal_to_world         : packoffset(c4);
-	// The texture transformation matrix.
+
+	/**
+	 The texture transformation matrix.
+	 */
 	float4x4 g_texture_transform       : packoffset(c8);
 
 	//-------------------------------------------------------------------------
 	// Member Variables: Material
 	//-------------------------------------------------------------------------
 
-	// The (linear) base color of the material.
+	/**
+	 The (linear) base color of the material.
+	 */
 	float4   g_base_color              : packoffset(c12);
-	// The (linear) roughness of the material.
+
+	/**
+	 The (linear) roughness of the material.
+	 */
 	float    g_roughness               : packoffset(c13.x);
-	// The (linear) metalness of the material.
+
+	/**
+	 The (linear) metalness of the material.
+	 */
 	float    g_metalness               : packoffset(c13.y);
 }
 
@@ -94,7 +107,7 @@ float2 GetMaterialParameters(float2 tex) {
 	#ifdef DISABLE_TEXTURE_MATERIAL
 	return float2(g_roughness, g_metalness);
 	#else  // DISABLE_TEXTURE_MATERIAL
-	const float2 material = g_material_texture.Sample(g_linear_wrap_sampler, 
+	const float2 material = g_material_texture.Sample(g_linear_wrap_sampler,
 													  tex).xy;
 	return float2(g_roughness, g_metalness) * material;
 	#endif // DISABLE_TEXTURE_MATERIAL
@@ -117,7 +130,7 @@ float3 GetNormal(float3 p, float3 n, float2 tex) {
 	return normalize(n);
 	#else  // DISABLE_TSNM
 	// Obtain the normal expressed in tangent space.
-	const float3 n_tangent = UnpackNormal(
+	const float3 n_tangent = TSNM_DECODE_FUNCTION(
 		g_normal_texture.Sample(g_linear_wrap_sampler, tex));
 	// Perturb the normal expressed in world space.
 	return PerturbNormal(p, normalize(n), tex, n_tangent);

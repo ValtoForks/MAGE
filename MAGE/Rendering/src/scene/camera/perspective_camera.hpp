@@ -20,14 +20,14 @@ namespace mage::rendering {
 	#pragma region
 
 	/**
-	 Returns the horizontal field-of-view corresponding to the given aspect 
+	 Returns the horizontal field-of-view corresponding to the given aspect
 	 ratio and vertical field-of-view.
 
 	 @param[in]		aspect_ratio
 					The aspect ratio.
 	 @param[in]		fov_y
 					The vertical field-of-view.
-	 @return		The horizontal field-of-view corresponding to the given 
+	 @return		The horizontal field-of-view corresponding to the given
 					aspect ratio and vertical field-of-view.
 	 */
 	[[nodiscard]]
@@ -36,14 +36,14 @@ namespace mage::rendering {
 	}
 
 	/**
-	 Returns the vertical field-of-view corresponding to the given aspect 
+	 Returns the vertical field-of-view corresponding to the given aspect
 	 ratio and horizontal field-of-view.
 
 	 @param[in]		aspect_ratio
 					The aspect ratio.
 	 @param[in]		fov_x
 					The horizontal field-of-view.
-	 @return		The vertical field-of-view corresponding to the given 
+	 @return		The vertical field-of-view corresponding to the given
 					aspect ratio and horizontal field-of-view.
 	 */
 	[[nodiscard]]
@@ -58,7 +58,7 @@ namespace mage::rendering {
 					The width.
 	 @param[in]		height
 					The height.
-	 @return		The aspect ratio corresponding to the given width and 
+	 @return		The aspect ratio corresponding to the given width and
 					height.
 	 */
 	[[nodiscard]]
@@ -67,14 +67,14 @@ namespace mage::rendering {
 	}
 
 	/**
-	 Returns the aspect ratio corresponding to the given horizontal and 
+	 Returns the aspect ratio corresponding to the given horizontal and
 	 vertical field-of-views.
 
 	 @param[in]		fov_x
 					The horizontal field-of-view.
 	 @param[in]		fov_y
 					The vertical field-of-view.
-	 @return		The aspect ratio corresponding to the given horizontal and 
+	 @return		The aspect ratio corresponding to the given horizontal and
 					vertical field-of-views.
 	 */
 	[[nodiscard]]
@@ -95,7 +95,7 @@ namespace mage::rendering {
 	/**
 	 A class of perspective cameras.
 	 */
-	class alignas(16) PerspectiveCamera final : public Camera {
+	class alignas(16) PerspectiveCamera : public Camera {
 
 	public:
 
@@ -106,10 +106,10 @@ namespace mage::rendering {
 		/**
 		 Constructs a perspective camera.
 
-		 @param[in]		device
+		 @param[in,out]	device
 						A reference to the device.
 		 */
-		PerspectiveCamera(ID3D11Device& device);
+		explicit PerspectiveCamera(ID3D11Device& device);
 
 		/**
 		 Constructs a perspective camera from the given perspective camera.
@@ -118,7 +118,7 @@ namespace mage::rendering {
 						A reference to the perspective camera to copy.
 		 */
 		PerspectiveCamera(const PerspectiveCamera& camera) = delete;
-		
+
 		/**
 		 Constructs a perspective camera by moving the given perspective camera.
 
@@ -134,14 +134,14 @@ namespace mage::rendering {
 
 		//---------------------------------------------------------------------
 		// Assignment Operators
-		//---------------------------------------------------------------------	
+		//---------------------------------------------------------------------
 
 		/**
 		 Copies the given perspective camera to this perspective camera.
 
 		 @param[in]		camera
 						A reference to the perspective camera to copy.
-		 @return		A reference to the copy of the given perspective 
+		 @return		A reference to the copy of the given perspective
 						camera (i.e. this perspective camera).
 		 */
 		PerspectiveCamera& operator=(const PerspectiveCamera& camera) = delete;
@@ -151,7 +151,7 @@ namespace mage::rendering {
 
 		 @param[in]		camera
 						A reference to the perspective camera to move.
-		 @return		A reference to the moved perspective camera (i.e. this 
+		 @return		A reference to the moved perspective camera (i.e. this
 						perspective camera).
 		 */
 		PerspectiveCamera& operator=(PerspectiveCamera&& camera) noexcept;
@@ -163,7 +163,7 @@ namespace mage::rendering {
 		/**
 		 Returns the horizontal field-of-view of this perspective camera.
 
-		 @return		The horizontal field-of-view of this perspective 
+		 @return		The horizontal field-of-view of this perspective
 						camera.
 		 */
 		[[nodiscard]]
@@ -174,7 +174,7 @@ namespace mage::rendering {
 		/**
 		 Returns the vertical field-of-view of this perspective camera.
 
-		 @return		The vertical field-of-view of this perspective 
+		 @return		The vertical field-of-view of this perspective
 						camera.
 		 */
 		[[nodiscard]]
@@ -183,7 +183,7 @@ namespace mage::rendering {
 		}
 
 		/**
-		 Sets the vertical field-of-view of this perspective camera to the 
+		 Sets the vertical field-of-view of this perspective camera to the
 		 given value.
 
 		 @param[in]		fov_y
@@ -204,7 +204,7 @@ namespace mage::rendering {
 		}
 
 		/**
-		 Sets the aspect ratio of this perspective camera to the given 
+		 Sets the aspect ratio of this perspective camera to the given
 		 value.
 
 		 @param[in]		aspect_ratio
@@ -225,29 +225,25 @@ namespace mage::rendering {
 		void SetAspectRatio(F32 width, F32 height) noexcept {
 			SetAspectRatio(AspectRatioFromWidthAndHeight(width, height));
 		}
-		
+
 		/**
 		 Returns the camera-to-projection matrix of this perspective camera.
 
-		 @return		The camera-to-projection matrix of this perspective 
+		 @return		The camera-to-projection matrix of this perspective
 						camera.
 		 */
 		[[nodiscard]]
-		virtual const XMMATRIX XM_CALLCONV 
+		virtual const XMMATRIX XM_CALLCONV
 			GetCameraToProjectionMatrix() const noexcept override {
 
-			const auto clipping_planes = GetClippingPlanes();
-
 			#ifdef DISABLE_INVERTED_Z_BUFFER
-			const auto near_plane = clipping_planes.m_x;
-			const auto far_plane  = clipping_planes.m_y;
+			const auto [near_plane, far_plane] = GetClippingPlanes();
 			#else  // DISABLE_INVERTED_Z_BUFFER
-			const auto near_plane = clipping_planes.m_y;
-			const auto far_plane  = clipping_planes.m_x;
+			const auto [far_plane, near_plane] = GetClippingPlanes();
 			#endif // DISABLE_INVERTED_Z_BUFFER
 
-			return XMMatrixPerspectiveFovLH(GetFOVY(), 
-											GetAspectRatio(), 
+			return XMMatrixPerspectiveFovLH(GetFOVY(),
+											GetAspectRatio(),
 											near_plane,
 											far_plane);
 		}
@@ -255,11 +251,11 @@ namespace mage::rendering {
 		/**
 		 Returns the projection-to-camera matrix of this perspective camera.
 
-		 @return		The projection-to-camera matrix of this perspective 
+		 @return		The projection-to-camera matrix of this perspective
 						camera.
 		 */
 		[[nodiscard]]
-		virtual const XMMATRIX XM_CALLCONV 
+		virtual const XMMATRIX XM_CALLCONV
 			GetProjectionToCameraMatrix() const noexcept override {
 
 			const auto camera_to_projection = GetCameraToProjectionMatrix();
@@ -269,7 +265,7 @@ namespace mage::rendering {
 			const auto m23 = 1.0f / XMVectorGetZ(camera_to_projection.r[3]);
 			const auto m33 = -XMVectorGetZ(camera_to_projection.r[2]) * m23;
 
-			return XMMATRIX {
+			return {
 				 m00, 0.0f, 0.0f, 0.0f,
 				0.0f,  m11, 0.0f, 0.0f,
 				0.0f, 0.0f, 0.0f,  m23,

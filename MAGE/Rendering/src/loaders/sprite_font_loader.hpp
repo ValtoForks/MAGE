@@ -11,27 +11,36 @@
 #pragma endregion
 
 //-----------------------------------------------------------------------------
+// System Includes
+//-----------------------------------------------------------------------------
+#pragma region
+
+#include <filesystem>
+
+#pragma endregion
+
+//-----------------------------------------------------------------------------
 // Engine Declarations
 //-----------------------------------------------------------------------------
 namespace mage::rendering::loader {
 
 	/**
-	 Imports the sprite font from the given file.
+	 Imports the sprite font from the file associated with the given path.
 
-	 @param[in]		fname
-					A reference to the filename.
-	 @param[in]		device
+	 @param[in]		path
+					A reference to the path.
+	 @param[in,out]	device
 					A reference to the device.
-	 @param[out]	output
+	 @param[in,out]	output
 					A reference to the sprite font output.
 	 @param[in]		desc
 					A reference to the sprite font descriptor.
 	 @throws		Exception
 					Failed to import the sprite font from file.
 	 */
-	void ImportSpriteFontFromFile(const wstring& fname, 
-		                          ID3D11Device& device, 
-		                          SpriteFontOutput& output, 
-		                          const SpriteFontDescriptor& desc 
+	void ImportSpriteFontFromFile(const std::filesystem::path& path,
+		                          ID3D11Device& device,
+		                          SpriteFontOutput& output,
+		                          const SpriteFontDescriptor& desc
 		                              = SpriteFontDescriptor());
 }

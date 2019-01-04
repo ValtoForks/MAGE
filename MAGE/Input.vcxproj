@@ -18,23 +18,12 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="Input\src\device\keyboard.hpp" />
-    <ClInclude Include="Input\src\device\mouse.hpp" />
-    <ClInclude Include="Input\src\direct_input.hpp" />
-    <ClInclude Include="Input\src\input_manager.hpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="Input\src\device\keyboard.cpp" />
-    <ClCompile Include="Input\src\device\mouse.cpp" />
-    <ClCompile Include="Input\src\input_manager.cpp" />
-  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{52FE3AC1-DA44-4E0C-A79E-1507FE0EB625}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>Input</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.16299.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -63,6 +52,7 @@
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
+  <PropertyGroup Label="UserMacros" />
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
   </ImportGroup>
@@ -84,23 +74,33 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="Properties\x64_Release.props" />
   </ImportGroup>
-  <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>$(ProjectName)\src\;Core\src\;Math\src\;Utilities\src\;GSL\src\;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
-    <SourcePath>Core\src\;Math\src\;Utilities\src\;$(VC_SourcePath);</SourcePath>
+    <IncludePath>$(ProjectName)\src\;Core\src\;Math\src\;Utilities\src\;fmt\src\;GSL\src\;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
+    <SourcePath>Core\src\;Math\src\;Utilities\src\;fmt\src\;$(VC_SourcePath);</SourcePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>$(ProjectName)\src\;Core\src\;Math\src\;Utilities\src\;GSL\src\;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
-    <SourcePath>Core\src\;Math\src\;Utilities\src\;$(VC_SourcePath);</SourcePath>
+    <IncludePath>$(ProjectName)\src\;Core\src\;Math\src\;Utilities\src\;fmt\src\;GSL\src\;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
+    <SourcePath>Core\src\;Math\src\;Utilities\src\;fmt\src\;$(VC_SourcePath);</SourcePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>$(ProjectName)\src\;Core\src\;Math\src\;Utilities\src\;GSL\src\;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
-    <SourcePath>Core\src\;Math\src\;Utilities\src\;$(VC_SourcePath);</SourcePath>
+    <IncludePath>$(ProjectName)\src\;Core\src\;Math\src\;Utilities\src\;fmt\src\;GSL\src\;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
+    <SourcePath>Core\src\;Math\src\;Utilities\src\;fmt\src\;$(VC_SourcePath);</SourcePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>$(ProjectName)\src\;Core\src\;Math\src\;Utilities\src\;GSL\src\;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
-    <SourcePath>Core\src\;Math\src\;Utilities\src\;$(VC_SourcePath);</SourcePath>
+    <IncludePath>$(ProjectName)\src\;Core\src\;Math\src\;Utilities\src\;fmt\src\;GSL\src\;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
+    <SourcePath>Core\src\;Math\src\;Utilities\src\;fmt\src\;$(VC_SourcePath);</SourcePath>
   </PropertyGroup>
+  <ItemGroup>
+    <ClInclude Include="Input\src\device\keyboard.hpp" />
+    <ClInclude Include="Input\src\device\mouse.hpp" />
+    <ClInclude Include="Input\src\direct_input.hpp" />
+    <ClInclude Include="Input\src\input_manager.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Input\src\device\keyboard.cpp" />
+    <ClCompile Include="Input\src\device\mouse.cpp" />
+    <ClCompile Include="Input\src\input_manager.cpp" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

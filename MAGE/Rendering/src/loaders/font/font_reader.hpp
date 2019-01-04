@@ -19,7 +19,7 @@ namespace mage::rendering::loader {
 	/**
 	 A class of readers for reading FONT files.
 	 */
-	class SpriteFontReader final : private BigEndianBinaryReader {
+	class SpriteFontReader : private BigEndianBinaryReader {
 
 	public:
 
@@ -30,17 +30,17 @@ namespace mage::rendering::loader {
 		/**
 		 Constructs a FONT reader.
 
-		 @param[in]		device
+		 @param[in,out]	device
 						A reference to the device.
-		 @param[out]	output
+		 @param[in,out]	output
 						A reference to the sprite font output.
 		 @param[in]		desc
 						A reference to the sprite font descriptor.
 		*/
-		explicit SpriteFontReader(ID3D11Device& device, 
-								  SpriteFontOutput& output, 
+		explicit SpriteFontReader(ID3D11Device& device,
+								  SpriteFontOutput& output,
 								  const SpriteFontDescriptor& desc);
-		
+
 		/**
 		 Constructs a FONT reader from the given FONT reader.
 
@@ -81,7 +81,7 @@ namespace mage::rendering::loader {
 
 		 @param[in]		reader
 						A reference to a FONT reader to move.
-		 @return		A reference to the moved FONT reader (i.e. this 
+		 @return		A reference to the moved FONT reader (i.e. this
 						FONT reader).
 		 */
 		SpriteFontReader& operator=(SpriteFontReader&& reader) = delete;
@@ -93,8 +93,6 @@ namespace mage::rendering::loader {
 		using BigEndianBinaryReader::ReadFromFile;
 
 		using BigEndianBinaryReader::ReadFromMemory;
-
-		using BigEndianBinaryReader::GetFilename;
 
 	private:
 
@@ -113,7 +111,7 @@ namespace mage::rendering::loader {
 		/**
 		 Checks whether the header of the file is valid.
 
-		 @return		@c true if the header of the file is valid. @c false 
+		 @return		@c true if the header of the file is valid. @c false
 						otherwise.
 		 @throws		Exception
 						Failed to read to the given file.

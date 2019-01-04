@@ -9,9 +9,9 @@
 #include "resource\mesh\mesh.hpp"
 #include "resource\model\material.hpp"
 #include "geometry\bounding_volume.hpp"
-#include "transform\texture_transform.hpp"
+#include "transform\transform.hpp"
 #include "renderer\buffer\constant_buffer.hpp"
-#include "renderer\buffer\model_buffer.hpp"
+#include "renderer\buffer\scene_buffer.hpp"
 
 #pragma endregion
 
@@ -26,7 +26,7 @@ namespace mage::rendering {
 	/**
 	 A class of models.
 	 */
-	class alignas(16) Model final : public Component {
+	class alignas(16) Model : public Component {
 
 	public:
 
@@ -37,7 +37,7 @@ namespace mage::rendering {
 		/**
 		 Constructs a model.
 
-		 @param[in]		device
+		 @param[in,out]	device
 						A reference to the device.
 		 */
 		explicit Model(ID3D11Device& device);
@@ -72,7 +72,7 @@ namespace mage::rendering {
 
 		 @param[in]		model
 						A reference to the model to copy.
-		 @return		A reference to the copy of the given model (i.e. this 
+		 @return		A reference to the copy of the given model (i.e. this
 						model).
 		 */
 		Model& operator=(const Model& model) = delete;
@@ -105,8 +105,8 @@ namespace mage::rendering {
 						The bounding sphere.
 		 */
 		void SetMesh(SharedPtr< const Mesh > mesh,
-					 size_t start_index,
-					 size_t nb_indices,
+					 std::size_t start_index,
+					 std::size_t nb_indices,
 					 AABB aabb,
 					 BoundingSphere bs);
 
@@ -136,25 +136,25 @@ namespace mage::rendering {
 		 @return		The start index of this model in the mesh of this model.
 		 */
 		[[nodiscard]]
-		size_t GetStartIndex() const noexcept {
+		std::size_t GetStartIndex() const noexcept {
 			return m_start_index;
 		}
 
 		/**
 		 Returns the number of indices of this model in the mesh of this model.
 
-		 @return		The number of indices of this model in the mesh of this 
+		 @return		The number of indices of this model in the mesh of this
 						model.
 		 */
 		[[nodiscard]]
-		size_t GetNumberOfIndices() const noexcept {
+		std::size_t GetNumberOfIndices() const noexcept {
 			return m_nb_indices;
 		}
 
 		/**
 		 Binds the mesh of this model.
 
-		 @param[in]		device_context
+		 @param[in,out]	device_context
 						A reference to the device context.
 		 */
 		void BindMesh(ID3D11DeviceContext& device_context) const noexcept {
@@ -164,12 +164,12 @@ namespace mage::rendering {
 		/**
 		 Binds the mesh of this model with given primitive topology.
 
-		 @param[in]		device_context
+		 @param[in,out]	device_context
 						A reference to the device context.
 		 @param[in]		topology
 						The primitive topology.
 		 */
-		void BindMesh(ID3D11DeviceContext& device_context, 
+		void BindMesh(ID3D11DeviceContext& device_context,
 			          D3D11_PRIMITIVE_TOPOLOGY topology) const noexcept {
 
 			m_mesh->BindMesh(device_context, topology);
@@ -178,7 +178,7 @@ namespace mage::rendering {
 		/**
 		 Draws this model.
 
-		 @param[in]		device_context
+		 @param[in,out]	device_context
 						A reference to the device context.
 		 */
 		void Draw(ID3D11DeviceContext& device_context) const noexcept {
@@ -195,7 +195,7 @@ namespace mage::rendering {
 		 @return		A reference to the texture transform of this model.
 		 */
 		[[nodiscard]]
-		TextureTransform& GetTextureTransform() noexcept {
+		TextureTransform2D& GetTextureTransform() noexcept {
 			return m_texture_transform;
 		}
 
@@ -205,7 +205,7 @@ namespace mage::rendering {
 		 @return		A reference to the texture transform of this model.
 		 */
 		[[nodiscard]]
-		const TextureTransform& GetTextureTransform() const noexcept {
+		const TextureTransform2D& GetTextureTransform() const noexcept {
 			return m_texture_transform;
 		}
 
@@ -236,7 +236,7 @@ namespace mage::rendering {
 		/**
 		 Checks whether this model occludes light.
 
-		 @return		@c true if this model occludes light. @c false 
+		 @return		@c true if this model occludes light. @c false
 						otherwise.
 		 */
 		[[nodiscard]]
@@ -269,7 +269,7 @@ namespace mage::rendering {
 		 Sets the occlusion of light by this model to the given value.
 
 		 @param[in]		light_occlusion
-						@c true if this model needs to occlude light. @c false 
+						@c true if this model needs to occlude light. @c false
 						otherwise.
 		 */
 		void SetLightOcclusion(bool light_occlusion) noexcept {
@@ -283,7 +283,7 @@ namespace mage::rendering {
 		/**
 		 Updates the buffer of this model.
 
-		 @param[in]		device_context
+		 @param[in,out]	device_context
 						A reference to the device context.
 		 */
 		void UpdateBuffer(ID3D11DeviceContext& device_context) const;
@@ -293,11 +293,11 @@ namespace mage::rendering {
 
 		 @tparam		PipelineStageT
 						The pipeline stage type.
-		 @param[in]		device_context
+		 @param[in,out]	device_context
 						A reference to the device context.
 		 @param[in]		slot
-						The index into the device's zero-based array to set 
-						the constant buffer to (ranges from 0 to 
+						The index into the device's zero-based array to set
+						the constant buffer to (ranges from 0 to
 						@c D3D11_COMMONSHADER_CONSTANT_BUFFER_API_SLOT_COUNT - 1).
 		 */
 		template< typename PipelineStageT >
@@ -340,12 +340,12 @@ namespace mage::rendering {
 		/**
 		 The start index of this model in the mesh of this model.
 		 */
-		size_t m_start_index;
+		std::size_t m_start_index;
 
 		/**
 		 The number of indices of this model in the mesh of this model.
 		 */
-		size_t m_nb_indices;
+		std::size_t m_nb_indices;
 
 		//---------------------------------------------------------------------
 		// Member Variables: Appearance
@@ -354,7 +354,7 @@ namespace mage::rendering {
 		/**
 		 The texture transform of this model.
 		 */
-		TextureTransform m_texture_transform;
+		TextureTransform2D m_texture_transform;
 
 		/**
 		 The material of this model.

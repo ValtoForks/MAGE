@@ -33,7 +33,7 @@ namespace mage::rendering {
 		/**
 		 Creates a flat (single-texel) 2D texture.
 
-		 @param[in]		resource_manager
+		 @param[in,out]	resource_manager
 						A reference to the resource manager.
 		 @param[in]		guid
 						A reference to the globally unique identifier.
@@ -44,8 +44,8 @@ namespace mage::rendering {
 						Failed to create the texture.
 		 */
 		[[nodiscard]]
-		inline TexturePtr CreateFlatTexture2D(ResourceManager& resource_manager, 
-											  const wstring& guid, 
+		inline TexturePtr CreateFlatTexture2D(ResourceManager& resource_manager,
+											  const std::wstring& guid,
 											  U32 color) {
 
 			D3D11_TEXTURE2D_DESC texture_desc = {};
@@ -62,8 +62,8 @@ namespace mage::rendering {
 			texture_data.pSysMem     = &color;
 			texture_data.SysMemPitch = sizeof(color);
 
-			return resource_manager.GetOrCreate< Texture >(guid, 
-														   texture_desc, 
+			return resource_manager.GetOrCreate< Texture >(guid,
+														   texture_desc,
 														   texture_data);
 		}
 	}
@@ -74,33 +74,33 @@ namespace mage::rendering {
 	#pragma region
 
 	TexturePtr CreateBlackTexture(ResourceManager& resource_manager) {
-		return CreateFlatTexture2D(resource_manager, 
-								   MAGE_GUID_TEXTURE_BLACK, 
-								   0xFF000000);
+		return CreateFlatTexture2D(resource_manager,
+								   MAGE_GUID_TEXTURE_BLACK,
+								   0xFF000000u);
 	}
 
 	TexturePtr CreateWhiteTexture(ResourceManager& resource_manager) {
 		return CreateFlatTexture2D(resource_manager,
 								   MAGE_GUID_TEXTURE_WHITE,
-								   0xFFFFFFFF);
+								   0xFFFFFFFFu);
 	}
 
 	TexturePtr CreateRedTexture(ResourceManager& resource_manager) {
 		return CreateFlatTexture2D(resource_manager,
 								   MAGE_GUID_TEXTURE_RED,
-								   0xFF000000);
+								   0xFF000000u);
 	}
 
 	TexturePtr CreateGreenTexture(ResourceManager& resource_manager) {
 		return CreateFlatTexture2D(resource_manager,
 								   MAGE_GUID_TEXTURE_GREEN,
-								   0xFF00FF00);
+								   0xFF00FF00u);
 	}
 
 	TexturePtr CreateBlueTexture(ResourceManager& resource_manager) {
 		return CreateFlatTexture2D(resource_manager,
 								   MAGE_GUID_TEXTURE_BLUE,
-								   0xFF0000FF);
+								   0xFF0000FFu);
 	}
 
 	#pragma endregion

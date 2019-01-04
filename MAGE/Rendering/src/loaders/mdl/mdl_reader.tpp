@@ -18,9 +18,9 @@ namespace mage::rendering::loader {
 
 	template< typename VertexT, typename IndexT >
 	MDLReader< VertexT, IndexT >
-		::MDLReader(ResourceManager& resource_manager, 
+		::MDLReader(ResourceManager& resource_manager,
 					ModelOutput< VertexT, IndexT >& model_output)
-		: LineReader(), 
+		: LineReader(),
 		m_resource_manager(resource_manager),
 		m_model_output(model_output) {}
 
@@ -32,72 +32,63 @@ namespace mage::rendering::loader {
 
 	template< typename VertexT, typename IndexT >
 	void MDLReader< VertexT, IndexT >::Preprocess() {
-		ThrowIfFailed(m_model_output.m_vertex_buffer.empty(), 
-					  "%ls: vertex buffer must be empty.", 
-					  GetFilename().c_str());
-		ThrowIfFailed(m_model_output.m_index_buffer.empty(), 
-					  "%ls: index buffer must be empty.", 
-					  GetFilename().c_str());
+		auto msh_path = GetPath();
+		msh_path.replace_extension(L".msh");
 
-		ImportMesh();
+		ImportMSHMeshFromFile(msh_path, m_model_output.m_vertex_buffer,
+							  m_model_output.m_index_buffer);
 	}
 
 	template< typename VertexT, typename IndexT >
-	void MDLReader< VertexT, IndexT >::ImportMesh() {
-		const auto msh_fname
-			= mage::GetFilenameWithoutFileExtension(GetFilename()) + L".msh";
-		ImportMSHMeshFromFile(msh_fname, m_model_output.m_vertex_buffer, 
-			                             m_model_output.m_index_buffer);
+	void MDLReader< VertexT, IndexT >::Postprocess() {
+		m_model_output.ComputeBoundingVolumes();
 	}
 
 	template< typename VertexT, typename IndexT >
-	void MDLReader< VertexT, IndexT >::ReadLine(NotNull< zstring > line) {
-		m_context = nullptr;
-		const auto* const token
-			= strtok_s(line, GetDelimiters().c_str(), &m_context);
+	void MDLReader< VertexT, IndexT >::ReadLine() {
+		const auto token = Read< std::string_view >();
 
-		if (!token || g_mdl_token_comment == token[0]) {
+		if (g_mdl_token_comment == token[0u]) {
 			return;
 		}
-
-		if (str_equals(token, g_mdl_token_submodel)) {
+		else if (g_mdl_token_submodel         == token) {
 			ReadMDLSubModel();
 		}
-		else if (str_equals(token, g_mdl_token_material_library)) {
+		else if (g_mdl_token_material_library == token) {
 			ReadMDLMaterialLibrary();
 		}
 		else {
-			Warning("%ls: line %u: unsupported keyword token: %s.", 
-				    GetFilename().c_str(), GetCurrentLineNumber(), token);
+			Warning("{}: line {}: unsupported keyword token: {}.",
+					GetPath(), GetCurrentLineNumber(), token);
 			return;
 		}
 
-		ReadLineRemaining();
+		ReadRemainingTokens();
 	}
 
 	template< typename VertexT, typename IndexT >
 	void MDLReader< VertexT, IndexT >::ReadMDLSubModel() {
 		ModelPart model_part;
-		model_part.m_child       = Read< string >();
-		model_part.m_parent      = Read< string >();
-		model_part.m_transform.SetTranslation(Read< F32x3 >());
-		model_part.m_transform.SetRotation(   Read< F32x3 >());
-		model_part.m_transform.SetScale(      Read< F32x3 >());
-		model_part.m_material    = Read< string >();
+		model_part.m_child       = Read< std::string_view >();
+		model_part.m_parent      = Read< std::string_view >();
+		model_part.m_transform.SetTranslation(Read< F32, 3u >());
+		model_part.m_transform.SetRotation(   Read< F32, 3u >());
+		model_part.m_transform.SetScale(      Read< F32, 3u >());
+		model_part.m_material    = Read< std::string_view >();
 		model_part.m_start_index = Read< U32 >();
 		model_part.m_nb_indices  = Read< U32 >();
-		
+
 		m_model_output.AddModelPart(std::move(model_part));
 	}
 
 	template< typename VertexT, typename IndexT >
 	void MDLReader< VertexT, IndexT >::ReadMDLMaterialLibrary() {
-		const auto mtl_path  = mage::GetPathName(GetFilename());
-		const auto mtl_name  = str_convert(Read< string >());
-		const auto mtl_fname = mage::GetFilename(mtl_path, mtl_name);
+		const UTF8toUTF16 mtl_name(Read< std::string_view >());
+		auto mtl_path = GetPath();
+		mtl_path.replace_filename(std::wstring_view(mtl_name));
 
-		ImportMaterialFromFile(mtl_fname, 
-							   m_resource_manager, 
+		ImportMaterialFromFile(mtl_path,
+							   m_resource_manager,
 							   m_model_output.m_material_buffer);
 	}
 }

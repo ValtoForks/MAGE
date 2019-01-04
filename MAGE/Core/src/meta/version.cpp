@@ -4,15 +4,7 @@
 #pragma region
 
 #include "meta\version.hpp"
-
-#pragma endregion
-
-//-----------------------------------------------------------------------------
-// System Includes
-//-----------------------------------------------------------------------------
-#pragma region
-
-#include <stdio.h>
+#include "string\format.hpp"
 
 #pragma endregion
 
@@ -22,11 +14,11 @@
 namespace mage {
 
 	void PrintConsoleHeader() noexcept {
-		printf("Engine version %u.%u.%u of %s at %s\n", 
-			   GetVersionMajor(), GetVersionMinor(), GetVersionPatch(), 
-			   __DATE__, __TIME__);
-		printf("Copyright (c) 2016-2018 Matthias Moulin.\n");
-		
-		fflush(stdout);
+		Print("Engine version {}.{}.{} of {} at {}\n",
+			  GetVersionMajor(), GetVersionMinor(), GetVersionPatch(),
+			  __DATE__, __TIME__);
+		Print("Copyright (c) 2016-2018 Matthias Moulin.\n");
+
+		std::fflush(stdout);
 	}
 }

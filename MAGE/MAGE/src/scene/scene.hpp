@@ -35,14 +35,14 @@ namespace mage {
 
 		//---------------------------------------------------------------------
 		// Assignment Operators
-		//---------------------------------------------------------------------	
+		//---------------------------------------------------------------------
 
 		/**
 		 Copies the given scene to this scene.
 
 		 @param[in]		scene
 						A reference to the scene to copy.
-		 @return		A reference to the copy of the given scene (i.e. this 
+		 @return		A reference to the copy of the given scene (i.e. this
 						scene).
 		 */
 		Scene& operator=(const Scene& scene) = delete;
@@ -63,7 +63,7 @@ namespace mage {
 		/**
 		 Initializes this scene.
 
-		 @param[in]		engine
+		 @param[in,out]	engine
 						A reference to the engine.
 		 @throws		Exception
 						Failed to initialize this scene.
@@ -73,7 +73,7 @@ namespace mage {
 		/**
 		 Uninitializes this scene.
 
-		 @param[in]		engine
+		 @param[in,out]	engine
 						A reference to the engine.
 		 @throws		Exception
 						Failed to unitialize this scene.
@@ -84,9 +84,9 @@ namespace mage {
 		// Member Methods: Nodes and Components
 		//---------------------------------------------------------------------
 
-		ProxyPtr< Node > Import(Engine& engine, 
+		ProxyPtr< Node > Import(Engine& engine,
 								const rendering::ModelDescriptor& desc);
-		ProxyPtr< Node > Import(Engine& engine, 
+		ProxyPtr< Node > Import(Engine& engine,
 								const rendering::ModelDescriptor& desc,
 								std::vector< ProxyPtr< Node > >& nodes);
 
@@ -100,13 +100,13 @@ namespace mage {
 
 		template< typename ElementT >
 		[[nodiscard]]
-		size_t GetNumberOf() const noexcept;
+		std::size_t GetNumberOf() const noexcept;
 
 		template< typename ElementT, typename ActionT >
-		void ForEach(ActionT action);
+		void ForEach(ActionT&& action);
 
 		template< typename ElementT, typename ActionT >
-		void ForEach(ActionT action) const;
+		void ForEach(ActionT&& action) const;
 
 		//---------------------------------------------------------------------
 		// Member Methods: Identification
@@ -115,10 +115,10 @@ namespace mage {
 		/**
 		 Returns the name of this scene.
 
-		 @return		A reference to the name of this scene.
+		 @return		The name of this scene.
 		 */
 		[[nodiscard]]
-		const string& GetName() const noexcept {
+		const std::string_view GetName() const noexcept {
 			return m_name;
 		}
 
@@ -128,7 +128,7 @@ namespace mage {
 		 @param[in]		name
 						The name.
 		 */
-		void SetName(string name) noexcept {
+		void SetName(std::string name) noexcept {
 			m_name = std::move(name);
 		}
 
@@ -144,7 +144,7 @@ namespace mage {
 		 @param[in]		name
 						The name of the scene.
 		 */
-		explicit Scene(string name);
+		explicit Scene(std::string name);
 
 		/**
 		 Constructs a scene from the given scene.
@@ -169,10 +169,10 @@ namespace mage {
 		//---------------------------------------------------------------------
 
 		/**
-		 Loads this scene. Allows this scene to preform any pre-processing 
+		 Loads this scene. Allows this scene to preform any pre-processing
 		 construction.
 
-		 @param[in]		engine
+		 @param[in,out]	engine
 						A reference to the engine.
 		 @throws		Exception
 						Failed to load this scene.
@@ -180,10 +180,10 @@ namespace mage {
 		virtual void Load([[maybe_unused]] Engine& engine);
 
 		/**
-		 Closes this scene. Allows this scene to preform any post-processing 
+		 Closes this scene. Allows this scene to preform any post-processing
 		 destruction.
 
-		 @param[in]		engine
+		 @param[in,out]	engine
 						A reference to the engine.
 		 @throws		Exception
 						Failed to close this scene.
@@ -216,7 +216,7 @@ namespace mage {
 		/**
 		 The name of this scene.
 		 */
-		string m_name;
+		std::string m_name;
 	};
 }
 

@@ -3,9 +3,9 @@
 //-----------------------------------------------------------------------------
 #pragma region
 
-#include "memory\memory_stack.hpp"
+#include "logging\logging.hpp"
 #include "memory\allocation.hpp"
-#include "logging\error.hpp"
+#include "memory\memory_stack.hpp"
 
 #pragma endregion
 
@@ -19,11 +19,11 @@ namespace mage {
 	//-------------------------------------------------------------------------
 	#pragma region
 
-	SingleEndedMemoryStack::SingleEndedMemoryStack(size_t size, 
-												   size_t alignment)
-		: m_alignment(alignment), 
-		m_size(size), 
-		m_begin(), 
+	SingleEndedMemoryStack::SingleEndedMemoryStack(std::size_t size,
+												   std::size_t alignment)
+		: m_alignment(alignment),
+		m_size(size),
+		m_begin(),
 		m_current() {
 
 		const auto ptr = AllocAligned(m_size, m_alignment);
@@ -31,7 +31,7 @@ namespace mage {
 			throw std::bad_alloc();
 		}
 
-		m_begin = reinterpret_cast< uintptr_t >(ptr);
+		m_begin = reinterpret_cast< std::uintptr_t >(ptr);
 		Reset();
 	}
 
@@ -43,21 +43,21 @@ namespace mage {
 	}
 
 	void SingleEndedMemoryStack::Reset() noexcept {
-		m_current = m_begin;
+		RollBack(m_begin);
 	}
 
-	void SingleEndedMemoryStack::RollBack(uintptr_t ptr) noexcept {
+	void SingleEndedMemoryStack::RollBack(std::uintptr_t ptr) noexcept {
 		Assert(m_begin <= ptr && ptr <= m_current);
-		
+
 		m_current = ptr;
 	}
 
-	void* SingleEndedMemoryStack::Alloc(size_t size) noexcept {
+	void* SingleEndedMemoryStack::Alloc(std::size_t size) noexcept {
 		if (GetAvailableSize() < size) {
 			// The allocation failed.
 			return nullptr;
 		}
-		
+
 		const auto ptr = (void*)m_current;
 		m_current += size;
 		return ptr;
@@ -70,12 +70,12 @@ namespace mage {
 	//-------------------------------------------------------------------------
 	#pragma region
 
-	DoubleEndedMemoryStack::DoubleEndedMemoryStack(size_t size, 
-												   size_t alignment)
-		: m_alignment(alignment), 
+	DoubleEndedMemoryStack::DoubleEndedMemoryStack(std::size_t size,
+												   std::size_t alignment)
+		: m_alignment(alignment),
 		m_size(size),
 		m_begin(),
-		m_current_low(), 
+		m_current_low(),
 		m_current_high() {
 
 		const auto ptr = AllocAligned(m_size, m_alignment);
@@ -83,7 +83,7 @@ namespace mage {
 			throw std::bad_alloc();
 		}
 
-		m_begin = reinterpret_cast< uintptr_t >(ptr);
+		m_begin = reinterpret_cast< std::uintptr_t >(ptr);
 		Reset();
 	}
 
@@ -95,23 +95,23 @@ namespace mage {
 	}
 
 	void DoubleEndedMemoryStack::Reset() noexcept {
-		m_current_low  = m_begin;
-		m_current_high = m_begin + m_size - 1;
+		RollBackLow(m_begin);
+		RollBackHigh(m_begin + m_size - 1u);
 	}
 
-	void DoubleEndedMemoryStack::RollBackLow(uintptr_t ptr) noexcept {
+	void DoubleEndedMemoryStack::RollBackLow(std::uintptr_t ptr) noexcept {
 		Assert(m_begin <= ptr && ptr <= m_current_low);
-		
+
 		m_current_low = ptr;
 	}
 
-	void DoubleEndedMemoryStack::RollBackHigh(uintptr_t ptr) noexcept {
+	void DoubleEndedMemoryStack::RollBackHigh(std::uintptr_t ptr) noexcept {
 		Assert(m_current_high <= ptr && ptr < m_begin + m_size);
-		
+
 		m_current_high = ptr;
 	}
 
-	void* DoubleEndedMemoryStack::AllocLow(size_t size) noexcept {
+	void* DoubleEndedMemoryStack::AllocLow(std::size_t size) noexcept {
 		if (GetAvailableSize() < size) {
 			// The allocation failed.
 			return nullptr;
@@ -122,7 +122,7 @@ namespace mage {
 		return ptr;
 	}
 
-	void* DoubleEndedMemoryStack::AllocHigh(size_t size) noexcept {
+	void* DoubleEndedMemoryStack::AllocHigh(std::size_t size) noexcept {
 		if (GetAvailableSize() < size) {
 			// The allocation failed.
 			return nullptr;

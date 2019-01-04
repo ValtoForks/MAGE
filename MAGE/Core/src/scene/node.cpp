@@ -13,23 +13,23 @@
 //-----------------------------------------------------------------------------
 namespace mage {
 
-	Node::Node(string name)
+	Node::Node(std::string name)
 		: m_transform(),
 		m_parent(nullptr),
 		m_childs(),
 		m_components(),
 		m_state(State::Active),
-		m_guid(IdGenerator::GetNextGuid()),
+		m_guid(GetNextGuid()),
 		m_this(),
 		m_name(std::move(name)) {}
 
-	Node::Node(const Node& node) 
+	Node::Node(const Node& node)
 		: m_transform(node.m_transform),
 		m_parent(nullptr),
 		m_childs(),
 		m_components(),
 		m_state(node.m_state),
-		m_guid(IdGenerator::GetNextGuid()),
+		m_guid(GetNextGuid()),
 		m_this(),
 		m_name(node.m_name) {}
 
@@ -85,6 +85,9 @@ namespace mage {
 	}
 
 	void Node::RemoveChild(NodePtr node) {
+		using std::cbegin;
+		using std::cend;
+
 		if (  nullptr == node
 			|| m_this != node->m_parent) {
 			return;
@@ -93,8 +96,8 @@ namespace mage {
 		node->m_parent = nullptr;
 		node->m_transform.SetDirty();
 
-		if (const auto it = std::find(m_childs.begin(), m_childs.end(), node); 
-			it != m_childs.end()) {
+		if (const auto it = std::find(cbegin(m_childs), cend(m_childs), node);
+			it != cend(m_childs)) {
 
 			m_childs.erase(it);
 		}

@@ -20,18 +20,18 @@ namespace mage::rendering {
 	/**
 	 A class of resource managers.
 	 */
-	class ResourceManager final {
+	class ResourceManager {
 
 	public:
 
 		//---------------------------------------------------------------------
-		// Type Declarations and Definitions
+		// Class Member Types
 		//---------------------------------------------------------------------
 		#pragma region
 
 		/**
 		 A struct of resource records.
-		 
+
 		 @tparam		ResourceT
 						The resource type.
 		 */
@@ -40,27 +40,27 @@ namespace mage::rendering {
 
 		/**
 		 A struct of non-shader resource records.
-		 
+
 		 @tparam		ResourceT
 						The resource type.
 		 */
 		template< typename ResourceT >
-		struct ResourceRecord< ResourceT, 
-			typename std::enable_if_t< !is_shader_v< ResourceT > > > final {
+		struct ResourceRecord< ResourceT,
+			typename std::enable_if_t< !is_shader_v< ResourceT > > > {
 
 		public:
 
 			//-----------------------------------------------------------------
-			// Type Declarations and Definitions
+			// Class Member Types
 			//-----------------------------------------------------------------
 
 			/**
 			 The pool type of resource pools containing resources of the given
 			 type.
 			 */
-			using pool_type = ResourcePool< wstring, const ResourceT >;
+			using pool_type = ResourcePool< std::wstring, const ResourceT >;
 		};
-		
+
 		/**
 		 A struct of shader resource records.
 
@@ -69,22 +69,22 @@ namespace mage::rendering {
 		 */
 		template< typename ResourceT >
 		struct ResourceRecord< ResourceT,
-			typename std::enable_if_t< is_shader_v< ResourceT > > > final {
+			typename std::enable_if_t< is_shader_v< ResourceT > > > {
 
 		public:
 
 			//-----------------------------------------------------------------
-			// Type Declarations and Definitions
+			// Class Member Types
 			//-----------------------------------------------------------------
 
 			/**
 			 The pool type of resource pools containing vertex shaders.
 			 */
-			using pool_type = PersistentResourcePool< wstring, const ResourceT >;
+			using pool_type = PersistentResourcePool< std::wstring, const ResourceT >;
 		};
 
 		/**
-		 The pool type of resource pools containing resources of the given 
+		 The pool type of resource pools containing resources of the given
 		 type.
 
 		 @tparam		ResourceT
@@ -92,9 +92,9 @@ namespace mage::rendering {
 		 */
 		template< typename ResourceT >
 		using pool_type = typename ResourceRecord< ResourceT >::pool_type;
-		
+
 		/**
-		 The key type of resource pools containing resources of the given 
+		 The key type of resource pools containing resources of the given
 		 type.
 
 		 @tparam		ResourceT
@@ -102,9 +102,9 @@ namespace mage::rendering {
 		 */
 		template< typename ResourceT >
 		using key_type = typename pool_type< ResourceT >::key_type;
-		
+
 		/**
-		 The value type of resource pools containing resources of the given 
+		 The value type of resource pools containing resources of the given
 		 type.
 
 		 @tparam		ResourceT
@@ -122,11 +122,11 @@ namespace mage::rendering {
 		/**
 		 Constructs a resource manager.
 
-		 @param[in]		device
+		 @param[in,out]	device
 						A reference to the device.
 		 */
-		ResourceManager(ID3D11Device& device);
-		
+		explicit ResourceManager(ID3D11Device& device);
+
 		/**
 		 Constructs a resource manager from the given resource manager.
 
@@ -134,7 +134,7 @@ namespace mage::rendering {
 						A reference to the resource manager to copy.
 		 */
 		ResourceManager(const ResourceManager& manager) = delete;
-		
+
 		/**
 		 Constructs a resource manager by moving the given resource manager.
 
@@ -142,7 +142,7 @@ namespace mage::rendering {
 						A reference to the resource manager to move.
 		 */
 		ResourceManager(ResourceManager&& manager) noexcept;
-		
+
 		/**
 		 Destructs this resource manager.
 		 */
@@ -161,49 +161,49 @@ namespace mage::rendering {
 						(i.e. this resource manager).
 		 */
 		ResourceManager& operator=(const ResourceManager& manager) = delete;
-		
+
 		/**
 		 Moves the given resource manager to this resource manager.
 
 		 @param[in]		manager
 						A reference to the resource manager to move.
-		 @return		A reference to the moved resource manager (i.e. this 
+		 @return		A reference to the moved resource manager (i.e. this
 						resource manager).
 		 */
 		ResourceManager& operator=(ResourceManager&& manager) = delete;
-		
+
 		//---------------------------------------------------------------------
 		// Member Methods
 		//---------------------------------------------------------------------
 
 		/**
-		 Checks whether this resource manager contains a resource of the given 
+		 Checks whether this resource manager contains a resource of the given
 		 type corresponding to the given globally unique identifier.
 
 		 @tparam		ResourceT
 						The resource type.
 		 @param[in]		guid
-						A reference to the globally unique identifier of the 
+						A reference to the globally unique identifier of the
 						resource.
-		 @return		@c true if this resource managers contains a resource 
-						of the given type corresponding to the given globally 
+		 @return		@c true if this resource managers contains a resource
+						of the given type corresponding to the given globally
 						unique identifier. @c false otherwise.
 		 */
 		template< typename ResourceT >
 		[[nodiscard]]
 		bool Contains(const typename key_type< ResourceT >& guid) noexcept;
-		
+
 		/**
-		 Returns the resource of the given type corresponding to the given 
+		 Returns the resource of the given type corresponding to the given
 		 globally unique identifier of this resource manager.
 
 		 @tparam		ResourceT
 						The resource type.
 		 @param[in]		guid
-						A reference to the globally unique identifier of the 
+						A reference to the globally unique identifier of the
 						model descriptor.
 		 @return		@c nullptr, if this resource managers does not contain
-						a resource of the given type corresponding to the given 
+						a resource of the given type corresponding to the given
 						globally unique identifier.
 		 @return		A pointer to the resource.
 		 */
@@ -226,7 +226,7 @@ namespace mage::rendering {
 		 @param[in]		desc
 						A reference to the mesh descriptor.
 		 @param[in]		export_as_MDL
-						@c true if the model descriptor needs to be exported as 
+						@c true if the model descriptor needs to be exported as
 						MDL file. @c false otherwise.
 		 @return		A pointer to the model descriptor.
 		 @throws		Exception
@@ -234,9 +234,9 @@ namespace mage::rendering {
 		 */
 		template< typename ResourceT, typename VertexT, typename IndexT >
 		typename std::enable_if_t< std::is_same_v< ModelDescriptor, ResourceT >,
-			ModelDescriptorPtr > GetOrCreate(const wstring& fname, 
-											 const  MeshDescriptor< VertexT, IndexT >& 
-											 desc = MeshDescriptor< VertexT, IndexT >(), 
+			ModelDescriptorPtr > GetOrCreate(const std::wstring& fname,
+											 const  MeshDescriptor< VertexT, IndexT >&
+											 desc = MeshDescriptor< VertexT, IndexT >(),
 											 bool export_as_MDL = false);
 
 		/**
@@ -256,9 +256,9 @@ namespace mage::rendering {
 		 */
 		template< typename ResourceT >
 		typename std::enable_if_t< std::is_same_v< VertexShader, ResourceT >,
-			VertexShaderPtr > GetOrCreate(const wstring& guid, 
-										  const CompiledShader& compiled_shader, 
-										  gsl::span< const D3D11_INPUT_ELEMENT_DESC > 
+			VertexShaderPtr > GetOrCreate(const std::wstring& guid,
+										  const CompiledShader& compiled_shader,
+										  gsl::span< const D3D11_INPUT_ELEMENT_DESC >
 										  input_element_descs);
 
 		/**
@@ -276,7 +276,7 @@ namespace mage::rendering {
 		 */
 		template< typename ResourceT >
 		typename std::enable_if_t< std::is_same_v< HullShader, ResourceT >,
-			HullShaderPtr > GetOrCreate(const wstring& guid, 
+			HullShaderPtr > GetOrCreate(const std::wstring& guid,
 										const CompiledShader& compiled_shader);
 
 		/**
@@ -294,7 +294,7 @@ namespace mage::rendering {
 		 */
 		template< typename ResourceT >
 		typename std::enable_if_t< std::is_same_v< DomainShader, ResourceT >,
-			DomainShaderPtr > GetOrCreate(const wstring& guid, 
+			DomainShaderPtr > GetOrCreate(const std::wstring& guid,
 										  const CompiledShader& compiled_shader);
 
 		/**
@@ -312,7 +312,7 @@ namespace mage::rendering {
 		 */
 		template< typename ResourceT >
 		typename std::enable_if_t< std::is_same_v< GeometryShader, ResourceT >,
-			GeometryShaderPtr > GetOrCreate(const wstring& guid, 
+			GeometryShaderPtr > GetOrCreate(const std::wstring& guid,
 											const CompiledShader& compiled_shader);
 
 		/**
@@ -330,7 +330,7 @@ namespace mage::rendering {
 		 */
 		template< typename ResourceT >
 		typename std::enable_if_t< std::is_same_v< PixelShader, ResourceT >,
-			PixelShaderPtr > GetOrCreate(const wstring& guid, 
+			PixelShaderPtr > GetOrCreate(const std::wstring& guid,
 										 const CompiledShader& compiled_shader);
 
 		/**
@@ -348,7 +348,7 @@ namespace mage::rendering {
 		 */
 		template< typename ResourceT >
 		typename std::enable_if_t< std::is_same_v< ComputeShader, ResourceT >,
-			ComputeShaderPtr > GetOrCreate(const wstring& guid, 
+			ComputeShaderPtr > GetOrCreate(const std::wstring& guid,
 										   const CompiledShader& compiled_shader);
 
 		/**
@@ -366,8 +366,8 @@ namespace mage::rendering {
 		 */
 		template< typename ResourceT >
 		typename std::enable_if_t< std::is_same_v< SpriteFont, ResourceT >,
-			SpriteFontPtr > GetOrCreate(const wstring& fname, 
-										const SpriteFontDescriptor& desc 
+			SpriteFontPtr > GetOrCreate(const std::wstring& fname,
+										const SpriteFontDescriptor& desc
 										    = SpriteFontDescriptor());
 
 		/**
@@ -383,7 +383,7 @@ namespace mage::rendering {
 		 */
 		template< typename ResourceT >
 		typename std::enable_if_t< std::is_same_v< Texture, ResourceT >,
-			TexturePtr > GetOrCreate(const wstring& fname);
+			TexturePtr > GetOrCreate(const std::wstring& fname);
 
 		/**
 		 Creates a texture (if not existing).
@@ -402,8 +402,8 @@ namespace mage::rendering {
 		 */
 		template< typename ResourceT >
 		typename std::enable_if_t< std::is_same_v< Texture, ResourceT >,
-			TexturePtr > GetOrCreate(const wstring& guid, 
-									 const D3D11_TEXTURE2D_DESC& desc, 
+			TexturePtr > GetOrCreate(const std::wstring& guid,
+									 const D3D11_TEXTURE2D_DESC& desc,
 									 const D3D11_SUBRESOURCE_DATA& initial_data);
 
 	private:
@@ -413,12 +413,12 @@ namespace mage::rendering {
 		//---------------------------------------------------------------------
 
 		/**
-		 Returns the resource pool containing resources of the given type of 
+		 Returns the resource pool containing resources of the given type of
 		 this resource manager.
-		
+
 		 @tparam		ResourceT
 						The resource type.
-		 @return		A reference to the the resource pool containing 
+		 @return		A reference to the the resource pool containing
 						resources of the given type of this resource manager.
 		 */
 		template< typename ResourceT >
@@ -426,12 +426,12 @@ namespace mage::rendering {
 		typename pool_type< ResourceT >& GetPool() noexcept;
 
 		/**
-		 Returns the resource pool containing resources of the given type of 
+		 Returns the resource pool containing resources of the given type of
 		 this resource manager.
-		
+
 		 @tparam		ResourceT
 						The resource type.
-		 @return		A reference to the the resource pool containing 
+		 @return		A reference to the the resource pool containing
 						resources of the given type of this resource manager.
 		 */
 		template< typename ResourceT >

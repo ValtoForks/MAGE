@@ -14,7 +14,7 @@
 namespace mage::script {
 
 	RotationScript::RotationScript()
-		: BehaviorScript(), 
+		: BehaviorScript(),
 		m_axis(RotationAxis::Y) {}
 
 	RotationScript::RotationScript(
@@ -27,37 +27,33 @@ namespace mage::script {
 
 	RotationScript& RotationScript
 		::operator=(const RotationScript& script) noexcept = default;
-	
+
 	RotationScript& RotationScript
 		::operator=(RotationScript&& script) noexcept = default;
 
 	void RotationScript::Load([[maybe_unused]] Engine& engine) {
-		ThrowIfFailed(HasOwner(), 
+		ThrowIfFailed(HasOwner(),
 					  "This script needs to be attached to a node.");
 	}
 
-	void RotationScript::Update([[maybe_unused]] Engine& engine, 
-								[[maybe_unused]] F64 delta_time) {
+	void RotationScript::Update([[maybe_unused]] Engine& engine) {
+		const auto delta_time
+			= static_cast< F32 >(engine.GetTime().GetWallClockDeltaTime().count());
+
 		switch (m_axis) {
-		
+
 		case RotationAxis::X: {
-			GetOwner()->GetTransform().AddRotationX(
-				static_cast< F32 >(delta_time));
-			
+			GetOwner()->GetTransform().AddRotationX(delta_time);
 			break;
 		}
-		
+
 		case RotationAxis::Y: {
-			GetOwner()->GetTransform().AddRotationY(
-				static_cast< F32 >(delta_time));
-			
-			break; 
+			GetOwner()->GetTransform().AddRotationY(delta_time);
+			break;
 		}
-		
+
 		case RotationAxis::Z: {
-			GetOwner()->GetTransform().AddRotationZ(
-				static_cast< F32 >(delta_time));
-			
+			GetOwner()->GetTransform().AddRotationZ(delta_time);
 			break;
 		}
 		}

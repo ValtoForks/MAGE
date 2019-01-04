@@ -8,7 +8,6 @@
 #include "engine_setup.hpp"
 #include "input_manager.hpp"
 #include "rendering_manager.hpp"
-#include "system\timer.hpp"
 #include "ui\window.hpp"
 
 #pragma endregion
@@ -26,7 +25,7 @@ namespace mage {
 	/**
 	 A class of engine message handlers.
 	 */
-	class EngineMessageHandler final : public WindowMessageHandler {
+	class EngineMessageHandler : public WindowMessageHandler {
 
 	public:
 
@@ -40,7 +39,7 @@ namespace mage {
 		EngineMessageHandler();
 
 		/**
-		 Constructs a engine message handler from the given engine message 
+		 Constructs a engine message handler from the given engine message
 		 handler.
 
 		 @param[in]		handler
@@ -49,7 +48,7 @@ namespace mage {
 		EngineMessageHandler(const EngineMessageHandler& handler);
 
 		/**
-		 Constructs a engine message handler by moving the given engine message 
+		 Constructs a engine message handler by moving the given engine message
 		 handler.
 
 		 @param[in]		handler
@@ -67,12 +66,12 @@ namespace mage {
 		//---------------------------------------------------------------------
 
 		/**
-		 Copies the given engine message handler to this engine message 
+		 Copies the given engine message handler to this engine message
 		 handler.
 
 		 @param[in]		handler
 						A reference to the engine message handler to copy.
-		 @return		A reference to the copy of the given engine message 
+		 @return		A reference to the copy of the given engine message
 						handler (i.e. this engine message handler).
 		 */
 		EngineMessageHandler& operator=(const EngineMessageHandler& handler);
@@ -82,7 +81,7 @@ namespace mage {
 
 		 @param[in]		handler
 						A reference to the engine message handler to move.
-		 @return		A reference to the moved engine message handler (i.e. 
+		 @return		A reference to the moved engine message handler (i.e.
 						this engine message handler).
 		 */
 		EngineMessageHandler& operator=(EngineMessageHandler&& handler) noexcept;
@@ -99,23 +98,20 @@ namespace mage {
 		 @param[in]		message
 						The message.
 		 @param[in]		wParam
-						Additional message information. The contents of this 
+						Additional message information. The contents of this
 						parameter depend on the value of @a msg.
 		 @param[in]		lParam
-						Additional message information. The contents of this 
+						Additional message information. The contents of this
 						parameter depend on the value of @a msg.
-		 @param[out]	result
-						The result of the message processing in case the 
-						message is handled by this engine message handler.
-		 @return		@c true if the given message is handled by this engine 
-						message handler. @c false otherwise.
+		 @return		The result of the message processing, if the given
+						message is handled by this window message handler.
 		 */
 		[[nodiscard]]
-		virtual bool HandleWindowMessage([[maybe_unused]] NotNull< HWND > window,
-										 UINT message, 
-										 [[maybe_unused]] WPARAM wParam,
-										 [[maybe_unused]] LPARAM lParam,
-										 LRESULT& result) override;
+		virtual const std::optional< LRESULT >
+			HandleWindowMessage([[maybe_unused]] NotNull< HWND > window,
+								UINT message,
+								[[maybe_unused]] WPARAM wParam,
+								[[maybe_unused]] LPARAM lParam) override;
 
 		//---------------------------------------------------------------------
 		// Member Methods
@@ -141,7 +137,7 @@ namespace mage {
 	/**
 	 A class of engines.
 	 */
-	class Engine final {
+	class Engine {
 
 	public:
 
@@ -159,7 +155,7 @@ namespace mage {
 		 @throws		Exception
 						Failed to initialize the engine.
 		 */
-		explicit Engine(const EngineSetup& setup, 
+		explicit Engine(const EngineSetup& setup,
 						rendering::DisplayConfiguration display_config);
 
 		/**
@@ -185,14 +181,14 @@ namespace mage {
 
 		//---------------------------------------------------------------------
 		// Assignment Operators
-		//---------------------------------------------------------------------	
+		//---------------------------------------------------------------------
 
 		/**
 		 Copies the given engine to this engine.
 
 		 @param[in]		engine
 						A reference to the engine to copy.
-		 @return		A reference to the copy of the given engine (i.e. this 
+		 @return		A reference to the copy of the given engine (i.e. this
 						engine).
 		 */
 		Engine& operator=(const Engine& engine) = delete;
@@ -217,9 +213,9 @@ namespace mage {
 						A reference to the start scene.
 		 @param[in]		nCmdShow
 						Controls how the engine window is to be shown.
-		 @return		@c 0, if the function terminates before entering the 
+		 @return		@c 0, if the function terminates before entering the
 						message loop.
-		 @return		The @c wParam parameter contained in the @c WM_QUIT 
+		 @return		The @c wParam parameter contained in the @c WM_QUIT
 						message.
 		 */
 		[[nodiscard]]
@@ -263,6 +259,15 @@ namespace mage {
 		 */
 		void RequestScene(UniquePtr< Scene >&& scene) noexcept;
 
+		/**
+		 Returns the game time of this game engine.
+
+		 @return		A reference to the game time of this game engine.
+		 */
+		const GameTime& GetTime() const noexcept {
+			return m_time;
+		}
+
 	private:
 
 		//---------------------------------------------------------------------
@@ -277,7 +282,7 @@ namespace mage {
 		 @param[in]		display_config
 						The display configuration.
 		 @throws		Exception
-						Failed to initialize at least one of the different 
+						Failed to initialize at least one of the different
 						systems of this engine.
 		 */
 		void InitializeSystems(const EngineSetup& setup,
@@ -292,10 +297,10 @@ namespace mage {
 
 		[[nodiscard]]
 		bool UpdateInput();
-		
+
 		[[nodiscard]]
 		bool UpdateRendering();
-		
+
 		[[nodiscard]]
 		bool UpdateScripting();
 
@@ -336,20 +341,25 @@ namespace mage {
 		/**
 		 The timer of this engine.
 		 */
-		WallClockTimer m_timer;
+		GameTimer m_timer;
 
 		/**
-		 The fixed delta time of this engine.
+		 The current time of this engine.
+		 */
+		GameTime m_time;
+
+		/**
+		 The fixed delta time (in seconds) of this engine.
 
 		 If the fixed delta time is equal to zero, fixed delta time updates
 		 will be treated as non-fixed delta time updates by this engine.
 		 */
-		F64 m_fixed_delta_time;
+		TimeIntervalSeconds m_fixed_delta_time;
 
 		/**
-		 The fixed time budget of this engine.
+		 The fixed time budget (in seconds) of this engine.
 		 */
-		F64 m_fixed_time_budget;
+		TimeIntervalSeconds m_fixed_time_budget;
 
 		/**
 		 Flag indicating whether the application is active or not.
@@ -364,8 +374,8 @@ namespace mage {
 
 		/**
 		 A flag indicating whether this engine has a requested scene.
-		 
-		 A separate flag is needed, because the requested scene maybe 
+
+		 A separate flag is needed, because the requested scene maybe
 		 @c nullptr.
 		 */
 		bool m_has_requested_scene;

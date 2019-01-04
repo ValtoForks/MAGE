@@ -27,7 +27,7 @@ namespace mage::rendering {
 	class VertexShader : public Resource< VertexShader > {
 
 	public:
-	
+
 		//---------------------------------------------------------------------
 		// Constructors and Destructors
 		//---------------------------------------------------------------------
@@ -35,7 +35,7 @@ namespace mage::rendering {
 		/**
 		 Constructs a vertex shader.
 
-		 @param[in]		device
+		 @param[in,out]	device
 						A reference to the device.
 		 @param[in]		guid
 						The globally unique identifier.
@@ -46,12 +46,12 @@ namespace mage::rendering {
 		 @throws		Exception
 						Failed to initialize this vertex shader.
 		 */
-		explicit VertexShader(ID3D11Device& device, 
-							  wstring guid,
-			                  const CompiledShader& compiled_shader, 
-			                  gsl::span< const D3D11_INPUT_ELEMENT_DESC > 
+		explicit VertexShader(ID3D11Device& device,
+							  std::wstring guid,
+			                  const CompiledShader& compiled_shader,
+			                  gsl::span< const D3D11_INPUT_ELEMENT_DESC >
 							  input_element_descs);
-		
+
 		/**
 		 Constructs a vertex shader from the given vertex shader.
 
@@ -59,7 +59,7 @@ namespace mage::rendering {
 						A reference to the vertex shader to copy.
 		 */
 		VertexShader(const VertexShader& vertex_shader) = delete;
-		
+
 		/**
 		 Constructs a vertex shader by moving the given vertex shader.
 
@@ -67,7 +67,7 @@ namespace mage::rendering {
 						A reference to the vertex shader to move.
 		 */
 		VertexShader(VertexShader&& vertex_shader) noexcept;
-		
+
 		/**
 		 Destructs this vertex shader.
 		 */
@@ -82,7 +82,7 @@ namespace mage::rendering {
 
 		 @param[in]		vertex_shader
 						A reference to the vertex shader to copy.
-		 @return		A reference to the copy of the given vertex shader 
+		 @return		A reference to the copy of the given vertex shader
 						(i.e. this vertex shader).
 		 */
 		VertexShader& operator=(const VertexShader& vertex_shader) = delete;
@@ -92,7 +92,7 @@ namespace mage::rendering {
 
 		 @param[in]		vertex_shader
 						A reference to the vertex shader to copy.
-		 @return		A reference to the moved vertex shader (i.e. this 
+		 @return		A reference to the moved vertex shader (i.e. this
 						vertex shader).
 		 */
 		VertexShader& operator=(VertexShader&& vertex_shader) noexcept;
@@ -104,7 +104,7 @@ namespace mage::rendering {
 		/**
 		 Binds this vertex shader.
 
-		 @param[in]		device_context
+		 @param[in,out]	device_context
 						A reference to the device context.
 		 */
 		void BindShader(ID3D11DeviceContext& device_context) const noexcept {
@@ -134,7 +134,7 @@ namespace mage::rendering {
 			             const CompiledShader& compiled_shader,
 						 gsl::span< const D3D11_INPUT_ELEMENT_DESC >
 						 input_element_descs);
-			
+
 		//---------------------------------------------------------------------
 		// Member Variables
 		//---------------------------------------------------------------------
@@ -149,7 +149,7 @@ namespace mage::rendering {
 		 */
 		ComPtr< ID3D11InputLayout >  m_vertex_layout;
 	};
-	
+
 	#pragma endregion
 
 	//-------------------------------------------------------------------------
@@ -169,7 +169,7 @@ namespace mage::rendering {
 	class Shader : public Resource< Shader< ShaderT, PipelineStageT > > {
 
 	public:
-	
+
 		//---------------------------------------------------------------------
 		// Constructors and Destructors
 		//---------------------------------------------------------------------
@@ -177,7 +177,7 @@ namespace mage::rendering {
 		/**
 		 Constructs a shader.
 
-		 @param[in]		device
+		 @param[in,out]	device
 						A reference to the device.
 		 @param[in]		guid
 						The globally unique identifier.
@@ -186,10 +186,10 @@ namespace mage::rendering {
 		 @throws		Exception
 						Failed to initialize this shader.
 		 */
-		explicit Shader(ID3D11Device& device, 
-						wstring guid, 
+		explicit Shader(ID3D11Device& device,
+						std::wstring guid,
 			            const CompiledShader& compiled_shader);
-		
+
 		/**
 		 Constructs a shader from the given shader.
 
@@ -220,7 +220,7 @@ namespace mage::rendering {
 
 		 @param[in]		shader
 						A reference to the shader to copy.
-		 @return		A reference to the copy of the given shader (i.e. this 
+		 @return		A reference to the copy of the given shader (i.e. this
 						shader).
 		 */
 		Shader& operator=(const Shader& shader) = delete;
@@ -241,7 +241,7 @@ namespace mage::rendering {
 		/**
 		 Binds this shader.
 
-		 @param[in]		device_context
+		 @param[in,out]	device_context
 						A reference to the device context.
 		 */
 		void BindShader(ID3D11DeviceContext& device_context) const noexcept;
@@ -255,16 +255,16 @@ namespace mage::rendering {
 		/**
 		 Sets up this shader.
 
-		 @param[in]		device
+		 @param[in,out]	device
 						A reference to the device.
 		 @param[in]		compiled_shader
 						A reference to the compiled shader.
 		 @throws		Exception
 						Failed to setup this shader.
 		 */
-		void SetupShader(ID3D11Device& device, 
+		void SetupShader(ID3D11Device& device,
 			             const CompiledShader& compiled_shader);
-		
+
 		//---------------------------------------------------------------------
 		// Member Variables
 		//---------------------------------------------------------------------
@@ -367,7 +367,7 @@ namespace mage::rendering {
 	struct is_shader< ComputeShader >  : public std::true_type {};
 
 	template< typename T >
-	inline constexpr bool is_shader_v = is_shader< T >::value;
+	constexpr bool is_shader_v = is_shader< T >::value;
 
 	#pragma endregion
 }

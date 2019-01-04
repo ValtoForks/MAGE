@@ -9,6 +9,7 @@
 // Engine Includes
 //-----------------------------------------------------------------------------
 #include "global.hlsli"
+#include "normal.hlsli"
 
 //-----------------------------------------------------------------------------
 // SRVs
@@ -16,12 +17,12 @@
 #ifdef MSAA
 TEXTURE_2D_MS(g_base_color_texture, float4, SLOT_SRV_BASE_COLOR);
 TEXTURE_2D_MS(g_material_texture,   float4, SLOT_SRV_MATERIAL);
-TEXTURE_2D_MS(g_normal_texture,     float3, SLOT_SRV_NORMAL);
+TEXTURE_2D_MS(g_normal_texture,     float2, SLOT_SRV_NORMAL);
 TEXTURE_2D_MS(g_depth_texture,      float,  SLOT_SRV_DEPTH);
 #else  // MSAA
 TEXTURE_2D(g_base_color_texture,    float4, SLOT_SRV_BASE_COLOR);
 TEXTURE_2D(g_material_texture,      float4, SLOT_SRV_MATERIAL);
-TEXTURE_2D(g_normal_texture,        float3, SLOT_SRV_NORMAL);
+TEXTURE_2D(g_normal_texture,        float2, SLOT_SRV_NORMAL);
 TEXTURE_2D(g_depth_texture,         float,  SLOT_SRV_DEPTH);
 #endif // MSAA
 
@@ -36,14 +37,14 @@ RW_TEXTURE_2D(g_output,             float4, SLOT_UAV_IMAGE);
 #ifdef MSAA
 
 /**
- Returns the base color of the material from the GBuffer corresponding to the 
+ Returns the base color of the material from the GBuffer corresponding to the
  given super-sampled display position.
 
  @param[in]		p_display
 				The super-sampled display coordinates.
  @param[in]		index
 				The sample index.
- @return		The base color of the material from the GBuffer corresponding 
+ @return		The base color of the material from the GBuffer corresponding
 				to the given super-sampled display position.
  */
 float3 GetGBufferMaterialBaseColor(uint2 p_ss_display, uint index) {
@@ -52,15 +53,15 @@ float3 GetGBufferMaterialBaseColor(uint2 p_ss_display, uint index) {
 }
 
 /**
- Returns the parameters of the material from the GBuffer corresponding to the 
+ Returns the parameters of the material from the GBuffer corresponding to the
  given super-sampled display position.
 
  @param[in]		p_display
 				The super-sampled display coordinates.
  @param[in]		index
 				The sample index.
- @return		The parameters of the material [roughness, metalness] from the 
-				GBuffer corresponding to the given super-sampled display 
+ @return		The parameters of the material [roughness, metalness] from the
+				GBuffer corresponding to the given super-sampled display
 				position.
  */
 float2 GetGBufferMaterialParameters(uint2 p_ss_display, uint index) {
@@ -69,52 +70,49 @@ float2 GetGBufferMaterialParameters(uint2 p_ss_display, uint index) {
 }
 
 /**
- Returns the surface normal from the GBuffer corresponding to the given 
+ Returns the surface normal from the GBuffer corresponding to the given
  super-sampled display position.
 
  @param[in]		p_display
 				The super-sampled display coordinates.
  @param[in]		index
 				The sample index.
- @return		The surface normal from the GBuffer expressed in world space 
+ @return		The surface normal from the GBuffer expressed in world space
 				corresponding to the given super-sampled display position.
  */
 float3 GetGBufferNormal(uint2 p_ss_display, uint index) {
 	// Load and unpack the view-space normal from the GBuffer normal texture.
-	return UnpackNormal(g_normal_texture.sample[index][p_ss_display]);
+	return NORMAL_DECODE_FUNCTION(g_normal_texture.sample[index][p_ss_display]);
 }
 
 /**
- Returns the surface position from the GBuffer corresponding to the given 
+ Returns the surface position from the GBuffer corresponding to the given
  super-sampled display position.
 
  @param[in]		p_display
 				The super-sampled display coordinates.
  @param[in]		index
 				The sample index.
- @return		The surface position from the GBuffer expressed in world space 
+ @return		The surface position from the GBuffer expressed in world space
 				corresponding to the given super-sampled display position.
  */
 float3 GetGBufferPosition(uint2 p_ss_display, uint index) {
 	// Load the depth from the GBuffer depth texture.
-	const float  depth = g_depth_texture.sample[index][p_ss_display];
-	// Obtain the NDC space coordinates.
-	const uint2  p_ss_viewport = p_ss_display - g_ss_viewport_top_left;
-	const float2 p_ndc_xy      = UVtoNDC(SSViewportToUV(p_ss_viewport));
-	const float3 p_ndc         = float3(p_ndc_xy, depth);
+	const float depth = g_depth_texture.sample[index][p_ss_display];
 	// Obtain the world space coodinates.
-	return NDCToWorld(p_ndc);
+	const float3 p_camera = SSDisplayToCamera(p_ss_display, depth);
+	return CameraToWorld(p_camera);
 }
 
 #else  // MSAA
 
 /**
- Returns the base color of the material from the GBuffer corresponding to the 
+ Returns the base color of the material from the GBuffer corresponding to the
  given super-sampled display position.
 
  @param[in]		p_display
 				The super-sampled display coordinates.
- @return		The base color of the material from the GBuffer corresponding 
+ @return		The base color of the material from the GBuffer corresponding
 				to the given super-sampled display position.
  */
 float3 GetGBufferMaterialBaseColor(uint2 p_ss_display) {
@@ -123,13 +121,13 @@ float3 GetGBufferMaterialBaseColor(uint2 p_ss_display) {
 }
 
 /**
- Returns the parameters of the material from the GBuffer corresponding to the 
+ Returns the parameters of the material from the GBuffer corresponding to the
  given super-sampled display position.
 
  @param[in]		p_display
 				The super-sampled display coordinates.
- @return		The parameters of the material [roughness, metalness] from the 
-				GBuffer corresponding to the given super-sampled display 
+ @return		The parameters of the material [roughness, metalness] from the
+				GBuffer corresponding to the given super-sampled display
 				position.
  */
 float2 GetGBufferMaterialParameters(uint2 p_ss_display) {
@@ -138,37 +136,34 @@ float2 GetGBufferMaterialParameters(uint2 p_ss_display) {
 }
 
 /**
- Returns the surface normal from the GBuffer corresponding to the given 
+ Returns the surface normal from the GBuffer corresponding to the given
  super-sampled display position.
 
  @param[in]		p_display
 				The super-sampled display coordinates.
- @return		The surface normal from the GBuffer expressed in world space 
+ @return		The surface normal from the GBuffer expressed in world space
 				corresponding to the given super-sampled display position.
  */
 float3 GetGBufferNormal(uint2 p_ss_display) {
 	// Load and unpack the view-space normal from the GBuffer normal texture.
-	return UnpackNormal(g_normal_texture[p_ss_display]);
+	return NORMAL_DECODE_FUNCTION(g_normal_texture[p_ss_display]);
 }
 
 /**
- Returns the surface position from the GBuffer corresponding to the given 
+ Returns the surface position from the GBuffer corresponding to the given
  super-sampled display position.
 
  @param[in]		p_display
 				The super-sampled display coordinates.
- @return		The surface position from the GBuffer expressed in world space 
+ @return		The surface position from the GBuffer expressed in world space
 				corresponding to the given super-sampled display position.
  */
 float3 GetGBufferPosition(uint2 p_ss_display) {
 	// Load the depth from the GBuffer depth texture.
-	const float  depth = g_depth_texture[p_ss_display];
-	// Obtain the NDC space coordinates.
-	const uint2  p_ss_viewport = p_ss_display - g_ss_viewport_top_left;
-	const float2 p_ndc_xy      = UVtoNDC(SSViewportToUV(p_ss_viewport));
-	const float3 p_ndc         = float3(p_ndc_xy, depth);
+	const float depth = g_depth_texture[p_ss_display];
 	// Obtain the world space coodinates.
-	return NDCToWorld(p_ndc);
+	const float3 p_camera = SSDisplayToCamera(p_ss_display, depth);
+	return CameraToWorld(p_camera);
 }
 
 #endif // MSAA

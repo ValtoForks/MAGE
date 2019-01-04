@@ -21,30 +21,26 @@ namespace mage::rendering {
 	#pragma region
 
 	/**
-	 Compiles Microsoft High Level Shader Language (HLSL) code into bytecode 
+	 Compiles Microsoft High Level Shader Language (HLSL) code into bytecode
 	 for a given shader target.
 
 	 @param[in]		fname
-					A pointer to a constant null-terminated string that 
-					contains the name of the file that contains the shader 
-					code.
+					The name of the file that contains the shader code.
 	 @param[in]		entry_point
-					A pointer to a constant null-terminated string that 
-					contains the name of the shader entry point function where 
-					shader execution begins.
+					The name of the shader entry point function where shader
+					execution begins.
 	 @param[in]		shader_target
-					A pointer to a constant null-terminated string that 
-					specifies the shader target or set of shader features to 
-					compile against.
+					The shader target or set of shader features to compile
+					against.
 	 @param[out]	output_blob
-					A pointer to a variable that receives a pointer to the 
-					@c ID3DBlob interface that you can use to access the 
+					A pointer to a variable that receives a pointer to the
+					@c ID3DBlob interface that you can use to access the
 					compiled code.
 	 */
 	[[nodiscard]]
-	HRESULT CompileShaderFromFile(const wstring& fname, 
-								  const  string& entry_point, 
-								  const  string& shader_target, 
+	HRESULT CompileShaderFromFile(std::wstring_view fname,
+								  std::string_view entry_point,
+								  std::string_view shader_target,
 								  NotNull< ID3DBlob** > output_blob);
 
 	#pragma endregion
@@ -76,20 +72,20 @@ namespace mage::rendering {
 
 		/**
 		 Copies the given compiled shader to this compiled shader.
-		 
+
 		 @param[in]		compiled_shader
 						A reference to the compiled shader to copy.
-		 @return		A reference to the copy of the given compiled shader 
+		 @return		A reference to the copy of the given compiled shader
 						(i.e. this compiled shader).
 		 */
 		CompiledShader& operator=(const CompiledShader& compiled_shader) noexcept;
 
 		/**
 		 Moves the given compiled shader to this compiled shader.
-		 
+
 		 @param[in]		compiled_shader
 						A reference to the compiled shader to copy.
-		 @return		A reference to the moved compiled shader (i.e. this 
+		 @return		A reference to the moved compiled shader (i.e. this
 						compiled shader).
 		 */
 		CompiledShader& operator=(CompiledShader&& compiled_shader) noexcept;
@@ -100,25 +96,25 @@ namespace mage::rendering {
 
 		/**
 		 Returns the shader bytecode of this compiled shader.
-		 
-		 @return		A pointer to the shader bytecode of this compiled 
+
+		 @return		A pointer to the shader bytecode of this compiled
 						shader.
 		 */
 		[[nodiscard]]
-		virtual const BYTE* GetBytecode() const noexcept = 0;
+		virtual const U8* GetBytecode() const noexcept = 0;
 
 		/**
-		 Returns the size of the shader bytecode (in bytes) of this compiled 
+		 Returns the size of the shader bytecode (in bytes) of this compiled
 		 shader.
-		 
-		 @return		The size of the shader bytecode (in bytes) of this 
+
+		 @return		The size of the shader bytecode (in bytes) of this
 						compiled shader.
 		 */
 		[[nodiscard]]
-		virtual SIZE_T GetBytecodeSize() const noexcept = 0;
-		
+		virtual std::size_t GetBytecodeSize() const noexcept = 0;
+
 	protected:
-	
+
 		//---------------------------------------------------------------------
 		// Constructors and Destructors
 		//---------------------------------------------------------------------
@@ -130,7 +126,7 @@ namespace mage::rendering {
 
 		/**
 		 Constructs a compiled shader from the given compiled shader.
-		 
+
 		 @param[in]		compiled_shader
 						A reference to the compiled shader to copy.
 		 */
@@ -138,7 +134,7 @@ namespace mage::rendering {
 
 		/**
 		 Constructs a compiled shader by moving the given compiled shader.
-		 
+
 		 @param[in]		compiled_shader
 						A reference to the compiled shader to move.
 		 */
@@ -165,25 +161,25 @@ namespace mage::rendering {
 
 		/**
 		 Constructs a buffer compiled shader.
-		 
+
 		 @param[in]		bytecode
 						The shader bytecode.
 		 */
-		explicit BufferCompiledShader(gsl::span< const BYTE > bytecode) noexcept;
+		explicit BufferCompiledShader(gsl::span< const U8 > bytecode) noexcept;
 
 		/**
-		 Constructs a buffer compiled shader from the given buffer compiled 
+		 Constructs a buffer compiled shader from the given buffer compiled
 		 shader.
-		 
+
 		 @param[in]		compiled_shader
 						A reference to the buffer compiled shader to copy.
 		 */
 		BufferCompiledShader(const BufferCompiledShader& compiled_shader) noexcept;
 
 		/**
-		 Constructs a buffer compiled shader by moving the given buffer 
+		 Constructs a buffer compiled shader by moving the given buffer
 		 compiled shader.
-		 
+
 		 @param[in]		compiled_shader
 						A reference to the buffer compiled shader to move.
 		 */
@@ -199,12 +195,12 @@ namespace mage::rendering {
 		//---------------------------------------------------------------------
 
 		/**
-		 Copies the given buffer compiled shader to this buffer compiled 
+		 Copies the given buffer compiled shader to this buffer compiled
 		 shader.
-		 
+
 		 @param[in]		compiled_shader
 						A reference to the buffer compiled shader to copy.
-		 @return		A reference to the copy of the given buffer compiled 
+		 @return		A reference to the copy of the given buffer compiled
 						shader (i.e. this buffer compiled shader).
 		 */
 		BufferCompiledShader& operator=(
@@ -212,10 +208,10 @@ namespace mage::rendering {
 
 		/**
 		 Moves the given buffer compiled shader to this buffer compiled shader.
-		 
+
 		 @param[in]		compiled_shader
 						A reference to the buffer compiled shader to copy.
-		 @return		A reference to the moved buffer compiled shader (i.e. 
+		 @return		A reference to the moved buffer compiled shader (i.e.
 						this buffer compiled shader).
 		 */
 		BufferCompiledShader& operator=(
@@ -227,24 +223,24 @@ namespace mage::rendering {
 
 		/**
 		 Returns the shader bytecode of this buffer compiled shader.
-		 
-		 @return		A pointer to the shader bytecode of this buffer 
+
+		 @return		A pointer to the shader bytecode of this buffer
 						compiled shader.
 		 */
 		[[nodiscard]]
-		virtual const BYTE* GetBytecode() const noexcept override {
+		virtual const U8* GetBytecode() const noexcept override {
 			return m_bytecode;
 		}
 
 		/**
-		 Returns the size of the shader bytecode (in bytes) of this buffer 
+		 Returns the size of the shader bytecode (in bytes) of this buffer
 		 compiled shader.
-		 
-		 @return		The size of the shader bytecode (in bytes) of this 
+
+		 @return		The size of the shader bytecode (in bytes) of this
 						buffer compiled shader.
 		 */
 		[[nodiscard]]
-		virtual SIZE_T GetBytecodeSize() const noexcept override {
+		virtual std::size_t GetBytecodeSize() const noexcept override {
 			return m_bytecode_size;
 		}
 
@@ -257,12 +253,12 @@ namespace mage::rendering {
 		/**
 		 A pointer to the shader bytecode of this buffer compiled shader.
 		 */
-		const BYTE* m_bytecode;
+		const U8* m_bytecode;
 
 		/**
 		 The size of the shader bytecode of this buffer compiled shader.
 		 */
-		SIZE_T m_bytecode_size;
+		std::size_t m_bytecode_size;
 	};
 
 	#pragma endregion
@@ -285,26 +281,26 @@ namespace mage::rendering {
 
 		/**
 		 Constructs a blob compiled shader.
-		 
+
 		 @param[in]		fname
-						A reference to the filename.
+						The filename.
 		 @throws		Exception
 						Failed to load the compiled shader from the given file.
 		 */
-		explicit BlobCompiledShader(const wstring& fname) noexcept;
-		
+		explicit BlobCompiledShader(std::wstring_view fname) noexcept;
+
 		/**
 		 Constructs a blob compiled shader from the given blob compiled shader.
-		 
+
 		 @param[in]		compiled_shader
 						A reference to the blob compiled shader to copy.
 		 */
 		BlobCompiledShader(const BlobCompiledShader& compiled_shader) noexcept;
 
 		/**
-		 Constructs a blob compiled shader by moving the given blob compiled 
+		 Constructs a blob compiled shader by moving the given blob compiled
 		 shader.
-		 
+
 		 @param[in]		compiled_shader
 						A reference to the blob compiled shader to move.
 		 */
@@ -321,10 +317,10 @@ namespace mage::rendering {
 
 		/**
 		 Copies the given blob compiled shader to this blob compiled shader.
-		 
+
 		 @param[in]		compiled_shader
 						A reference to the blob compiled shader to copy.
-		 @return		A reference to the copy of the given blob compiled 
+		 @return		A reference to the copy of the given blob compiled
 						shader (i.e. this blob compiled shader).
 		 */
 		BlobCompiledShader& operator=(
@@ -332,10 +328,10 @@ namespace mage::rendering {
 
 		/**
 		 Moves the given blob compiled shader to this blob compiled shader.
-		 
+
 		 @param[in]		compiled_shader
 						A reference to the blob compiled shader to copy.
-		 @return		A reference to the moved blob compiled shader (i.e. 
+		 @return		A reference to the moved blob compiled shader (i.e.
 						this blob compiled shader).
 		 */
 		BlobCompiledShader& operator=(
@@ -347,24 +343,24 @@ namespace mage::rendering {
 
 		/**
 		 Returns the shader bytecode of this blob compiled shader.
-		 
-		 @return		A pointer to the shader bytecode of this blob compiled 
+
+		 @return		A pointer to the shader bytecode of this blob compiled
 						shader.
 		 */
 		[[nodiscard]]
-		virtual const BYTE* GetBytecode() const noexcept override {
-			return static_cast< BYTE* >(m_shader_blob->GetBufferPointer());
+		virtual const U8* GetBytecode() const noexcept override {
+			return static_cast< U8* >(m_shader_blob->GetBufferPointer());
 		}
 
 		/**
-		 Returns the size of the shader bytecode (in bytes) of this blob 
+		 Returns the size of the shader bytecode (in bytes) of this blob
 		 compiled shader.
-		 
-		 @return		The size of the shader bytecode (in bytes) of this blob 
+
+		 @return		The size of the shader bytecode (in bytes) of this blob
 						compiled shader.
 		 */
 		[[nodiscard]]
-		virtual SIZE_T GetBytecodeSize() const noexcept override {
+		virtual std::size_t GetBytecodeSize() const noexcept override {
 			return m_shader_blob->GetBufferSize();
 		}
 

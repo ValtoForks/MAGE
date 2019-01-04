@@ -24,12 +24,10 @@ float4 PS(float4 input : SV_Position, uint index : SV_SampleIndex) : SV_Target {
 float4 PS(float4 input : SV_Position) : SV_Target {
 #endif // MSAA_AS_SSAA
 
-	// Obtain the NDC space coodinates.
-	const float2 p_ss_viewport = uint2(input.xy) - g_ss_viewport_top_left;
-	const float2 p_ndc_xy      = UVtoNDC(SSViewportToUV(p_ss_viewport));
-	const float3 p_ndc         = float3(p_ndc_xy, input.z);
-	// Obtain the world space coordinates.
-	const float3 p_world       = NDCToWorld(p_ndc);
+	// Obtain the world space coodinates.
+	const float3 p_camera = SSDisplayToCamera(input.xy, input.z);
+	const float3 p_world  = CameraToWorld(p_camera);
+
 	// Sample the cube map.
 	return float4(g_sky.Sample(g_linear_wrap_sampler, p_world), 1.0f);
 }

@@ -5,7 +5,7 @@
 //-----------------------------------------------------------------------------
 #pragma region
 
-#include "type\types.hpp"
+#include "exception\exception.hpp"
 
 #pragma endregion
 
@@ -26,12 +26,12 @@ namespace mage {
 		//---------------------------------------------------------------------
 
 		/**
-		 Copies the given big endian binary writer to this big endian binary 
+		 Copies the given big endian binary writer to this big endian binary
 		 writer.
 
 		 @param[in]		writer
 						A reference to a big endian binary writer to copy.
-		 @return		A reference to the copy of the given big endian binary 
+		 @return		A reference to the copy of the given big endian binary
 						writer (i.e. this big endian binary writer).
 		 */
 		BigEndianBinaryWriter& operator=(
@@ -42,7 +42,7 @@ namespace mage {
 
 		 @param[in]		writer
 						A reference to a big endian binary writer to move.
-		 @return		A reference to the moved big endian binary writer (i.e. 
+		 @return		A reference to the moved big endian binary writer (i.e.
 						this big endian binary writer).
 		 */
 		BigEndianBinaryWriter& operator=(
@@ -53,24 +53,14 @@ namespace mage {
 		//---------------------------------------------------------------------
 
 		/**
-		 Writes to the given file.
+		 Writes to the file associated with the given path.
 
-		 @param[in]		fname
-						The file name.
+		 @param[in]		path
+						The path.
 		 @throws		Exception
-						Failed to write to the given file.
+						Failed to write to the file.
 		 */
-		void WriteToFile(wstring fname);
-
-		/**
-		 Returns the current filename of this writer.
-
-		 @return		A reference to the current filename of this writer.
-		 */
-		[[nodiscard]]
-		const wstring& GetFilename() const noexcept {
-			return m_fname;
-		}
+		void WriteToFile(std::filesystem::path path);
 
 	protected:
 
@@ -82,18 +72,18 @@ namespace mage {
 		 Constructs a big endian binary writer.
 		 */
 		BigEndianBinaryWriter();
-		
+
 		/**
-		 Constructs a big endian binary writer from the given big endian binary 
+		 Constructs a big endian binary writer from the given big endian binary
 		 writer.
 
 		 @param[in]		writer
 						A reference to the big endian binary writer to copy.
 		 */
 		BigEndianBinaryWriter(const BigEndianBinaryWriter& writer) = delete;
-		
+
 		/**
-		 Constructs a big endian binary writer by moving the given big endian 
+		 Constructs a big endian binary writer by moving the given big endian
 		 binary writer.
 
 		 @param[in]		writer
@@ -111,30 +101,41 @@ namespace mage {
 		//---------------------------------------------------------------------
 
 		/**
+		 Returns the current path of this big endian binary writer.
+
+		 @return		A reference to the current path of this big endian
+						binary writer.
+		 */
+		[[nodiscard]]
+		const std::filesystem::path& GetPath() const noexcept {
+			return m_path;
+		}
+
+		/**
 		 Writes the given data.
 
-		 @tparam		DataT
+		 @tparam		T
 						The data type.
 		 @param[in]		data
 						A reference to the data.
 		 @throws		Exception
 						Failed to write the given data.
 		 */
-		template< typename DataT >
-		void Write(const DataT& data);
-		
+		template< typename T >
+		void Write(const T& data);
+
 		/**
 		 Writes the given data array.
 
-		 @tparam		DataT
+		 @tparam		T
 						The data type.
 		 @param[in]		data
 						The data array.
 		 @throws		Exception
 						Failed to write the given data.
 		 */
-		template< typename DataT >
-		void WriteArray(gsl::span< const DataT > data);
+		template< typename T >
+		void WriteArray(gsl::span< const T > data);
 
 		/**
 		 Writes the given character.
@@ -145,12 +146,12 @@ namespace mage {
 						Failed to write the given character.
 		 */
 		void WriteCharacter(char c);
-		
+
 		/**
 		 Writes the given string.
 
 		 @param[in]		str
-						A pointer to the first null-terminated byte string to 
+						A pointer to the first null-terminated byte string to
 						write.
 		 @throws		Exception
 						Failed to write the given string.
@@ -181,9 +182,9 @@ namespace mage {
 		UniqueFileStream m_file_stream;
 
 		/**
-		 The current filename of this big endian binary writer.
+		 The current path of this big endian binary writer.
 		 */
-		wstring m_fname;
+		std::filesystem::path m_path;
 	};
 }
 

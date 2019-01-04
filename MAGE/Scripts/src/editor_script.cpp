@@ -5,7 +5,7 @@
 
 #include "editor_script.hpp"
 #include "scene\scene.hpp"
-#include "imgui.hpp"
+#include "imgui.h"
 
 #pragma endregion
 
@@ -23,27 +23,27 @@ namespace mage::script {
 						const F32x2& clipping_planes) {
 
 			//-----------------------------------------------------------------
-			// Lens Radius
+			// Aperture Radius
 			//-----------------------------------------------------------------
-			auto radius = lens.GetLensRadius();
-			ImGui::InputFloat("Radius", &radius);
-			lens.SetLensRadius(radius);
+			auto aperture_radius = lens.GetApertureRadius();
+			ImGui::SliderFloat("Aperture Radius", &aperture_radius, 0.0f, 0.10f);
+			lens.SetApertureRadius(aperture_radius);
 
 			//-----------------------------------------------------------------
 			// Focal Length
 			//-----------------------------------------------------------------
 			auto focal_length = lens.GetFocalLength();
-			ImGui::SliderFloat("Focal Length", &focal_length, 
-							   clipping_planes.m_x, 
-							   clipping_planes.m_y);
+			ImGui::SliderFloat("Focal Length", &focal_length, 0.01f, 0.10f);
 			lens.SetFocalLength(focal_length);
 
 			//-----------------------------------------------------------------
 			// Maximum Radius of the Circle-of-Confusion
 			//-----------------------------------------------------------------
-			auto coc = lens.GetMaximumCoCRadius();
-			ImGui::SliderFloat("CoC", &coc, 0.0f, 10.0f);
-			lens.SetMaximumCoCRadius(coc);
+			auto focus_distance = lens.GetFocusDistance();
+			ImGui::SliderFloat("Focus Distance", &focus_distance,
+							   clipping_planes[0],
+							   clipping_planes[1]);
+			lens.SetFocusDistance(focus_distance);
 		}
 
 		void DrawWidget(rendering::VoxelizationSettings& settings) {
@@ -54,7 +54,7 @@ namespace mage::script {
 			//-----------------------------------------------------------------
 			if (ImGui::TreeNode("Voxelization")) {
 				auto origin = VoxelizationSettings::GetVoxelGridCenter();
-				ImGui::InputFloat3("Origin", origin.GetData());
+				ImGui::InputFloat3("Origin", origin.data());
 				VoxelizationSettings::SetVoxelGridCenter(origin);
 
 				auto exponent = static_cast< S32 >(
@@ -75,15 +75,14 @@ namespace mage::script {
 			// Voxel Cone Tracing
 			//-----------------------------------------------------------------
 			if (ImGui::TreeNode("Voxel Cone Tracing")) {
-				auto nb_cones = static_cast< S32 >(settings.GetNumberOfCones());
-				ImGui::SliderInt("Number of Cones", &nb_cones, 0,
-								 static_cast< S32 >(VoxelizationSettings::s_max_nb_cones));
-				settings.SetNumberOfCones(static_cast< U32 >(nb_cones));
+				auto vct = settings.UsesVCT();
+				ImGui::Checkbox("VCT", &vct);
+				settings.SetVCT(vct);
 
-				auto cone_step_multiplier = settings.GetConeStepMultiplier();
-				ImGui::DragFloat("Cone Step Multiplier", &cone_step_multiplier,
+				auto cone_step = settings.GetConeStep();
+				ImGui::DragFloat("Cone Step", &cone_step,
 								 0.01f, 0.01f, 1.0f, "%.2f");
-				settings.SetConeStepMultiplier(cone_step_multiplier);
+				settings.SetConeStep(cone_step);
 
 				auto max_cone_distance = settings.GetMaxConeDistance();
 				ImGui::DragFloat("Max Cone Distance", &max_cone_distance,
@@ -95,11 +94,12 @@ namespace mage::script {
 		}
 
 		void DrawWidget(rendering::Fog& fog) {
+
 			//-----------------------------------------------------------------
 			// Base Color
 			//-----------------------------------------------------------------
 			SRGB color(fog.GetBaseColor());
-			ImGui::ColorEdit3("Base Color", color.GetData());
+			ImGui::ColorEdit3("Base Color", color.data());
 			fog.GetBaseColor() = RGB(color);
 
 			//-----------------------------------------------------------------
@@ -111,12 +111,13 @@ namespace mage::script {
 		}
 
 		void DrawWidget(rendering::Sky& sky) {
+
 			//-----------------------------------------------------------------
 			// Texture
 			//-----------------------------------------------------------------
 			if (sky.GetTexture()) {
-				const auto& guid = sky.GetTexture()->GetGuid();
-				ImGui::LabelText("Sky Texture", str_convert(guid).c_str());
+				const UTF16toUTF8 guid(sky.GetTexture()->GetGuid());
+				ImGui::LabelText("Sky Texture", guid.c_str());
 			}
 			else {
 				ImGui::Text("mage_black_texture");
@@ -136,7 +137,7 @@ namespace mage::script {
 			using rendering::BRDF;
 			using rendering::ToneMapping;
 			using rendering::RenderLayer;
-			
+
 			//-----------------------------------------------------------------
 			// Render Mode
 			//-----------------------------------------------------------------
@@ -202,23 +203,21 @@ namespace mage::script {
 				"Lambertian",
 				"Blinn-Phong",
 				"Cook-Torrance",
-				"Frostbite",
-				"Ward-Duer"
+				"Frostbite"
 			};
 			static constexpr BRDF brdfs[] = {
 				BRDF::Lambertian,
 				BRDF::BlinnPhong,
 				BRDF::CookTorrance,
-				BRDF::Frostbite,
-				BRDF::WardDuer
+				BRDF::Frostbite
 			};
 			static_assert(std::size(brdf_names) == std::size(brdfs));
-		
+
 			auto brdf_index = static_cast< int >(settings.GetBRDF());
 			ImGui::Combo("BRDF", &brdf_index, brdf_names,
 						 static_cast< int >(std::size(brdf_names)));
 			settings.SetBRDF(brdfs[brdf_index]);
-	
+
 			//-----------------------------------------------------------------
 			// Tone Mapping
 			//-----------------------------------------------------------------
@@ -237,7 +236,7 @@ namespace mage::script {
 				ToneMapping::Uncharted
 			};
 			static_assert(std::size(tone_mapping_names) == std::size(tone_mappings));
-		
+
 			auto tone_mapping_index = static_cast< int >(settings.GetToneMapping());
 			ImGui::Combo("Tone Mapping", &tone_mapping_index, tone_mapping_names,
 						 static_cast< int >(std::size(tone_mappings)));
@@ -247,7 +246,7 @@ namespace mage::script {
 			// Voxelization Settings
 			//-----------------------------------------------------------------
 			auto render_mode = settings.GetRenderMode();
-			if (RenderMode::Forward   == render_mode || 
+			if (RenderMode::Forward   == render_mode ||
 				RenderMode::Deferred  == render_mode ||
 				RenderMode::VoxelGrid == render_mode) {
 
@@ -268,7 +267,7 @@ namespace mage::script {
 				ImGui::OpenPopup("Render Layers");
 			}
 			if (ImGui::BeginPopup("Render Layers")) {
-			
+
 				if (auto wireframe = settings.ContainsRenderLayer(RenderLayer::Wireframe);
 					ImGui::Checkbox("Wireframe", &wireframe)) {
 
@@ -285,29 +284,29 @@ namespace mage::script {
 			}
 		}
 
-		void DrawWidget(rendering::Viewport& viewport, 
+		void DrawWidget(rendering::Viewport& viewport,
 						const F32x2& display_resolution) {
-			
+
 			static bool normalization = false;
 
 			if (normalization) {
 				//-------------------------------------------------------------
 				// Top Left
 				//-------------------------------------------------------------
-				auto top_left 
-					= AbsoluteToNormalized(F32x2(viewport.GetTopLeft()), 
+				auto top_left
+					= AbsoluteToNormalized(F32x2(viewport.GetTopLeft()),
 										   display_resolution);
-				ImGui::InputFloat2("Top Left", top_left.GetData());
-				viewport.SetTopLeft(U32x2(
+				ImGui::InputFloat2("Top Left", top_left.data());
+				viewport.SetTopLeft(S32x2(
 					NormalizedToAbsolute(top_left, display_resolution)));
 
 				//-------------------------------------------------------------
 				// Width and Height
 				//-------------------------------------------------------------
-				auto resolution 
+				auto resolution
 					= AbsoluteToNormalized(F32x2(viewport.GetSize()),
 										   display_resolution);
-				ImGui::InputFloat2("Resolution", resolution.GetData());
+				ImGui::InputFloat2("Resolution", resolution.data());
 				viewport.SetSize(U32x2(
 					NormalizedToAbsolute(resolution, display_resolution)));
 			}
@@ -316,14 +315,14 @@ namespace mage::script {
 				// Top Left
 				//-------------------------------------------------------------
 				auto top_left = S32x2(viewport.GetTopLeft());
-				ImGui::InputInt2("Top Left", top_left.GetData());
-				viewport.SetTopLeft(U32x2(top_left));
+				ImGui::InputInt2("Top Left", top_left.data());
+				viewport.SetTopLeft(top_left);
 
 				//-------------------------------------------------------------
 				// Width and Height
 				//-------------------------------------------------------------
 				auto resolution = S32x2(viewport.GetSize());
-				ImGui::InputInt2("Resolution", resolution.GetData());
+				ImGui::InputInt2("Resolution", resolution.data());
 				viewport.SetSize(U32x2(resolution));
 			}
 
@@ -337,7 +336,7 @@ namespace mage::script {
 			// Clipping Planes
 			//-----------------------------------------------------------------
 			auto clipping_planes = camera.GetClippingPlanes();
-			ImGui::InputFloat2("Clipping Planes", clipping_planes.GetData());
+			ImGui::InputFloat2("Clipping Planes", clipping_planes.data());
 			camera.SetClippingPlanes(std::move(clipping_planes));
 
 			//-----------------------------------------------------------------
@@ -384,24 +383,24 @@ namespace mage::script {
 
 		void DrawWidget(rendering::OrthographicCamera& camera,
 						const U32x2& display_resolution) {
-			
+
 			//-----------------------------------------------------------------
 			// Size
 			//-----------------------------------------------------------------
 			auto size = camera.GetSize();
-			ImGui::InputFloat2("Resolution", size.GetData());
+			ImGui::InputFloat2("Size", size.data());
 			camera.SetSize(std::move(size));
 
 			//-----------------------------------------------------------------
 			// Camera
 			//-----------------------------------------------------------------
-			DrawWidget(static_cast< rendering::Camera& >(camera), 
+			DrawWidget(static_cast< rendering::Camera& >(camera),
 					   display_resolution);
 		}
-	
+
 		void DrawWidget(rendering::PerspectiveCamera& camera,
 						const U32x2& display_resolution) {
-			
+
 			//-----------------------------------------------------------------
 			// Aspect Ratio
 			//-----------------------------------------------------------------
@@ -419,16 +418,17 @@ namespace mage::script {
 			//-----------------------------------------------------------------
 			// Camera
 			//-----------------------------------------------------------------
-			DrawWidget(static_cast< rendering::Camera& >(camera), 
+			DrawWidget(static_cast< rendering::Camera& >(camera),
 					   display_resolution);
 		}
 
 		void DrawWidget(rendering::AmbientLight& light) {
+
 			//-----------------------------------------------------------------
 			// Base Color
 			//-----------------------------------------------------------------
 			SRGB color(light.GetBaseColor());
-			ImGui::ColorEdit3("Base Color", color.GetData());
+			ImGui::ColorEdit3("Base Color", color.data());
 			light.GetBaseColor() = RGB(color);
 
 			//-----------------------------------------------------------------
@@ -438,13 +438,14 @@ namespace mage::script {
 			ImGui::InputFloat("Radiance", &radiance);
 			light.SetRadiance(radiance);
 		}
-	
+
 		void DrawWidget(rendering::DirectionalLight& light) {
+
 			//-----------------------------------------------------------------
 			// Base Color
 			//-----------------------------------------------------------------
 			SRGB color(light.GetBaseColor());
-			ImGui::ColorEdit3("Base Color", color.GetData());
+			ImGui::ColorEdit3("Base Color", color.data());
 			light.GetBaseColor() = RGB(color);
 
 			//-----------------------------------------------------------------
@@ -453,14 +454,45 @@ namespace mage::script {
 			auto irradiance = light.GetIrradiance();
 			ImGui::InputFloat("Irradiance", &irradiance);
 			light.SetIrradiance(irradiance);
+
+			//-----------------------------------------------------------------
+			// Size
+			//-----------------------------------------------------------------
+			auto size = light.GetSize();
+			ImGui::InputFloat2("Size", size.data());
+			light.SetSize(std::move(size));
+
+			//-----------------------------------------------------------------
+			// Range
+			//-----------------------------------------------------------------
+			auto range = light.GetRange();
+			ImGui::InputFloat("Range", &range);
+			light.SetRange(range);
+
+			//-----------------------------------------------------------------
+			// Shadows
+			//-----------------------------------------------------------------
+			auto shadows = light.UseShadows();
+			ImGui::Checkbox("Shadows", &shadows);
+			light.SetShadows(shadows);
+
+			//-----------------------------------------------------------------
+			// Clipping Planes and Size
+			//-----------------------------------------------------------------
+			if (shadows) {
+				auto clipping_planes = light.GetClippingPlanes();
+				ImGui::InputFloat2("Clipping Planes", clipping_planes.data());
+				light.SetClippingPlanes(std::move(clipping_planes));
+			}
 		}
-	
+
 		void DrawWidget(rendering::OmniLight& light) {
+
 			//-----------------------------------------------------------------
 			// Base Color
 			//-----------------------------------------------------------------
 			SRGB color(light.GetBaseColor());
-			ImGui::ColorEdit3("Base Color", color.GetData());
+			ImGui::ColorEdit3("Base Color", color.data());
 			light.GetBaseColor() = RGB(color);
 
 			//-----------------------------------------------------------------
@@ -496,17 +528,18 @@ namespace mage::script {
 			//-----------------------------------------------------------------
 			if (shadows) {
 				auto clipping_planes = light.GetClippingPlanes();
-				ImGui::InputFloat2("Clipping Planes", clipping_planes.GetData());
+				ImGui::InputFloat2("Clipping Planes", clipping_planes.data());
 				light.SetClippingPlanes(std::move(clipping_planes));
 			}
 		}
-	
+
 		void DrawWidget(rendering::SpotLight& light) {
+
 			//-----------------------------------------------------------------
 			// Base Color
 			//-----------------------------------------------------------------
 			SRGB color(light.GetBaseColor());
-			ImGui::ColorEdit3("Base Color", color.GetData());
+			ImGui::ColorEdit3("Base Color", color.data());
 			light.GetBaseColor() = RGB(color);
 
 			//-----------------------------------------------------------------
@@ -551,26 +584,26 @@ namespace mage::script {
 			//-----------------------------------------------------------------
 			if (shadows) {
 				auto clipping_planes = light.GetClippingPlanes();
-				ImGui::InputFloat2("Clipping Planes", clipping_planes.GetData());
+				ImGui::InputFloat2("Clipping Planes", clipping_planes.data());
 				light.SetClippingPlanes(std::move(clipping_planes));
 			}
 		}
 
-		void DrawWidget(TextureTransform& transform) {
+		void DrawWidget(TextureTransform2D& transform) {
 			ImGui::Text("Texture Transform:");
 
 			//-----------------------------------------------------------------
 			// Translation
 			//-----------------------------------------------------------------
-			auto translation = transform.GetTranslation();
-			ImGui::InputFloat2("Translation", translation.GetData());
+			auto translation = transform.GetTranslationView();
+			ImGui::InputFloat2("Translation", translation.data());
 			transform.SetTranslation(std::move(translation));
 
 			//-----------------------------------------------------------------
 			// Rotation Origin
 			//-----------------------------------------------------------------
-			auto rotation_origin = transform.GetRotationOrigin();
-			ImGui::InputFloat2("Rotation Origin", rotation_origin.GetData());
+			auto rotation_origin = transform.GetRotationOriginView();
+			ImGui::InputFloat2("Rotation Origin", rotation_origin.data());
 			transform.SetRotationOrigin(std::move(rotation_origin));
 
 			//-----------------------------------------------------------------
@@ -578,13 +611,13 @@ namespace mage::script {
 			//-----------------------------------------------------------------
 			auto rotation = transform.GetRotation();
 			ImGui::DragFloat("Rotation", &rotation, 0.0001f, -XM_PI, XM_PI);
-			transform.SetRotation(ClampAngleRadians(rotation));
+			transform.SetRotation(rotation);
 
 			//-----------------------------------------------------------------
 			// Scale
 			//-----------------------------------------------------------------
-			auto scale = transform.GetScale();
-			ImGui::InputFloat2("Scale", scale.GetData());
+			auto scale = transform.GetScaleView();
+			ImGui::InputFloat2("Scale", scale.data());
 			transform.SetScale(std::move(scale));
 		}
 
@@ -592,10 +625,24 @@ namespace mage::script {
 			ImGui::Text("Material:");
 
 			//-----------------------------------------------------------------
+			// Transparency
+			//-----------------------------------------------------------------
+			auto transparency = material.IsTransparant();
+			ImGui::Checkbox("Transparency", &transparency);
+			material.SetTransparent(transparency);
+
+			//-----------------------------------------------------------------
+			// Radiance
+			//-----------------------------------------------------------------
+			auto radiance = material.GetRadiance();
+			ImGui::InputFloat("Radiance", &radiance);
+			material.SetRadiance(radiance);
+
+			//-----------------------------------------------------------------
 			// Base Color
 			//-----------------------------------------------------------------
 			SRGBA color(material.GetBaseColor());
-			ImGui::ColorEdit4("Base Color", color.GetData());
+			ImGui::ColorEdit4("Base Color", color.data());
 			material.GetBaseColor() = RGBA(color);
 
 			//-----------------------------------------------------------------
@@ -603,23 +650,16 @@ namespace mage::script {
 			//-----------------------------------------------------------------
 			const auto base_color_tex = material.GetBaseColorTexture();
 			if (base_color_tex) {
-				const auto& guid = base_color_tex->GetGuid();
-				ImGui::Text(str_convert(guid).c_str());
+				const UTF16toUTF8 guid(base_color_tex->GetGuid());
+				ImGui::Text(guid.c_str());
 				const auto resolution
 					= rendering::GetTexture2DSize(*material.GetBaseColorSRV());
-				ImGui::Text("%u x %u texels", resolution.m_x, resolution.m_y);
+				ImGui::Text("%u x %u texels", resolution[0], resolution[1]);
 			}
 			else {
 				ImGui::Text("mage_black_texture");
 				ImGui::Text("1 x 1 texel");
 			}
-
-			//-----------------------------------------------------------------
-			// Transparency
-			//-----------------------------------------------------------------
-			auto transparency = material.IsTransparant();
-			ImGui::Checkbox("Transparency", &transparency);
-			material.SetTransparent(transparency);
 
 			//-----------------------------------------------------------------
 			// Roughness
@@ -640,11 +680,11 @@ namespace mage::script {
 			//-----------------------------------------------------------------
 			const auto material_tex = material.GetMaterialTexture();
 			if (material_tex) {
-				const auto& guid = material_tex->GetGuid();
-				ImGui::Text(str_convert(guid).c_str());
+				const UTF16toUTF8 guid(material_tex->GetGuid());
+				ImGui::Text(guid.c_str());
 				const auto resolution
 					= rendering::GetTexture2DSize(*material.GetMaterialSRV());
-				ImGui::Text("%u x %u texels", resolution.m_x, resolution.m_y);
+				ImGui::Text("%u x %u texels", resolution[0], resolution[1]);
 			}
 			else {
 				ImGui::Text("mage_black_texture");
@@ -656,19 +696,12 @@ namespace mage::script {
 			//-----------------------------------------------------------------
 			const auto normal_tex = material.GetNormalTexture();
 			if (normal_tex) {
-				const auto& guid = normal_tex->GetGuid();
-				ImGui::Text(str_convert(guid).c_str());
+				const UTF16toUTF8 guid(normal_tex->GetGuid());
+				ImGui::Text(guid.c_str());
 				const auto resolution
 					= rendering::GetTexture2DSize(*material.GetNormalSRV());
-				ImGui::Text("%u x %u texels", resolution.m_x, resolution.m_y);
+				ImGui::Text("%u x %u texels", resolution[0], resolution[1]);
 			}
-
-			//-----------------------------------------------------------------
-			// Light Interaction
-			//-----------------------------------------------------------------
-			auto light_interaction = material.InteractsWithLight();
-			ImGui::Checkbox("Interacts with Light", &light_interaction);
-			material.SetLightInteraction(light_interaction);
 		}
 
 		void DrawWidget(rendering::Model& model) {
@@ -692,10 +725,10 @@ namespace mage::script {
 			model.SetLightOcclusion(light_occlusion);
 		}
 
-		void DrawWidget(SpriteTransform& transform, 
-						const F32x2& display_resolution, 
+		void DrawWidget(SpriteTransform2D& transform,
+						const F32x2& display_resolution,
 						const F32x2& texture_resolution) {
-			
+
 			ImGui::Text("Sprite Transform:");
 
 			static bool normalization = false;
@@ -704,15 +737,15 @@ namespace mage::script {
 			// Translation
 			//-----------------------------------------------------------------
 			if (normalization) {
-				auto translation = AbsoluteToNormalized(transform.GetTranslation(), 
+				auto translation = AbsoluteToNormalized(transform.GetTranslationView(),
 														display_resolution);
-				ImGui::InputFloat2("Translation", translation.GetData());
+				ImGui::InputFloat2("Translation", translation.data());
 				transform.SetTranslation(
 					NormalizedToAbsolute(translation, display_resolution));
 			}
 			else {
-				auto translation = transform.GetTranslation();
-				ImGui::InputFloat2("Translation", translation.GetData());
+				auto translation = transform.GetTranslationView();
+				ImGui::InputFloat2("Translation", translation.data());
 				transform.SetTranslation(std::move(translation));
 			}
 
@@ -728,14 +761,14 @@ namespace mage::script {
 			//-----------------------------------------------------------------
 			if (normalization) {
 				auto rotation_origin = AbsoluteToNormalized(
-					transform.GetRotationOrigin(), texture_resolution);
-				ImGui::InputFloat2("Rotation Origin", rotation_origin.GetData());
+					transform.GetRotationOriginView(), texture_resolution);
+				ImGui::InputFloat2("Rotation Origin", rotation_origin.data());
 				transform.SetRotationOrigin(
 					NormalizedToAbsolute(rotation_origin, texture_resolution));
 			}
 			else {
-				auto rotation_origin = transform.GetRotationOrigin();
-				ImGui::InputFloat2("Rotation Origin", rotation_origin.GetData());
+				auto rotation_origin = transform.GetRotationOriginView();
+				ImGui::InputFloat2("Rotation Origin", rotation_origin.data());
 				transform.SetRotationOrigin(std::move(rotation_origin));
 			}
 
@@ -744,13 +777,13 @@ namespace mage::script {
 			//-----------------------------------------------------------------
 			auto rotation = transform.GetRotation();
 			ImGui::DragFloat("Rotation", &rotation, 0.0001f, -XM_PI, XM_PI);
-			transform.SetRotation(ClampAngleRadians(rotation));
+			transform.SetRotation(rotation);
 
 			//-----------------------------------------------------------------
 			// Scale
 			//-----------------------------------------------------------------
-			auto scale = transform.GetScale();
-			ImGui::InputFloat2("Scale", scale.GetData());
+			auto scale = transform.GetScaleView();
+			ImGui::InputFloat2("Scale", scale.data());
 			transform.SetScale(std::move(scale));
 
 			ImGui::Checkbox("Normalization", &normalization);
@@ -758,17 +791,17 @@ namespace mage::script {
 
 		void DrawWidget(rendering::SpriteImage& sprite,
 						const U32x2& display_resolution) {
-			
+
 			using rendering::SpriteEffect;
-			
+
 			const auto base_color_tex = sprite.GetBaseColorTexture();
 			const auto texture_resolution = !base_color_tex ? U32x2(1u, 1u)
 				: rendering::GetTexture2DSize(*sprite.GetBaseColorSRV());
-				
+
 			//-----------------------------------------------------------------
 			// Sprite transform
 			//-----------------------------------------------------------------
-			DrawWidget(sprite.GetSpriteTransform(), 
+			DrawWidget(sprite.GetSpriteTransform(),
 					   static_cast< F32x2 >(display_resolution),
 					   static_cast< F32x2 >(texture_resolution));
 
@@ -778,17 +811,17 @@ namespace mage::script {
 			// Base Color
 			//-----------------------------------------------------------------
 			SRGBA color(sprite.GetBaseColor());
-			ImGui::ColorEdit4("Base Color", color.GetData());
+			ImGui::ColorEdit4("Base Color", color.data());
 			sprite.GetBaseColor() = RGBA(color);
 
 			//-----------------------------------------------------------------
 			// Base Color Texture
 			//-----------------------------------------------------------------
 			if (base_color_tex) {
-				const auto& guid = base_color_tex->GetGuid();
-				ImGui::Text(str_convert(guid).c_str());
-				ImGui::Text("%u x %u texels", 
-							texture_resolution.m_x, texture_resolution.m_y);
+				const UTF16toUTF8 guid(base_color_tex->GetGuid());
+				ImGui::Text(guid.c_str());
+				ImGui::Text("%u x %u texels",
+							texture_resolution[0], texture_resolution[1]);
 			}
 			else {
 				ImGui::Text("mage_black_texture");
@@ -817,15 +850,15 @@ namespace mage::script {
 						 static_cast< int >(std::size(sprite_effect_names)));
 			sprite.SetSpriteEffects(sprite_effects[sprite_effect_index]);
 		}
-	
+
 		void DrawWidget(rendering::SpriteText& sprite,
 						const U32x2& display_resolution) {
 
 			using rendering::SpriteEffect;
 			using rendering::SpriteText;
-			
+
 			const auto font = sprite.GetFont();
-			const auto texture_resolution = !font ? U32x2(1, 1)
+			const auto texture_resolution = !font ? U32x2(1u, 1u)
 				: rendering::GetTexture2DSize(*sprite.GetFontSRV());
 
 			//-----------------------------------------------------------------
@@ -841,10 +874,10 @@ namespace mage::script {
 			// Sprite font
 			//-----------------------------------------------------------------
 			if (font) {
-				const auto& guid = font->GetGuid();
-				ImGui::Text(str_convert(guid).c_str());
+				const UTF16toUTF8 guid(font->GetGuid());
+				ImGui::Text(guid.c_str());
 				ImGui::Text("%u x %u texels",
-							texture_resolution.m_x, texture_resolution.m_y);
+							texture_resolution[0], texture_resolution[1]);
 			}
 			else {
 				ImGui::Text("no font");
@@ -877,7 +910,7 @@ namespace mage::script {
 			// Text effect color
 			//-----------------------------------------------------------------
 			SRGBA color(sprite.GetTextEffectColor());
-			ImGui::ColorEdit4("Text Effect Color", color.GetData());
+			ImGui::ColorEdit4("Text Effect Color", color.data());
 			sprite.GetTextEffectColor() = RGBA(color);
 
 			//-----------------------------------------------------------------
@@ -905,34 +938,34 @@ namespace mage::script {
 			//-----------------------------------------------------------------
 			// Translation
 			//-----------------------------------------------------------------
-			if (auto translation = transform.GetTranslation();
-				ImGui::InputFloat3("Translation", translation.GetData())) {
+			if (auto translation = transform.GetTranslationView();
+				ImGui::InputFloat3("Translation", translation.data())) {
 
 				transform.SetTranslation(std::move(translation));
 			}
-		
+
 			//-----------------------------------------------------------------
 			// Rotation
 			//-----------------------------------------------------------------
-			if (auto rotation = transform.GetRotation();
-				ImGui::InputFloat3("Rotation", rotation.GetData())) {
+			if (auto rotation = transform.GetRotationView();
+				ImGui::InputFloat3("Rotation", rotation.data())) {
 
 				transform.SetRotation(std::move(rotation));
 			}
-		
+
 			//-----------------------------------------------------------------
 			// Scale
 			//-----------------------------------------------------------------
-			if (auto scale = transform.GetScale();
-				ImGui::InputFloat3("Scale", scale.GetData())) {
+			if (auto scale = transform.GetScaleView();
+				ImGui::InputFloat3("Scale", scale.data())) {
 
 				transform.SetScale(std::move(scale));
 			}
 		}
 
-		void DrawWidget(Node& node, 
+		void DrawWidget(Node& node,
 						const U32x2& display_resolution) {
-			
+
 			using rendering::OrthographicCamera;
 			using rendering::PerspectiveCamera;
 			using rendering::AmbientLight;
@@ -947,13 +980,13 @@ namespace mage::script {
 			// Name
 			//-----------------------------------------------------------------
 			char buffer[128];
-			sprintf_s(buffer, std::size(buffer), "%s", node.GetName().c_str());
+			WriteTo(buffer, "{}", node.GetName());
 			if (ImGui::InputText("", buffer, std::size(buffer))) {
-				node.SetName(string(buffer));
+				node.SetName(std::string(buffer));
 			}
 
 			ImGui::SameLine();
-		
+
 			//-----------------------------------------------------------------
 			// State
 			//-----------------------------------------------------------------
@@ -961,7 +994,7 @@ namespace mage::script {
 				ImGui::Checkbox("Active", &active)) {
 				node.SetState(active ? State::Active : State::Passive);
 			}
-		
+
 			ImGui::Separator();
 
 			//-----------------------------------------------------------------
@@ -975,13 +1008,18 @@ namespace mage::script {
 			//-----------------------------------------------------------------
 			// OrthographicCameras
 			//-----------------------------------------------------------------
-			node.ForEach< OrthographicCamera >([&display_resolution]
-			(OrthographicCamera& camera) {
-				if (const auto id = std::to_string(camera.GetGuid());
-					ImGui::TreeNode(id.c_str(), "Orthographic Camera")) {
-				
+			node.ForEach< OrthographicCamera >([&display_resolution](OrthographicCamera& camera) {
+				char guid[20];
+				WriteTo(guid, "{}", camera.GetGuid());
+				if (ImGui::TreeNode(guid, "Orthographic Camera")) {
+
+					if (auto active = (State::Active == camera.GetState());
+					ImGui::Checkbox("Active", &active)) {
+						camera.SetState(active ? State::Active : State::Passive);
+					}
+
 					DrawWidget(camera, display_resolution);
-				
+
 					ImGui::TreePop();
 				}
 			});
@@ -989,13 +1027,18 @@ namespace mage::script {
 			//-----------------------------------------------------------------
 			// PerspectiveCameras
 			//-----------------------------------------------------------------
-			node.ForEach< PerspectiveCamera >([&display_resolution]
-			(PerspectiveCamera& camera) {
-				if (const auto id = std::to_string(camera.GetGuid());
-					ImGui::TreeNode(id.c_str(), "Perspective Camera")) {
-				
+			node.ForEach< PerspectiveCamera >([&display_resolution](PerspectiveCamera& camera) {
+				char guid[20];
+				WriteTo(guid, "{}", camera.GetGuid());
+				if (ImGui::TreeNode(guid, "Perspective Camera")) {
+
+					if (auto active = (State::Active == camera.GetState());
+					ImGui::Checkbox("Active", &active)) {
+						camera.SetState(active ? State::Active : State::Passive);
+					}
+
 					DrawWidget(camera, display_resolution);
-				
+
 					ImGui::TreePop();
 				}
 			});
@@ -1004,8 +1047,14 @@ namespace mage::script {
 			// AmbientLights
 			//-----------------------------------------------------------------
 			node.ForEach< AmbientLight >([](AmbientLight& light) {
-				if (const auto id = std::to_string(light.GetGuid());
-					ImGui::TreeNode(id.c_str(), "Ambient Light")) {
+				char guid[20];
+				WriteTo(guid, "{}", light.GetGuid());
+				if (ImGui::TreeNode(guid, "Ambient Light")) {
+
+					if (auto active = (State::Active == light.GetState());
+					ImGui::Checkbox("Active", &active)) {
+						light.SetState(active ? State::Active : State::Passive);
+					}
 
 					DrawWidget(light);
 
@@ -1017,8 +1066,14 @@ namespace mage::script {
 			// DirectionalLights
 			//-----------------------------------------------------------------
 			node.ForEach< DirectionalLight >([](DirectionalLight& light) {
-				if (const auto id = std::to_string(light.GetGuid());
-					ImGui::TreeNode(id.c_str(), "Directional Light")) {
+				char guid[20];
+				WriteTo(guid, "{}", light.GetGuid());
+				if (ImGui::TreeNode(guid, "Directional Light")) {
+
+					if (auto active = (State::Active == light.GetState());
+					ImGui::Checkbox("Active", &active)) {
+						light.SetState(active ? State::Active : State::Passive);
+					}
 
 					DrawWidget(light);
 
@@ -1030,8 +1085,14 @@ namespace mage::script {
 			// OmniLights
 			//-----------------------------------------------------------------
 			node.ForEach< OmniLight >([](OmniLight& light) {
-				if (const auto id = std::to_string(light.GetGuid());
-					ImGui::TreeNode(id.c_str(), "Omni Light")) {
+				char guid[20];
+				WriteTo(guid, "{}", light.GetGuid());
+				if (ImGui::TreeNode(guid, "Omni Light")) {
+
+					if (auto active = (State::Active == light.GetState());
+					ImGui::Checkbox("Active", &active)) {
+						light.SetState(active ? State::Active : State::Passive);
+					}
 
 					DrawWidget(light);
 
@@ -1043,8 +1104,14 @@ namespace mage::script {
 			// SpotLights
 			//-----------------------------------------------------------------
 			node.ForEach< SpotLight >([](SpotLight& light) {
-				if (const auto id = std::to_string(light.GetGuid());
-					ImGui::TreeNode(id.c_str(), "Spotlight")) {
+				char guid[20];
+				WriteTo(guid, "{}", light.GetGuid());
+				if (ImGui::TreeNode(guid, "Spotlight")) {
+
+					if (auto active = (State::Active == light.GetState());
+					ImGui::Checkbox("Active", &active)) {
+						light.SetState(active ? State::Active : State::Passive);
+					}
 
 					DrawWidget(light);
 
@@ -1056,9 +1123,15 @@ namespace mage::script {
 			// Models
 			//-----------------------------------------------------------------
 			node.ForEach< Model >([](Model& model) {
-				if (const auto id = std::to_string(model.GetGuid());
-					ImGui::TreeNode(id.c_str(), "Model")) {
-				
+				char guid[20];
+				WriteTo(guid, "{}", model.GetGuid());
+				if (ImGui::TreeNode(guid, "Model")) {
+
+					if (auto active = (State::Active == model.GetState());
+					ImGui::Checkbox("Active", &active)) {
+						model.SetState(active ? State::Active : State::Passive);
+					}
+
 					DrawWidget(model);
 
 					ImGui::TreePop();
@@ -1068,10 +1141,15 @@ namespace mage::script {
 			//-----------------------------------------------------------------
 			// SpriteImages
 			//-----------------------------------------------------------------
-			node.ForEach< SpriteImage >([&display_resolution]
-			(SpriteImage& sprite) {
-				if (const auto id = std::to_string(sprite.GetGuid());
-					ImGui::TreeNode(id.c_str(), "Sprite Image")) {
+			node.ForEach< SpriteImage >([&display_resolution](SpriteImage& sprite) {
+				char guid[20];
+				WriteTo(guid, "{}", sprite.GetGuid());
+				if (ImGui::TreeNode(guid, "Sprite Image")) {
+
+					if (auto active = (State::Active == sprite.GetState());
+					ImGui::Checkbox("Active", &active)) {
+						sprite.SetState(active ? State::Active : State::Passive);
+					}
 
 					DrawWidget(sprite, display_resolution);
 
@@ -1082,10 +1160,15 @@ namespace mage::script {
 			//-----------------------------------------------------------------
 			// SpriteTexts
 			//-----------------------------------------------------------------
-			node.ForEach< SpriteText >([&display_resolution]
-			(SpriteText& sprite) {
-				if (const auto id = std::to_string(sprite.GetGuid());
-					ImGui::TreeNode(id.c_str(), "Sprite Text")) {
+			node.ForEach< SpriteText >([&display_resolution](SpriteText& sprite) {
+				char guid[20];
+				WriteTo(guid, "{}", sprite.GetGuid());
+				if (ImGui::TreeNode(guid, "Sprite Text")) {
+
+					if (auto active = (State::Active == sprite.GetState());
+					ImGui::Checkbox("Active", &active)) {
+						sprite.SetState(active ? State::Active : State::Passive);
+					}
 
 					DrawWidget(sprite, display_resolution);
 
@@ -1096,9 +1179,11 @@ namespace mage::script {
 
 		void DrawGraph(Node& node,
 					   ProxyPtr< Node >& selected) {
-			
-			const auto  id   = std::to_string(node.GetGuid());
-			const auto& name = node.GetName();
+
+			char guid[20];
+			WriteTo(guid, "{}", node.GetGuid());
+			char name[128];
+			WriteTo(name, "{}", node.GetName());
 
 			if (node.ContainsChilds()) {
 				static constexpr ImGuiTreeNodeFlags node_flags
@@ -1108,7 +1193,7 @@ namespace mage::script {
 				const ImGuiTreeNodeFlags flags = (node.Get() == selected)
 					? node_flags | ImGuiTreeNodeFlags_Selected : node_flags;
 
-				const auto node_open = ImGui::TreeNodeEx(id.c_str(), flags, name.c_str());
+				const auto node_open = ImGui::TreeNodeEx(guid, flags, name);
 
 				if (ImGui::IsItemClicked()) {
 					selected = node.Get();
@@ -1132,19 +1217,19 @@ namespace mage::script {
 				const ImGuiTreeNodeFlags flags = (node.Get() == selected)
 					? node_flags | ImGuiTreeNodeFlags_Selected : node_flags;
 
-				ImGui::TreeNodeEx(id.c_str(), flags, name.c_str());
+				ImGui::TreeNodeEx(guid, flags, name);
 				if (ImGui::IsItemClicked()) {
 					selected = node.Get();
 				}
 			}
 		}
 
-		void DrawGraph(Scene& scene, 
+		void DrawGraph(Scene& scene,
 					   ProxyPtr< Node >& selected) {
 
 			ImGui::Begin("Scene Graph");
 			// Increase spacing to differentiate leaves from expanded contents.
-			ImGui::PushStyleVar(ImGuiStyleVar_IndentSpacing, 
+			ImGui::PushStyleVar(ImGuiStyleVar_IndentSpacing,
 								ImGui::GetFontSize() * 3.0f);
 
 			scene.ForEach< Node >([&selected](Node& node) {
@@ -1175,12 +1260,13 @@ namespace mage::script {
 	//-------------------------------------------------------------------------
 	#pragma region
 
-	EditorScript::EditorScript() noexcept = default;
+	EditorScript::EditorScript() noexcept
+		: m_visible(false), m_selected() {}
 
 	EditorScript::EditorScript(const EditorScript& script) noexcept = default;
 
 	EditorScript::EditorScript(EditorScript&& script) noexcept = default;
-	
+
 	EditorScript::~EditorScript() = default;
 
 	EditorScript& EditorScript
@@ -1193,9 +1279,17 @@ namespace mage::script {
 		m_selected = nullptr;
 	}
 
-	void EditorScript::Update([[maybe_unused]] Engine& engine,
-							  [[maybe_unused]] F64 delta_time) {
-		
+	void EditorScript::Update([[maybe_unused]] Engine& engine) {
+		const auto& input_manager = engine.GetInputManager();
+		const auto& keyboard      = input_manager.GetKeyboard();
+
+		if (keyboard.IsActivated(DIK_F4)) {
+			m_visible = !m_visible;
+		}
+		if (m_visible) {
+			return;
+		}
+
 		const auto scene = engine.GetScene();
 		DrawGraph(*scene, m_selected);
 

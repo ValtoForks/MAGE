@@ -6,7 +6,7 @@
 #pragma region
 
 #include "renderer\buffer\structured_buffer.hpp"
-#include "renderer\buffer\light_buffer.hpp"
+#include "renderer\buffer\scene_buffer.hpp"
 #include "renderer\buffer\shadow_map_buffer.hpp"
 #include "renderer\pass\depth_pass.hpp"
 
@@ -17,7 +17,7 @@
 //-----------------------------------------------------------------------------
 namespace mage::rendering {
 
-	class LBufferPass final {
+	class LBufferPass {
 
 	public:
 
@@ -28,18 +28,18 @@ namespace mage::rendering {
 		/**
 		 Constructs a LBuffer pass.
 
-		 @param[in]		device
+		 @param[in,out]	device
 						A reference to the device.
-		 @param[in]		device_context
+		 @param[in,out]	device_context
 						A reference to the device context.
-		 @param[in]		state_manager
+		 @param[in,out]	state_manager
 						A reference to the state manager.
-		 @param[in]		resource_manager
+		 @param[in,out]	resource_manager
 						A reference to the resource manager.
 		 */
-		explicit LBufferPass(ID3D11Device& device, 
-							 ID3D11DeviceContext& device_context, 
-							 StateManager& state_manager, 
+		explicit LBufferPass(ID3D11Device& device,
+							 ID3D11DeviceContext& device_context,
+							 StateManager& state_manager,
 							 ResourceManager& resource_manager);
 		LBufferPass(const LBufferPass& buffer) = delete;
 		LBufferPass(LBufferPass&& buffer) noexcept;
@@ -58,7 +58,7 @@ namespace mage::rendering {
 
 		void XM_CALLCONV Render(const World& world,
 			                    FXMMATRIX world_to_projection);
-		
+
 	private:
 
 		//---------------------------------------------------------------------
@@ -70,10 +70,11 @@ namespace mage::rendering {
 
 		void ProcessLightsData(const World& world);
 
-		void XM_CALLCONV ProcessDirectionalLights(const World& world);
-		void XM_CALLCONV ProcessOmniLights(const World& world, 
+		void XM_CALLCONV ProcessDirectionalLights(const World& world,
+												  FXMMATRIX world_to_projection);
+		void XM_CALLCONV ProcessOmniLights(const World& world,
 										   FXMMATRIX world_to_projection);
-		void XM_CALLCONV ProcessSpotLights(const World& world, 
+		void XM_CALLCONV ProcessSpotLights(const World& world,
 										   FXMMATRIX world_to_projection);
 
 		void SetupShadowMaps();
@@ -93,7 +94,7 @@ namespace mage::rendering {
 		StructuredBuffer< DirectionalLightBuffer > m_directional_lights;
 		StructuredBuffer< OmniLightBuffer > m_omni_lights;
 		StructuredBuffer< SpotLightBuffer > m_spot_lights;
-		StructuredBuffer< ShadowMappedDirectionalLightBuffer > m_sm_directional_lights;
+		StructuredBuffer< DirectionalLightBuffer > m_sm_directional_lights;
 		StructuredBuffer< ShadowMappedOmniLightBuffer > m_sm_omni_lights;
 		StructuredBuffer< ShadowMappedSpotLightBuffer > m_sm_spot_lights;
 
@@ -101,7 +102,7 @@ namespace mage::rendering {
 		UniquePtr< ShadowCubeMapBuffer > m_omni_sms;
 		UniquePtr< ShadowMapBuffer > m_spot_sms;
 
-		struct alignas(16) LightCameraInfo final {
+		struct alignas(16) LightCameraInfo {
 			XMMATRIX world_to_light;
 			XMMATRIX light_to_projection;
 		};

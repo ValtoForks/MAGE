@@ -36,14 +36,13 @@ RW_TEXTURE_2D(g_output_image_texture, float4, SLOT_UAV_IMAGE);
 //-----------------------------------------------------------------------------
 // Compute Shader
 //-----------------------------------------------------------------------------
-
 [numthreads(GROUP_SIZE, GROUP_SIZE, 1)]
 void CS(uint3 thread_id : SV_DispatchThreadID) {
-	
-	const uint2 p_display = g_viewport_top_left + thread_id.xy;
+	const uint2 p_viewport = thread_id.xy;
+	uint2 p_display;
 
 	[branch]
-	if (any(p_display >= g_display_resolution)) {
+	if (IsViewportOutOfBounds(p_viewport, p_display)) {
 		return;
 	}
 

@@ -29,16 +29,16 @@ namespace mage::rendering {
 	 @return		The viewport transform for the given viewport.
 	 */
 	[[nodiscard]]
-	inline const XMMATRIX XM_CALLCONV 
+	inline const XMMATRIX XM_CALLCONV
 		GetViewportTransform(const U32x2& resolution) noexcept {
 
-		const auto width  = (0 < resolution.m_x) ? 2.0f / resolution.m_x : 0.0f;
-		const auto height = (0 < resolution.m_y) ? 2.0f / resolution.m_y : 0.0f;
+		const auto width  = (0u < resolution[0]) ? 2.0f / resolution[0] : 0.0f;
+		const auto height = (0u < resolution[1]) ? 2.0f / resolution[1] : 0.0f;
 
 		// x =  Sx . [0,W] - 1 =  2/W . [0,W] - 1 = [0, 2] - 1 = [-1,  1]
 		// y = -Sy . [0,H] + 1 = -2/H . [0,H] + 1 = [0,-2] + 1 = [ 1, -1]
-		
-		return XMMATRIX {
+
+		return {
 			width,    0.0f, 0.0f, 0.0f,
 			 0.0f, -height, 0.0f, 0.0f,
 			 0.0f,    0.0f, 1.0f, 0.0f,
@@ -56,34 +56,9 @@ namespace mage::rendering {
 	/**
 	 A class of viewports.
 	 */
-	class Viewport final {
+	class Viewport {
 
 	public:
-
-		//---------------------------------------------------------------------
-		// Class Member Methods
-		//---------------------------------------------------------------------
-
-		[[nodiscard]]
-		static const D3D11_VIEWPORT GetMaxViewport(const U32x2& size) noexcept {
-			D3D11_VIEWPORT viewport = {};
-			viewport.Width    = static_cast< F32 >(size.m_x);
-			viewport.Height   = static_cast< F32 >(size.m_y);
-			viewport.MaxDepth = 1.0f;
-			return viewport;
-		}
-
-		[[nodiscard]]
-		static const D3D11_VIEWPORT GetMaxViewport(const U32x2& size,
-												   AntiAliasing aa) noexcept {
-			
-			const auto multiplier = GetResolutionMultiplier(aa);
-
-			D3D11_VIEWPORT viewport = GetMaxViewport(size);
-			viewport.Width  *= multiplier;
-			viewport.Height *= multiplier;
-			return viewport;
-		}
 
 		//---------------------------------------------------------------------
 		// Constructors and Destructors
@@ -94,15 +69,15 @@ namespace mage::rendering {
 
 		explicit Viewport(const U32x2& size) noexcept
 			: Viewport(GetMaxViewport(size)) {}
-		
+
 		explicit Viewport(const U32x2& size, AntiAliasing aa) noexcept
 			: Viewport(GetMaxViewport(size, aa)) {}
 
 		explicit Viewport(D3D11_VIEWPORT viewport) noexcept
 			: m_viewport(std::move(viewport)) {}
-		
+
 		Viewport(const Viewport& viewport) noexcept = default;
-		
+
 		Viewport(Viewport&& viewport) noexcept = default;
 
 		explicit Viewport(Viewport viewport, AntiAliasing aa) noexcept
@@ -122,7 +97,7 @@ namespace mage::rendering {
 		//---------------------------------------------------------------------
 
 		Viewport& operator=(const Viewport& viewport) noexcept = default;
-		
+
 		Viewport& operator=(Viewport&& viewport) noexcept = default;
 
 		//---------------------------------------------------------------------
@@ -154,24 +129,24 @@ namespace mage::rendering {
 		}
 
 		[[nodiscard]]
-		const U32x2 GetTopLeft() const noexcept {
-			return U32x2(static_cast< U32 >(m_viewport.TopLeftX), 
-						 static_cast< U32 >(m_viewport.TopLeftY));
+		const S32x2 GetTopLeft() const noexcept {
+			return { static_cast< S32 >(m_viewport.TopLeftX),
+				     static_cast< S32 >(m_viewport.TopLeftY) };
 		}
 
-		void SetTopLeft(U32 x, U32 y) noexcept {
+		void SetTopLeft(S32 x, S32 y) noexcept {
 			m_viewport.TopLeftX = static_cast< F32 >(x);
 			m_viewport.TopLeftY = static_cast< F32 >(y);
 		}
 
-		void SetTopLeft(const U32x2& top_left) noexcept {
-			SetTopLeft(top_left.m_x, top_left.m_y);
+		void SetTopLeft(const S32x2& top_left) noexcept {
+			SetTopLeft(top_left[0], top_left[1]);
 		}
 
 		[[nodiscard]]
 		const U32x2 GetSize() const noexcept {
-			return U32x2(static_cast< U32 >(m_viewport.Width),
-						 static_cast< U32 >(m_viewport.Height));
+			return { static_cast< U32 >(m_viewport.Width),
+				     static_cast< U32 >(m_viewport.Height) };
 		}
 
 		void SetSize(U32 x, U32 y) noexcept {
@@ -180,12 +155,12 @@ namespace mage::rendering {
 		}
 
 		void SetSize(const U32x2& size) noexcept {
-			SetSize(size.m_x, size.m_y);
+			SetSize(size[0], size[1]);
 		}
 
 		[[nodiscard]]
 		const F32x2 GetDepthRange() const noexcept {
-			return F32x2(m_viewport.MinDepth, m_viewport.MaxDepth);
+			return { m_viewport.MinDepth, m_viewport.MaxDepth };
 		}
 
 		void SetDepthRange(F32 min_depth, F32 max_depth) noexcept {
@@ -194,7 +169,7 @@ namespace mage::rendering {
 		}
 
 		void SetDepthRange(const F32x2& range) noexcept {
-			SetDepthRange(range.m_x, range.m_y);
+			SetDepthRange(range[0], range[1]);
 		}
 
 		[[nodiscard]]
@@ -205,9 +180,35 @@ namespace mage::rendering {
 	private:
 
 		//---------------------------------------------------------------------
+		// Class Member Methods
+		//---------------------------------------------------------------------
+
+		[[nodiscard]]
+		static const D3D11_VIEWPORT GetMaxViewport(const U32x2& size) noexcept {
+			D3D11_VIEWPORT viewport = {};
+			viewport.Width    = static_cast< F32 >(size[0]);
+			viewport.Height   = static_cast< F32 >(size[1]);
+			viewport.MaxDepth = 1.0f;
+			return viewport;
+		}
+
+		[[nodiscard]]
+		static const D3D11_VIEWPORT GetMaxViewport(const U32x2& size,
+												   AntiAliasing aa) noexcept {
+
+			const auto multiplier = GetResolutionMultiplier(aa);
+
+			D3D11_VIEWPORT viewport = GetMaxViewport(size);
+			viewport.Width  *= multiplier;
+			viewport.Height *= multiplier;
+			return viewport;
+		}
+
+
+		//---------------------------------------------------------------------
 		// Member Variables
 		//---------------------------------------------------------------------
-		
+
 		/**
 		 The viewport of this viewport.
 		 */

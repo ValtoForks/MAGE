@@ -24,7 +24,7 @@
 //-----------------------------------------------------------------------------
 namespace mage::script {
 
-	class TextConsoleScript final : public BehaviorScript {
+	class TextConsoleScript : public BehaviorScript {
 
 	public:
 
@@ -49,14 +49,12 @@ namespace mage::script {
 		//---------------------------------------------------------------------
 
 		virtual void Load([[maybe_unused]] Engine& engine) override;
+		virtual void Update([[maybe_unused]] Engine& engine) override;
 
-		virtual void Update([[maybe_unused]] Engine& engine, 
-							[[maybe_unused]] F64 delta_time) override;
-		
 		void Clear();
 		void Write(NotNull< const_wzstring > str);
 		void WriteLine(NotNull< const_wzstring > str);
-		void Format(NotNull< const_wzstring > format, ...);
+		void Format(const_wzstring format, ...);
 
 	private:
 
@@ -82,7 +80,7 @@ namespace mage::script {
 
 		UniquePtr< wchar_t[] > m_buffer;
 		std::vector< wchar_t > m_temp_buffer;
-		
+
 		std::mutex m_mutex;
 	};
 }

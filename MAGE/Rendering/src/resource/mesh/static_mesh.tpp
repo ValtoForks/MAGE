@@ -21,10 +21,10 @@ namespace mage::rendering {
 		             std::vector< VertexT > vertices,
 		             std::vector< IndexT >  indices,
 		             D3D11_PRIMITIVE_TOPOLOGY primitive_topology)
-		: Mesh(sizeof(VertexT), 
+		: Mesh(sizeof(VertexT),
 			   mage::rendering::GetIndexFormat< IndexT >(),
 			   primitive_topology),
-	    m_vertices(std::move(vertices)), 
+	    m_vertices(std::move(vertices)),
 		m_indices(std::move(indices)) {
 
 		SetupVertexBuffer(device);
@@ -46,11 +46,11 @@ namespace mage::rendering {
 	template< typename VertexT, typename IndexT >
 	void StaticMesh< VertexT, IndexT >
 		::SetupVertexBuffer(ID3D11Device& device) {
-		
+
 		const HRESULT result = CreateStaticVertexBuffer(
-			device, m_vertex_buffer.ReleaseAndGetAddressOf(), 
+			device, NotNull< ID3D11Buffer** >(m_vertex_buffer.ReleaseAndGetAddressOf()),
 			gsl::make_span(static_cast< const std::vector< VertexT >& >(m_vertices)));
-		ThrowIfFailed(result, "Vertex buffer creation failed: %08X.", result);
+		ThrowIfFailed(result, "Vertex buffer creation failed: {:08X}.", result);
 
 		SetNumberOfVertices(m_vertices.size());
 	}
@@ -58,11 +58,11 @@ namespace mage::rendering {
 	template< typename VertexT, typename IndexT >
 	void StaticMesh< VertexT, IndexT >
 		::SetupIndexBuffer(ID3D11Device& device) {
-		
+
 		const HRESULT result = CreateStaticIndexBuffer(
-			device, m_index_buffer.ReleaseAndGetAddressOf(), 
+			device, NotNull< ID3D11Buffer** >(m_index_buffer.ReleaseAndGetAddressOf()),
 			gsl::make_span(static_cast< const std::vector< IndexT >& >(m_indices)));
-		ThrowIfFailed(result, "Index buffer creation failed: %08X.", result);
+		ThrowIfFailed(result, "Index buffer creation failed: {:08X}.", result);
 
 		SetNumberOfIndices(m_indices.size());
 	}

@@ -6,16 +6,7 @@
 #pragma region
 
 #include "math.hpp"
-#include "logging\error.hpp"
-
-#pragma endregion
-
-//-----------------------------------------------------------------------------
-// System Includes
-//-----------------------------------------------------------------------------
-#pragma region
-
-#include <algorithm>
+#include "logging\logging.hpp"
 
 #pragma endregion
 
@@ -36,33 +27,57 @@ namespace mage {
 		return std::clamp(value, 0.0f, 1.0f);
 	}
 
+	/**
+	 Clamps the given value to [0,1]^4.
+
+	 @param[in]		value
+					The value.
+	 @return		The clamped value.
+	 */
+	[[nodiscard]]
+	inline const XMVECTOR XM_CALLCONV Saturate(FXMVECTOR value) noexcept {
+		return XMVectorSaturate(value);
+	}
+
 	//-------------------------------------------------------------------------
 	// Angles
 	//-------------------------------------------------------------------------
 	#pragma region
 
 	/**
-	 Clamps the given angle (in degrees) to [-180, 180].
+	 Wraps the given angle (in degrees) to [-180, 180].
 
 	 @param[in]		angle
 					The angle (in degrees).
-	 @return		The clamped angle (in degrees).
+	 @return		The wrapped angle (in degrees).
 	 */
 	[[nodiscard]]
-	inline F32 ClampAngleDegrees(F32 angle) noexcept {
+	inline F32 WrapAngleDegrees(F32 angle) noexcept {
 		return std::remainder(angle, 360.0f);
 	}
 
 	/**
-	 Clamps the given angle (in radians) to [-pi, pi].
+	 Wraps the given angle (in radians) to [-pi, pi].
 
 	 @param[in]		angle
 					The angle (in radians).
-	 @return		The clamped angle (in radians).
+	 @return		The wrapped angle (in radians).
 	 */
 	[[nodiscard]]
-	inline F32 ClampAngleRadians(F32 angle) noexcept {
+	inline F32 WrapAngleRadians(F32 angle) noexcept {
 		return std::remainder(angle, XM_2PI);
+	}
+
+	/**
+	 Wraps the given angles (in radians) to [-pi, pi).
+
+	 @param[in]		angles
+					The angles (in radians).
+	 @return		The wrapped angles (in radians).
+	 */
+	[[nodiscard]]
+	inline const XMVECTOR XM_CALLCONV WrapAngleRadians(FXMVECTOR angles) noexcept {
+		return XMVectorModAngles(angles);
 	}
 
 	/**
@@ -78,16 +93,16 @@ namespace mage {
 					The minimum angle (in degrees).
 	 @param[in]		max_angle
 					The maximum angle (in degrees).
-	 @return		The clamped angle between the given minimum and maximum 
+	 @return		The clamped angle between the given minimum and maximum
 					angle (in degrees).
 	 */
 	[[nodiscard]]
 	inline F32 ClampAngleDegrees(F32 angle, F32 min_angle, F32 max_angle) noexcept {
 		Assert(min_angle <= max_angle);
-		Assert(-180.0f <= max_angle && max_angle <= 180.0f);
+		Assert(-180.0f <= min_angle && min_angle <= 180.0f);
 		Assert(-180.0f <= max_angle && max_angle <= 180.0f);
 
-		return std::clamp(ClampAngleDegrees(angle), min_angle, max_angle);
+		return std::clamp(WrapAngleDegrees(angle), min_angle, max_angle);
 	}
 
 	/**
@@ -103,18 +118,43 @@ namespace mage {
 					The minimum angle (in radians).
 	 @param[in]		max_angle
 					The maximum angle (in radians).
-	 @return		The clamped angle between the given minimum and maximum 
+	 @return		The clamped angle between the given minimum and maximum
 					angle (in radians).
 	 */
 	[[nodiscard]]
 	inline F32 ClampAngleRadians(F32 angle, F32 min_angle, F32 max_angle) noexcept {
 		Assert(min_angle <= max_angle);
+		Assert(-XM_PI <= min_angle && min_angle <= XM_PI);
 		Assert(-XM_PI <= max_angle && max_angle <= XM_PI);
-		Assert(-XM_PI <= max_angle && max_angle <= XM_PI);
-		
-		return std::clamp(ClampAngleRadians(angle), min_angle, max_angle);
+
+		return std::clamp(WrapAngleRadians(angle), min_angle, max_angle);
 	}
-	
+
+
+	/**
+	 Clamps the given angles (in radians) between the given minimum and maximum
+	 angles (in radians).
+
+	 @pre			@a min_angles lies in [-pi, pi].
+	 @pre			@a max_angles lies in [-pi, pi].
+	 @pre			@a min_angles is not greater than @a max_angles.
+	 @param[in]		angles
+					The angles (in radians).
+	 @param[in]		min_angles
+					The minimum angles (in radians).
+	 @param[in]		max_angles
+					The maximum angles (in radians).
+	 @return		The clamped angles between the given minimum and maximum
+					angles (in radians).
+	 */
+	[[nodiscard]]
+	inline const XMVECTOR XM_CALLCONV ClampAngleRadians(FXMVECTOR angles,
+														FXMVECTOR min_angles,
+														FXMVECTOR max_angles) noexcept {
+
+		return XMVectorClamp(WrapAngleRadians(angles), min_angles, max_angles);
+	}
+
 	#pragma endregion
 
 	//-------------------------------------------------------------------------
@@ -130,8 +170,7 @@ namespace mage {
 	[[nodiscard]]
 	inline const F32x2 NormalizedToAbsolute(const F32x2& p,
 											const F32x2& resolution) noexcept {
-
-		return F32x2(p.m_x * resolution.m_x, p.m_y * resolution.m_y);
+		return XMStore< F32x2 >(XMLoad(p) * XMLoad(resolution));
 
 	}
 
@@ -150,8 +189,7 @@ namespace mage {
 	[[nodiscard]]
 	inline const F32x2 AbsoluteToNormalized(const F32x2& p,
 											const F32x2& resolution) noexcept {
-
-		return F32x2(p.m_x / resolution.m_x, p.m_y / resolution.m_y);
+		return XMStore< F32x2 >(XMLoad(p) / XMLoad(resolution));
 	}
 
 	[[nodiscard]]
@@ -169,32 +207,32 @@ namespace mage {
 	#pragma region
 
 	/**
-	 Converts the given @c RECT (left, top, right, bottom) to a @c XMVECTOR 
+	 Converts the given @c RECT (left, top, right, bottom) to a @c XMVECTOR
 	 (left, top, right, bottom).
 
 	 @param[in]		rect
 					A reference to the rectangle.
-	 @return		A @c XMVECTOR  (left, top, right, bottom) representing the 
+	 @return		A @c XMVECTOR  (left, top, right, bottom) representing the
 					given @c RECT (left, top, right, bottom).
 	 */
 	[[nodiscard]]
-	inline const XMVECTOR XM_CALLCONV 
+	inline const XMVECTOR XM_CALLCONV
 		XMVectorLeftTopRightBottom(const RECT& rect) noexcept {
-		
+
 		return XMLoad(rect);
 	}
 
 	/**
-	 Converts the given @c RECT (left, top, right, bottom) to a @c XMVECTOR 
+	 Converts the given @c RECT (left, top, right, bottom) to a @c XMVECTOR
 	 (left, top, width, height).
 
 	 @param[in]		rect
 					A reference to the rectangle.
-	 @return		A @c XMVECTOR  (left, top, width, height) representing the 
+	 @return		A @c XMVECTOR  (left, top, width, height) representing the
 					given @c RECT (left, top, right, bottom).
 	 */
 	[[nodiscard]]
-	inline const XMVECTOR XM_CALLCONV 
+	inline const XMVECTOR XM_CALLCONV
 		XMVectorLeftTopWidthHeight(const RECT& rect) noexcept {
 
 		const auto v = XMVectorLeftTopRightBottom(rect);
@@ -203,12 +241,12 @@ namespace mage {
 	}
 
 	/**
-	 Returns the projection values from the given projection matrix to construct 
+	 Returns the projection values from the given projection matrix to construct
 	 the NDC z-coordinate from the view z-coordinate.
 
 	 @param[in]		projection_matrix
 					The projection matrix.
-	 @return		The projection values from the given projection matrix to 
+	 @return		The projection values from the given projection matrix to
 					construct the NDC z-coordinate from the view z-coordinate.
 	 */
 	[[nodiscard]]
@@ -227,8 +265,8 @@ namespace mage {
 
 		const auto x = XMVectorGetZ(projection_matrix.r[2]);
 		const auto y = XMVectorGetZ(projection_matrix.r[3]);
-		
-		return XMVectorSet(x, y, 0.0f, 0.0f);
+
+		return { x, y, 0.0f, 0.0f };
 	}
 
 	#pragma endregion

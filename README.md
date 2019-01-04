@@ -1,70 +1,53 @@
 <img align="left" src="https://github.com/matt77hias/MAGE-Meta/blob/master/res/MAGE.png" width="120px"/>
 
-[![Build status][s1]][av] [![Documentation][s2]][do] [![License][s3]][li] [![Join the chat][s4]][gi]
+[![Build status][s1]][av] [![Code quality][s2]][co] [![Documentation][s3]][do] [![License][s4]][li] [![Join the chat][s5]][gi]
 <a href="https://twitter.com/intent/follow?screen_name=matt77hias"><img src="https://img.shields.io/twitter/follow/matt77hias.svg?style=social" alt="follow on Twitter"></a>
 
 [s1]: https://ci.appveyor.com/api/projects/status/ike880pg85pupdj6?svg=true
-[s2]: https://img.shields.io/badge/docs-doxygen-blue.svg
-[s3]: https://img.shields.io/badge/licence-No%20Licence-blue.svg
-[s4]: https://badges.gitter.im/MatthiasAdvancedGameEngine/Lobby.svg
+[s2]: https://api.codacy.com/project/badge/Grade/9d2719c91eb445fd916fd07bdeff098d
+[s3]: https://img.shields.io/badge/docs-doxygen-blue.svg
+[s4]: https://img.shields.io/badge/license-GPL%203.0-blue.svg
+[s5]: https://badges.gitter.im/MatthiasAdvancedGameEngine/Lobby.svg
 
 [av]: https://ci.appveyor.com/project/matt77hias/MAGE
-[do]: https://matt77hias.github.io/MAGE-Doc/MAGE-Doc/html/index.html
-[gi]: https://gitter.im/MatthiasAdvancedGameEngine/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge
+[co]: https://www.codacy.com/app/matt77hias/MAGE?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=matt77hias/MAGE&amp;utm_campaign=Badge_Grade
+[do]: https://matt77hias.github.io/MAGE-Doc
 [li]: https://raw.githubusercontent.com/matt77hias/MAGE/master/LICENSE.txt
+[gi]: https://gitter.im/MatthiasAdvancedGameEngine/Lobby
 
 # MAGE - Matthias Advanced Game Engine
 
 ## About
+Game and rendering engine featuring both forward and deferred PBR pipelines with optional indirect illumination using Voxel Cone Tracing.
 
 <p align="center"><img src="https://github.com/matt77hias/MAGE-Meta/blob/master/res/Example.png"></p>
+<p align="center"><img src="https://github.com/matt77hias/MAGE-Meta/blob/master/res/Example 4.png"></p>
 <p align="center"><img src="https://github.com/matt77hias/MAGE-Meta/blob/master/res/Example 2.png" width="436"><img src="https://github.com/matt77hias/MAGE-Meta/blob/master/res/Example 3.png" width="436"></p>
-
-**License**: Currently, MAGE is licensed under a [No License](https://raw.githubusercontent.com/matt77hias/MAGE/master/LICENSE.txt), since we do not allow diverging from the base version yet in this early stage of development.  
-
-## Development
-* **Platform**: Windows 10 32 Bit and 64 Bit (Windows API + Direct3D 11)
-* **Engine Programming Language**: ISO C++ Latest Draft Standard (> C++17)
-* **Shading Model**: Shader Model 5.0
-* **Scripting Language**: ISO C++ Latest Draft Standard (> C++17)
-* **Dependencies**:
-  * d3d11.lib
-  * dxgi.lib
-  * dinput8.lib
-  * dxguid.lib
-  * (d3dcompiler.lib)
-* **Compiler**: MSVC++ 15.6.6
-* **IDE**: Visual Studio 2017
-* **GPU Debuggers/Profilers**:
-  * NVidia Nsight 5.5
-  * RenderDoc v1.0
-
-## Use
-
-### How to build the sample project?
-1. Open the Solution file `MAGE\MAGE\MAGE.sln` in Visual Studio 2017 (or higher).
-2. Build the Solution (Platform: `x64|x86`, Configuration: `Debug|Release`).
-3. Reposition the [assets directory](https://github.com/matt77hias/MAGE-Assets) and all of its contents to the `MAGE\MAGE\Demo\bin\<Platform>\<Configuration>\assets` directory. This is required for running the .exe from inside and outside Visual Studio.
-4. Run `MAGE\MAGE\Demo\bin\<Platform>\<Configuration>\Demo.exe` from inside or outside Visual Studio.
-5. Have fun! 
-
-Sample scene - buttons:
-  * mouse: camera
-  * arrows (or WASD): movement
-  * left shift: vertical down movement
-  * right shift: vertical up movement
-  * F1: terminate
-  * F2: toggle freezing camera orientation
-  * F3: switch scene
 
 ## Index
 * [Code Guidelines](meta/code-guidelines.md)
+* [Code of Conduct](CODE_OF_CONDUCT.md)
+* [Contributing Guidelines](CONTRIBUTING.md)
 * [Documentation](https://matt77hias.github.io/MAGE-Doc/MAGE-Doc/html/index.html)
 * [FAQ](meta/faq.md)
 * [Features](meta/features.md)
 * [File Formats](meta/file-formats.md)
 * [Iterations](meta/iterations.md)
+* [License](https://raw.githubusercontent.com/matt77hias/MAGE/master/LICENSE.txt)
 * [References](meta/references.md)
 * [Standard Scripts](meta/standard-scripts.md)
 
-<p align="center">Copyright © 2016-2018 Matthias Moulin. All Rights Reserved.</p>
+## Development
+* **Platform**: Windows 10 32 Bit and 64 Bit (Windows API + Direct3D 11)
+* **Engine Programming Language**: ISO C++ Latest Draft Standard (> C++17)
+* **Scripting Language**: ISO C++ Latest Draft Standard (> C++17)
+* **Shading Language**: HLSL (Shader Model 5.0)
+* **Dependencies**:
+  * d3d11.lib
+  * dxgi.lib
+  * dxguid.lib
+  * (d3dcompiler.lib)
+* **Compiler**: MSVC++ 15.9.4
+* **IDE**: Visual Studio 2017
+
+<p align="center">Copyright © 2016-2019 Matthias Moulin. All Rights Reserved.</p>

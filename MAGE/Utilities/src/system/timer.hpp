@@ -15,6 +15,23 @@
 namespace mage {
 
 	//-------------------------------------------------------------------------
+	// Time
+	//-------------------------------------------------------------------------
+	#pragma region
+
+	/**
+	 A time stamp type expressed in seconds.
+	 */
+	using TimeStampSeconds = std::chrono::duration< F64 >;
+
+	/**
+	 A time interval type expressed in seconds.
+	 */
+	using TimeIntervalSeconds = std::chrono::duration< F64 >;
+
+	#pragma endregion
+
+	//-------------------------------------------------------------------------
 	// Timer
 	//-------------------------------------------------------------------------
 	#pragma region
@@ -26,7 +43,7 @@ namespace mage {
 					The clock type.
 	 */
 	template< typename ClockT >
-	class Timer final {
+	class Timer {
 
 	public:
 
@@ -41,7 +58,7 @@ namespace mage {
 
 		/**
 		 Constructs a timer from the given timer.
-		
+
 		 @param[in]		timer
 						A reference to the timer to copy.
 		 */
@@ -62,14 +79,14 @@ namespace mage {
 
 		//---------------------------------------------------------------------
 		// Assignment Operators
-		//---------------------------------------------------------------------	
+		//---------------------------------------------------------------------
 
 		/**
 		 Copies the given timer to this timer.
-		
+
 		 @param[in]		timer
 						A reference to the timer to copy.
-		 @return		A reference to the copy of the given timer (i.e. this 
+		 @return		A reference to the copy of the given timer (i.e. this
 						timer).
 		 */
 		Timer& operator=(const Timer& timer) noexcept = default;
@@ -108,27 +125,31 @@ namespace mage {
 		void Resume() noexcept;
 
 		//---------------------------------------------------------------------
-		// Member Methods: Delta Time
+		// Member Methods: (Total) Delta Time
 		//---------------------------------------------------------------------
 
 		/**
-		 Returns the wall clock delta time (in seconds) of this timer.
+		 Returns the delta time (in seconds) of this timer.
 
-		 @return		The wall clock delta time (in seconds) of this timer.
+		 @return		The delta time (in seconds) of this timer.
 		 */
-		F64 GetDeltaTime() const noexcept;
-
-		//---------------------------------------------------------------------
-		// Member Methods: Total Delta Time
-		//---------------------------------------------------------------------
+		TimeIntervalSeconds GetDeltaTime() noexcept;
 
 		/**
-		 Returns the total wall clock delta time (in seconds) of this timer.
+		 Returns the total delta time (in seconds) of this timer.
 
-		 @return		The total wall clock delta time (in seconds) of this 
-						timer.
+		 @return		The total delta time (in seconds) of this timer.
 		 */
-		F64 GetTotalDeltaTime() const noexcept;
+		TimeIntervalSeconds GetTotalDeltaTime() noexcept;
+
+		/**
+		 Returns the delta and total delta time (in seconds) of this timer.
+
+		 @return		A pair containing the the delta and total delta time
+						(in seconds) of this timer.
+		 */
+		const std::pair< TimeIntervalSeconds, TimeIntervalSeconds >
+			GetTime() noexcept;
 
 	private:
 
@@ -137,19 +158,19 @@ namespace mage {
 		//---------------------------------------------------------------------
 
 		/**
-		 Resets the delta time, total delta time and last timestamp of this 
+		 Resets the delta time, total delta time and last timestamp of this
 		 timer.
 		 */
-		void ResetDeltaTime() const noexcept;
+		void ResetDeltaTime() noexcept;
 
 		/**
-		 Updates the delta time, total delta time and last timestamp of this 
+		 Updates the delta time, total delta time and last timestamp of this
 		 timer.
 		 */
-		void UpdateDeltaTime() const noexcept;
+		void UpdateDeltaTime() noexcept;
 
 		//---------------------------------------------------------------------
-		// Type Declarations and Definitions
+		// Class Member Types
 		//---------------------------------------------------------------------
 
 		/**
@@ -158,7 +179,7 @@ namespace mage {
 		using TimeStamp = typename ClockT::time_point;
 
 		/**
-		 The time interval type representing the interval between time points 
+		 The time interval type representing the interval between time points
 		 of timers.
 		 */
 		using TimeInterval = typename ClockT::duration;
@@ -175,17 +196,17 @@ namespace mage {
 		/**
 		 The last timestamp of this timer.
 		 */
-		mutable TimeStamp m_last_timestamp;
+		TimeStamp m_last_timestamp;
 
 		/**
 		 The delta time of this timer.
 		 */
-		mutable TimeInterval m_delta_time;
+		TimeInterval m_delta_time;
 
 		/**
 		 The total delta time of this timer.
 		 */
-		mutable TimeInterval m_total_delta_time;
+		TimeInterval m_total_delta_time;
 
 		/**
 		 Flag indicating whether this timer is running.

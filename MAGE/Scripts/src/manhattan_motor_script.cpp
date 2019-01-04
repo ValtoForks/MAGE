@@ -14,7 +14,7 @@
 namespace mage::script {
 
 	ManhattanMotorScript::ManhattanMotorScript()
-		: BehaviorScript(), 
+		: BehaviorScript(),
 		m_velocity(2.0f) {}
 
 	ManhattanMotorScript::ManhattanMotorScript(
@@ -22,55 +22,54 @@ namespace mage::script {
 
 	ManhattanMotorScript::ManhattanMotorScript(
 		ManhattanMotorScript&& script) noexcept = default;
-	
+
 	ManhattanMotorScript::~ManhattanMotorScript() = default;
 
 	ManhattanMotorScript& ManhattanMotorScript::operator=(
 		const ManhattanMotorScript& script) noexcept = default;
-	
+
 	ManhattanMotorScript& ManhattanMotorScript::operator=(
 		ManhattanMotorScript&& script) noexcept = default;
 
 	void ManhattanMotorScript::Load([[maybe_unused]] Engine& engine) {
-		ThrowIfFailed(HasOwner(), 
+		ThrowIfFailed(HasOwner(),
 					  "This script needs to be attached to a node.");
 	}
 
-	void ManhattanMotorScript::Update([[maybe_unused]] Engine& engine, 
-									  [[maybe_unused]] F64 delta_time) {
-
+	void ManhattanMotorScript::Update([[maybe_unused]] Engine& engine) {
+		const auto delta_time
+			= static_cast< F32 >(engine.GetTime().GetWallClockDeltaTime().count());
 		const auto& input_manager = engine.GetInputManager();
 		const auto& keyboard      = input_manager.GetKeyboard();
 		auto& transform           = GetOwner()->GetTransform();
 
-		const auto movement_magnitude 
-			= static_cast< F32 >(delta_time * m_velocity);
+		const auto movement_magnitude = delta_time * m_velocity;
 
-		if (     keyboard.GetKeyPress(DIK_UP,     true) 
-			  || keyboard.GetKeyPress(DIK_W,      true)) {
-			
-			transform.AddTranslationZ(movement_magnitude);
+		if (     keyboard.IsActive(DIK_UP)
+			  || keyboard.IsActive(DIK_W)) {
+
+			transform.AddTranslationZ( movement_magnitude);
 		}
-		else if (keyboard.GetKeyPress(DIK_DOWN,   true) 
-			  || keyboard.GetKeyPress(DIK_S,      true)) {
-			
+		else if (keyboard.IsActive(DIK_DOWN)
+			  || keyboard.IsActive(DIK_S)) {
+
 			transform.AddTranslationZ(-movement_magnitude);
 		}
-		else if (keyboard.GetKeyPress(DIK_RIGHT,  true) 
-			  || keyboard.GetKeyPress(DIK_D,      true)) {
-			
-			transform.AddTranslationX(movement_magnitude);
+		else if (keyboard.IsActive(DIK_RIGHT)
+			  || keyboard.IsActive(DIK_D)) {
+
+			transform.AddTranslationX( movement_magnitude);
 		}
-		else if (keyboard.GetKeyPress(DIK_LEFT,   true) 
-			  || keyboard.GetKeyPress(DIK_A,      true)) {
-			
+		else if (keyboard.IsActive(DIK_LEFT)
+			  || keyboard.IsActive(DIK_A)) {
+
 			transform.AddTranslationX(-movement_magnitude);
 		}
-		else if (keyboard.GetKeyPress(DIK_LSHIFT, true)) {
+		else if (keyboard.IsActive(DIK_LSHIFT)) {
 			transform.AddTranslationY(-movement_magnitude);
 		}
-		else if (keyboard.GetKeyPress(DIK_RSHIFT, true)) {
-			transform.AddTranslationY(movement_magnitude);
+		else if (keyboard.IsActive(DIK_RSHIFT)) {
+			transform.AddTranslationY( movement_magnitude);
 		}
 	}
 }

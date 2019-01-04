@@ -9,7 +9,6 @@
 #include "resource\font\sprite_font_factory.hpp"
 #include "resource\model\material_factory.hpp"
 #include "resource\texture\texture_factory.hpp"
-#include "logging\error.hpp"
 
 #pragma endregion
 
@@ -27,10 +26,10 @@ namespace mage::rendering {
 	inline ProxyPtr< PerspectiveCamera > World::Create() {
 		const auto ptr = AddElement(m_perspective_cameras, m_device);
 
-		const auto resolution 
+		const auto resolution
 			= m_display_configuration.get().GetDisplayResolution();
-		ptr->SetAspectRatio(static_cast< F32 >(resolution.m_x), 
-							static_cast< F32 >(resolution.m_y));
+		ptr->SetAspectRatio(static_cast< F32 >(resolution[0]),
+							static_cast< F32 >(resolution[1]));
 		ptr->GetViewport() = Viewport(resolution);
 
 		return ptr;
@@ -77,16 +76,16 @@ namespace mage::rendering {
 		const auto ptr = AddElement(m_sprite_images);
 
 		ptr->SetBaseColorTexture(CreateWhiteTexture(m_resource_manager));
-		
+
 		return ptr;
 	}
 
 	template<>
 	inline ProxyPtr< SpriteText > World::Create() {
 		const auto ptr = AddElement(m_sprite_texts);
-		
+
 		ptr->SetFont(CreateConsolasFont(m_resource_manager));
-		
+
 		return ptr;
 	}
 
@@ -99,17 +98,17 @@ namespace mage::rendering {
 
 	template< typename ElementT >
 	[[nodiscard]]
-	inline size_t World::GetNumberOf() const noexcept {
-		size_t count = 0;
+	inline std::size_t World::GetNumberOf() const noexcept {
+		std::size_t count = 0u;
 		ForEach< ElementT >([&count](
 			[[maybe_unused]] const ElementT& element) noexcept {
 				++count;
 			}
 		);
-		
+
 		return count;
 	}
-	
+
 	#pragma endregion
 
 	//-------------------------------------------------------------------------
@@ -118,7 +117,7 @@ namespace mage::rendering {
 	#pragma region
 
 	template< typename ComponentT, typename ActionT >
-	void World::ForEach(ActionT action) {
+	void World::ForEach(ActionT&& action) {
 
 		if constexpr (std::is_same_v< PerspectiveCamera, ComponentT >) {
 			for (auto& component : m_perspective_cameras) {
@@ -210,7 +209,7 @@ namespace mage::rendering {
 	}
 
 	template< typename ComponentT, typename ActionT >
-	void World::ForEach(ActionT action) const {
+	void World::ForEach(ActionT&& action) const {
 
 		if constexpr (std::is_same_v< PerspectiveCamera, ComponentT >) {
 			for (const auto& component : m_perspective_cameras) {

@@ -8,6 +8,7 @@
 #include "renderer\swap_chain.hpp"
 #include "resource\rendering_resource_manager.hpp"
 #include "scene\rendering_world.hpp"
+#include "system\game_timer.hpp"
 
 #pragma endregion
 
@@ -19,7 +20,7 @@ namespace mage::rendering {
 	/**
 	 A class of renderers.
 	 */
-	class Renderer final {
+	class Renderer {
 
 	public:
 
@@ -30,15 +31,15 @@ namespace mage::rendering {
 		/**
 		 Constructs a renderer.
 
-		 @param[in]		device
+		 @param[in,out]	device
 						A reference to the device.
-		 @param[in]		device_context
+		 @param[in,out]	device_context
 						A reference to the device context.
-		 @param[in]		display_configuration
+		 @param[in,out]	display_configuration
 						A reference to the display configuration.
-		 @param[in]		swap_chain
+		 @param[in,out]	swap_chain
 						A reference to the swap chain.
-		 @param[in]		resource_manager
+		 @param[in,out]	resource_manager
 						A pointer to the resource manager.
 		 */
 		explicit Renderer(ID3D11Device& device,
@@ -77,7 +78,7 @@ namespace mage::rendering {
 
 		 @param[in]		renderer
 						A reference to the renderer to copy.
-		 @return		A reference to the copy of the given renderer (i.e. 
+		 @return		A reference to the copy of the given renderer (i.e.
 						this renderer).
 		 */
 		Renderer& operator=(const Renderer& renderer) = delete;
@@ -108,10 +109,12 @@ namespace mage::rendering {
 
 		 @param[in]		world
 						A reference to the world.
+		 @param[in]		time
+						A reference to the game time.
 		 @throws		Exception
 						Failed to render the world.
 		 */
-		void Render(const World& world);
+		void Render(const World& world, const GameTime& time);
 
 	private:
 

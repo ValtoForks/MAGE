@@ -11,14 +11,23 @@
 #pragma endregion
 
 //-----------------------------------------------------------------------------
-// Engine Declarations
+// System Includes
+//-----------------------------------------------------------------------------
+#pragma region
+
+#include <bitset>
+
+#pragma endregion
+
+//-----------------------------------------------------------------------------
+// Engine Declarations and Definitions
 //-----------------------------------------------------------------------------
 namespace mage::input {
-	
+
 	/**
 	 A class of keyboards.
 	 */
-	class Keyboard final {
+	class Keyboard {
 
 	public:
 
@@ -31,7 +40,7 @@ namespace mage::input {
 
 		 @param[in]		window
 						The handle of the parent window.
-		 @param[in]		di
+		 @param[in,out]	di
 						A reference to a direct input object.
 		 @throws		Exception
 						Failed to initialize the keyboard.
@@ -61,14 +70,14 @@ namespace mage::input {
 
 		//---------------------------------------------------------------------
 		// Assignment Operators
-		//---------------------------------------------------------------------	
+		//---------------------------------------------------------------------
 
 		/**
 		 Copies the given keyboard to this keyboard.
 
 		 @param[in]		keyboard
 						A reference to the keyboard to copy.
-		 @return		A reference to the copy of the given keyboard (i.e. 
+		 @return		A reference to the copy of the given keyboard (i.e.
 						this keyboard).
 		 */
 		Keyboard& operator=(const Keyboard& keyboard) = delete;
@@ -92,7 +101,9 @@ namespace mage::input {
 		 @return		The window handle of this keyboard.
 		 */
 		[[nodiscard]]
-		NotNull< HWND > GetWindow() noexcept;
+		NotNull< HWND > GetWindow() noexcept {
+			return m_window;
+		}
 
 		/**
 		 Updates the state of this keyboard.
@@ -100,31 +111,114 @@ namespace mage::input {
 		void Update() noexcept;
 
 		/**
-		 Checks whether the given key of this keyboard is pressed.
+		 Checks whether the given key is active.
 
 		 @param[in]		key
 						The key.
-		 @param[in]		ignore_press_stamp
-						Flag indicating whether press stamps should be 
-						ignored. Consistent presses will return false when 
-						using the press stamp.
-		 @return		@c true if the given key of this keyboard is pressed.
+		 @return		@c true if the given key is active. @c false otherwise.
+		 */
+		[[nodiscard]]
+		bool IsActive(U8 key) const noexcept {
+			const std::size_t index = 2u * key + 1u;
+			return m_key_states[index];
+		}
+
+		/**
+		 Checks whether the given key is passive.
+
+		 @param[in]		key
+						The key.
+		 @return		@c true if the given key is passive. @c false
+						otherwise.
+		 */
+		[[nodiscard]]
+		bool IsPassive(U8 key) const noexcept {
+			return !IsActive(key);
+		}
+
+		/**
+		 Checks whether the given key is switched from being passive to active
+		 or vice versa (i.e. activated or deactivated).
+
+		 @param[in]		key
+						The key.
+		 @return		@c true if the given key is switched from being passive
+						to active or vice versa (i.e. activated or deactivated).
 						@c false otherwise.
 		 */
-		bool GetKeyPress(unsigned char key, 
-			             bool ignore_press_stamp = false) const noexcept;
+		[[nodiscard]]
+		bool IsSwitched(U8 key) const noexcept {
+			const std::size_t index = 2u * key;
+			return m_key_states[index];
+		}
+
+		/**
+		 Checks whether the given key is activated.
+
+		 @param[in]		key
+						The key.
+		 @return		@c true if the given key is activated. @c false
+						otherwise.
+		 */
+		[[nodiscard]]
+		bool IsActivated(U8 key) const noexcept {
+			return IsActive(key) && IsSwitched(key);
+		}
+
+		/**
+		 Checks whether the given key is deactivated.
+
+		 @param[in]		key
+						The key.
+		 @return		@c true if the given key is deactivated. @c false
+						otherwise.
+		 */
+		[[nodiscard]]
+		bool IsDeactivated(U8 key) const noexcept {
+			return IsPassive(key) && IsSwitched(key);
+		}
 
 	private:
+
+		//---------------------------------------------------------------------
+		// Member Methods
+		//---------------------------------------------------------------------
+
+		/**
+		 Initializes the keyboard device of this keyboard.
+
+		 @throws		Exception
+						Failed to initialize the keyboard.
+		 */
+		void InitializeKeyboard();
 
 		//---------------------------------------------------------------------
 		// Member Variables
 		//---------------------------------------------------------------------
 
-		class Impl;
+		/**
+		 The handle of the parent window of this keyboard.
+		 */
+		NotNull< HWND > m_window;
 
 		/**
-		 A pointer to the implementation of this keyboard.
+		 A reference to the DirectInput object of this keyboard.
 		 */
-		UniquePtr< Impl > m_impl;
+		IDirectInput8& m_di;
+
+		/**
+		 A pointer to the DirectInput keyboard device of this keyboard.
+		 */
+		ComPtr< IDirectInputDevice8 > m_keyboard;
+
+		/**
+		 The key states of this keyboard. Each key state consists of two flags.
+
+		 The first flag indicates whether the key state switched from being
+		 passive to active or vice versa (i.e. activated or deactivated).
+
+		 The second flag indicates whether the key state is active.
+		 */
+		std::bitset< 512 > m_key_states;
 	};
 }

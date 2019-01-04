@@ -15,103 +15,91 @@
 namespace mage {
 
 	/**
-	 Calculates an orthonormal basis from a given unit vector with the method 
+	 Calculates an orthonormal basis from a given unit vector with the method
 	 of Hughes and Möller.
 
-	 @pre			The given vector is normalized.
+	 @pre			@a n is normalized.
 	 @param[in]		n
-					The first basis vector of the orthonormal basis.
-	 @param[out]	b1
-					The second basis vector of the orthonormal basis.
-	 @param[out]	b2
-					The third basis vector of the orthonormal basis.
+					A basis vector of the orthonormal basis.
+	 @return		An orthonormal basis (i.e. object-to-world transformation).
 	 */
-	inline void XM_CALLCONV OrthonormalBasis_HughesMoller(FXMVECTOR n, 
-		                                                  XMVECTOR& b1, 
-		                                                  XMVECTOR& b2) noexcept {
+	[[nodiscard]]
+	inline const XMMATRIX XM_CALLCONV
+		OrthonormalBasis_HughesMoller(FXMVECTOR n) noexcept {
 
-		const auto u = (fabs(XMVectorGetX(n)) > fabs(XMVectorGetZ(n)))
+		const auto abs_n   = XMVectorAbs(n);
+		const auto n_ortho = (XMVectorGetX(abs_n) > XMVectorGetZ(abs_n))
 			? XMVectorSet(-XMVectorGetY(n), XMVectorGetX(n), 0.0f, 0.0f)
 			: XMVectorSet(0.0f, -XMVectorGetZ(n), XMVectorGetY(n), 0.0f);
-		b2 = XMVector3Normalize(u);
-		b1 = XMVector3Cross(b2, n);
+
+		const auto t = XMVector3Normalize(XMVector3Cross(n_ortho, n));
+		const auto b = XMVector3Cross(n, t);
+		return { t, b, n, g_XMIdentityR3 };
 	}
 
 	/**
-	 Calculates an orthonormal basis from a given unit vector with the method 
+	 Calculates an orthonormal basis from a given unit vector with the method
 	 of Frisvad.
 
-	 @pre			The given vector is normalized.
+	 @pre			@a n is normalized.
 	 @param[in]		n
-					The first basis vector of the orthonormal basis.
-	 @param[out]	b1
-					The second basis vector of the orthonormal basis.
-	 @param[out]	b2
-					The third basis vector of the orthonormal basis.
+					A basis vector of the orthonormal basis.
+	 @return		An orthonormal basis (i.e. object-to-world transformation).
 	 */
-	inline void XM_CALLCONV OrthonormalBasis_Frisvad(FXMVECTOR n, 
-		                                             XMVECTOR& b1, 
-		                                             XMVECTOR& b2) noexcept {
-		const auto nf = XMStore< F32x3 >(n);
+	[[nodiscard]]
+	inline const XMMATRIX XM_CALLCONV
+		OrthonormalBasis_Frisvad(FXMVECTOR n) noexcept {
 
-		if (nf.m_z < -0.9999999f) {
-			b1 = XMVectorSet( 0.0f, -1.0f, 0.0f, 0.0f);
-			b2 = XMVectorSet(-1.0f,  0.0f, 0.0f, 0.0f);
-			return;
+		const auto [nx, ny, nz] = XMStore< F32x3 >(n);
+
+		if (nz < -0.9999999f) {
+			return { -g_XMIdentityR1, -g_XMIdentityR0, n, g_XMIdentityR3 };
 		}
 
-		const auto a = 1.0f / (1.0f + nf.m_z);
-		const auto b = -nf.m_x * nf.m_y * a;
-		b1 = XMVectorSet(1.0f - nf.m_x * nf.m_x * a, 
-			             b, 
-			             -nf.m_x, 0.0f);
-		b2 = XMVectorSet(b, 
-			             1.0f - nf.m_y * nf.m_y * a, 
-			             -nf.m_y, 0.0f);
+		const auto a0 = 1.0f / (1.0f + nz);
+		const auto a1 = -nx * ny * a0;
+
+		const XMVECTOR t = { 1.0f - nx * nx * a0, a1, -nx, 0.0f };
+		const XMVECTOR b = { a1, 1.0f - ny * ny * a0, -ny, 0.0f };
+		return { t, b, n, g_XMIdentityR3 };
 	}
 
 	/**
-	 Calculates an orthonormal basis from a given unit vector with the method 
+	 Calculates an orthonormal basis from a given unit vector with the method
 	 of Duff, Burgess, Christensen, Hery, Kensler, Liani and Villemin.
 
-	 @pre			The given vector is normalized.
+	 @pre			@a n is normalized.
 	 @param[in]		n
-					The first basis vector of the orthonormal basis.
-	 @param[out]	b1
-					The second basis vector of the orthonormal basis.
-	 @param[out]	b2
-					The third basis vector of the orthonormal basis.
+					A basis vector of the orthonormal basis.
+	 @return		An orthonormal basis (i.e. object-to-world transformation).
 	 */
-	inline void XM_CALLCONV OrthonormalBasis_Duff(FXMVECTOR n, 
-		                                          XMVECTOR& b1, 
-		                                          XMVECTOR& b2) noexcept {
-		const auto nf = XMStore< F32x3 >(n);
+	[[nodiscard]]
+	inline const XMMATRIX XM_CALLCONV
+		OrthonormalBasis_Duff(FXMVECTOR n) noexcept {
 
-		const auto sign = copysignf(1.0f, nf.m_z);
-		const auto a = -1.0f / (sign + nf.m_z);
-		const auto b = nf.m_x * nf.m_y * a;
-		b1 = XMVectorSet(1.0f + sign * nf.m_x * nf.m_x * a, 
-			             sign * b, 
-			             -sign * nf.m_x, 0.0f);
-		b2 = XMVectorSet(b, sign + nf.m_y * nf.m_y * a, 
-			             -nf.m_y, 
-			             0.0f);
+		const auto [nx, ny, nz] = XMStore< F32x3 >(n);
+
+		const auto s  = std::copysignf(1.0f, nz);
+		const auto a0 = -1.0f / (s + nz);
+		const auto a1 = nx * ny * a0;
+
+		const XMVECTOR t = { 1.0f + s * nx * nx * a0, s * a1, -s * nx, 0.0f };
+		const XMVECTOR b = { a1, s + ny * ny * a0, -ny, 0.0f };
+		return { t, b, n, g_XMIdentityR3 };
 	}
 
 	/**
 	 Calculates an orthonormal basis from a given unit vector.
 
-	 @pre			The given vector is normalized.
+	 @pre			@a n is normalized.
 	 @param[in]		n
-					The first basis vector of the orthonormal basis.
-	 @param[out]	b1
-					The second basis vector of the orthonormal basis.
-	 @param[out]	b2
-					The third basis vector of the orthonormal basis.
+					A basis vector of the orthonormal basis.
+	 @return		An orthonormal basis (i.e. object-to-world transformation).
 	 */
-	inline void XM_CALLCONV OrthonormalBasis(FXMVECTOR n, 
-		                                     XMVECTOR& b1, 
-		                                     XMVECTOR& b2) noexcept {
-		OrthonormalBasis_Duff(n, b1, b2);
+	[[nodiscard]]
+	inline const XMMATRIX XM_CALLCONV
+		OrthonormalBasis(FXMVECTOR n) noexcept {
+
+		return OrthonormalBasis_Duff(n);
 	}
 }

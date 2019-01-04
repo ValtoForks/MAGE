@@ -19,7 +19,7 @@ namespace mage::rendering {
 	/**
 	 A class of depth passes for rendering models to a depth buffer only.
 	 */
-	class DepthPass final {
+	class DepthPass {
 
 	public:
 
@@ -30,18 +30,18 @@ namespace mage::rendering {
 		/**
 		 Constructs a depth pass.
 
-		 @param[in]		device
+		 @param[in,out]	device
 						A reference to the device.
-		 @param[in]		device_context
+		 @param[in,out]	device_context
 						A reference to the device context.
-		 @param[in]		state_manager
+		 @param[in,out]	state_manager
 						A reference to the state manager.
-		 @param[in]		resource_manager
+		 @param[in,out]	resource_manager
 						A reference to the resource manager.
 		 */
-		explicit DepthPass(ID3D11Device& device, 
-						   ID3D11DeviceContext& device_context, 
-						   StateManager& state_manager, 
+		explicit DepthPass(ID3D11Device& device,
+						   ID3D11DeviceContext& device_context,
+						   StateManager& state_manager,
 						   ResourceManager& resource_manager);
 
 		/**
@@ -74,7 +74,7 @@ namespace mage::rendering {
 
 		 @param[in]		pass
 						A reference to the depth pass to copy.
-		 @return		A reference to the copy of the given depth pass (i.e. 
+		 @return		A reference to the copy of the given depth pass (i.e.
 						this depth pass).
 		 */
 		DepthPass& operator=(const DepthPass& pass) = delete;
@@ -84,7 +84,7 @@ namespace mage::rendering {
 
 		 @param[in]		pass
 						A reference to the depth pass to move.
-		 @return		A reference to the moved depth pass (i.e. this depth 
+		 @return		A reference to the moved depth pass (i.e. this depth
 						pass).
 		 */
 		DepthPass& operator=(DepthPass&& pass) noexcept;
@@ -92,7 +92,7 @@ namespace mage::rendering {
 		//---------------------------------------------------------------------
 		// Member Methods
 		//---------------------------------------------------------------------
-		
+
 		/**
 		 Binds the fixed state of this depth pass.
 
@@ -143,7 +143,7 @@ namespace mage::rendering {
 		 Binds the shaders for opaque models.
 		 */
 		void BindOpaqueShaders() const noexcept;
-		
+
 		/**
 		 Binds the shaders for transparent models.
 		 */
@@ -159,7 +159,7 @@ namespace mage::rendering {
 		 @throws		Exception
 						Failed to bind the camera of this depth pass.
 		 */
-		void XM_CALLCONV BindCamera(FXMMATRIX world_to_camera, 
+		void XM_CALLCONV BindCamera(FXMMATRIX world_to_camera,
 									CXMMATRIX camera_to_projection);
 
 		/**
@@ -170,7 +170,7 @@ namespace mage::rendering {
 		 @param[in]		world_to_projection
 						The world-to-projection transformation matrix.
 		 */
-		void XM_CALLCONV RenderOpaque(const Model& model, 
+		void XM_CALLCONV RenderOpaque(const Model& model,
 									  FXMMATRIX world_to_projection) const noexcept;
 
 		/**
@@ -181,7 +181,7 @@ namespace mage::rendering {
 		 @param[in]		world_to_projection
 						The world-to-projection transformation matrix.
 		 */
-		void XM_CALLCONV RenderTransparent(const Model& model, 
+		void XM_CALLCONV RenderTransparent(const Model& model,
 										   FXMMATRIX world_to_projection) const noexcept;
 
 		//---------------------------------------------------------------------

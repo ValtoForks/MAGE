@@ -1,6 +1,14 @@
 # File Formats
 
-## Fonts
+## Table of contents
+* [Fonts](#SS-Fonts)
+* [Materials](#SS-Materials)
+* [Meshes](#SS-Meshes)
+* [Models](#SS-Models)
+* [Textures](#SS-Textures)
+* [Variable Scripts](#SS-Variable-Scripts)
+
+## <a name="SS-Fonts"></a>Fonts
 
 ### .font
 * File mode: binary
@@ -9,7 +17,7 @@
 * Magic: `MAGEfont`
 * Syntax: see [SpriteFont format](https://github.com/matt77hias/MAGE-SpriteFont)
 
-## Materials
+## <a name="SS-Materials"></a>Materials
 
 ### .mtl
 * File mode: ANSI
@@ -24,23 +32,23 @@
   * `\r`(CR: carriage return character)
 * Syntax: see [MTL format](http://paulbourke.net/dataformats/mtl/)
 
-| Definitions        | Syntax                                      | Arguments                          |
-|--------------------|---------------------------------------------|------------------------------------|
-| base color         | `base_color <F32>`                          | R=G=B channel (A=1)          [0,1] |
-| base color         | `base_color <F32> <F32> <F32>`              | R, G, B channels (A=1)       [0,1] |
-| base color         | `base_color <F32> <F32> <F32> <F32>`        | R, G, B, A channels          [0,1] |
-| base color texture | `texture_base_color <string>`               | relative file name                 |
-| emissive           | `emissive`                                  | no light interaction               |
-| metalness          | `metalness <F32>`                           | metalness value              [0,1] |
-| material texture   | `material_base_color <string>`              | relative file name                 |
-| new material       | `newmtl <string>`                           | material name                      |
-| normal texture     | `normal_base_color <string>`                | relative file name                 |
-| opaque             | `opaque`                                    | opaque base color      (= default) |
-| roughness          | `roughness <F32>`                           | roughness value              [0,1] |
-| transparent        | `transparent`                               | transparent base color (= default) |
-| `<string>`         | `<ANSI string without delimiters and EOFs>` |                                    |
+| Definitions        | Syntax                                      | Arguments                                |
+|--------------------|---------------------------------------------|------------------------------------------|
+| base color         | `base_color <F32>`                          | R=G=B channel (A=1)    [0,1]             |
+| base color         | `base_color <F32> <F32> <F32>`              | R, G, B channels (A=1) [0,1]<sup>3</sup> |
+| base color         | `base_color <F32> <F32> <F32> <F32>`        | R, G, B, A channels    [0,1]<sup>4</sup> |
+| base color texture | `texture_base_color <string>`               | relative file name                       |
+| metalness          | `metalness <F32>`                           | metalness value        [0,1]             |
+| material texture   | `material_base_color <string>`              | relative file name                       |
+| new material       | `newmtl <string>`                           | material name                            |
+| normal texture     | `normal_base_color <string>`                | relative file name                       |
+| opaque             | `opaque`                                    | opaque base color      (= default)       |
+| radiance           | `radiance <F32>`                            | radiance value                           |
+| roughness          | `roughness <F32>`                           | roughness value        [0,1]             |
+| transparent        | `transparent`                               | transparent base color (= default)       |
+| `<string>`         | `<ANSI string without delimiters and EOFs>` |                                          |
 
-## Meshes
+## <a name="SS-Meshes"></a>Meshes
 
 ### .msh
 * File mode: binary
@@ -70,21 +78,9 @@
   * `\r`(CR: carriage return character)
 * Syntax: see [OBJ format](http://paulbourke.net/dataformats/obj/)
   * only a subset is supported
-  * `g` has different usage
   * UVW vertex texture coordinates will be converted to UV vertex texture coordinates
-  
-| Definitions       | Syntax                                                          |
-|-------------------|-----------------------------------------------------------------|
-| local transform   | `g <child-name>`                                                |
-| local transform   | `g <child-name> <translation> <rotation> <scale>`               |
-| local transform   | `g <child-name> <parent-name> <translation> <rotation> <scale>` |
-| `<child-name>`    | `<string>`                                                      |
-| `<parent-name>`   | `<string>`                                                      |
-| `<translation>`   | `<F32> <F32> <F32>`                                             |
-| `<rotation>`      | `<F32> <F32> <F32>`                                             |
-| `<scale>`         | `<F32> <F32> <F32>`                                             |
-  
-## Models
+
+## <a name="SS-Models"></a>Models
   
 ### .mdl
 * File mode: ANSI
@@ -113,7 +109,7 @@
 | `<nb-indices>`    | `<U32>`                                                                                                    |
 | `<string>`        | `<ANSI string without delimiters and EOFs>`                                                                |
  
-## Textures
+## <a name="SS-Textures"></a>Textures
      
 ### .dds
 * File mode: binary
@@ -122,7 +118,7 @@
 * Magic: `DDS`
 * Syntax: see [DDS format](https://msdn.microsoft.com/en-us/library/windows/desktop/bb943991%28v=vs.85%29.aspx?f=255&MSPPError=-2147217396#File_Layout1).
 
-## Variable Scripts
+## <a name="SS-Variable-Scripts"></a>Variable Scripts
 
 ### .var
 * File mode: ANSI
@@ -141,13 +137,18 @@
 |-------------------|--------------------------------------------------------------------|
 | property          | `bool <property-name> true`                                        |
 | property          | `bool <property-name> false`                                       |
-| property          | `int <property-name> <S32>`                                        |  
-| property          | `int2 <property-name> <S32> <S32>`                                 |
-| property          | `int3 <property-name> <S32> <S32> <S32>`                           |
-| property          | `float <property-name> <F32>`                                      |
-| property          | `float2 <property-name> <F32> <F32>`                               |
-| property          | `float3 <property-name> <F32> <F32> <F32>`                         |
-| property          | `float4 <property-name> <F32> <F32> <F32> <F32>`                   |
+| property          | `F32   <property-name> <F32>`                                      |
+| property          | `F32x2 <property-name> <F32> <F32>`                                |
+| property          | `F32x3 <property-name> <F32> <F32> <F32>`                          |
+| property          | `F32x4 <property-name> <F32> <F32> <F32> <F32>`                    |
+| property          | `S32   <property-name> <S32>`                                      |
+| property          | `S32x2 <property-name> <S32> <S32>`                                |
+| property          | `S32x3 <property-name> <S32> <S32> <S32>`                          |
+| property          | `S32x4 <property-name> <S32> <S32> <S32> <S32>`                    |
+| property          | `U32   <property-name> <U32>`                                      |
+| property          | `U32x2 <property-name> <U32> <U32>`                                |
+| property          | `U32x3 <property-name> <U32> <U32> <U32>`                          |
+| property          | `U32x4 <property-name> <U32> <U32> <U32> <U32>`                    |
 | property          | `string <property-name> <string>`                                  |
 | `<property-name>` | `<string>`                                                         |
 | `<string>`        | `<ANSI string without delimiters and EOFs>`                        |

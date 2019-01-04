@@ -5,7 +5,7 @@
 //-----------------------------------------------------------------------------
 #pragma region
 
-#include "parallel\atomic.hpp"
+#include "type\atomic_types.hpp"
 
 #pragma endregion
 
@@ -15,24 +15,19 @@
 namespace mage {
 
 	/**
+	 Returns the next guid.
+
+	 @return		The next guid.
+	 */
+	U64 GetNextGuid() noexcept;
+
+	/**
 	 A class of id generators.
 	 */
-	class IdGenerator final {
+	template< typename T, typename = std::enable_if_t< std::is_integral_v< T > > >
+	class IdGenerator {
 
 	public:
-
-		//---------------------------------------------------------------------
-		// Class Member Methods
-		//---------------------------------------------------------------------
-
-		/**
-		 Returns the next guid.
-
-		 @return		The next guid.
-		 */
-		static U64 GetNextGuid() noexcept {
-			return s_guid_generator.GetNextId();
-		}
 
 		//---------------------------------------------------------------------
 		// Constructors and Destructors
@@ -44,7 +39,7 @@ namespace mage {
 		 @param[in]		first_id
 						The first id of this id_generator
 		 */
-		constexpr explicit IdGenerator(U64 first_id = 0ull) noexcept
+		constexpr explicit IdGenerator(T first_id = T(0)) noexcept
 			: m_current_id(first_id) {}
 
 		/**
@@ -53,7 +48,7 @@ namespace mage {
 		 @param[in]		generator
 						A reference to the id generator to copy.
 		 */
-		constexpr IdGenerator(const IdGenerator& generator) = delete;
+		IdGenerator(const IdGenerator& generator) = delete;
 
 		/**
 		 Constructs an id generator by moving the given id generator.
@@ -61,7 +56,7 @@ namespace mage {
 		 @param[in]		generator
 						A reference to the id generator to move.
 		 */
-		constexpr IdGenerator(IdGenerator&& generator) = delete;
+		IdGenerator(IdGenerator&& generator) = delete;
 
 		/**
 		 Destructs this id generator.
@@ -70,14 +65,14 @@ namespace mage {
 
 		//---------------------------------------------------------------------
 		// Assignment Operators
-		//---------------------------------------------------------------------	
+		//---------------------------------------------------------------------
 
 		/**
 		 Copies the given id generator to this id generator.
 
 		 @param[in]		generator
 						The id generator to copy.
-		 @return		A reference to the copy of the given id generator (i.e. 
+		 @return		A reference to the copy of the given id generator (i.e.
 						this id generator).
 		 */
 		IdGenerator& operator=(const IdGenerator& generator) = delete;
@@ -87,7 +82,7 @@ namespace mage {
 
 		 @param[in]		generator
 						The id generator to move.
-		 @return		A reference to the moved id generator (i.e. this id 
+		 @return		A reference to the moved id generator (i.e. this id
 						generator).
 		 */
 		IdGenerator& operator=(IdGenerator&& generator) = delete;
@@ -101,20 +96,11 @@ namespace mage {
 
 		 @return		The next id of this id generator.
 		 */
-		U64 GetNextId() noexcept {
+		T GetNextId() noexcept {
 			return m_current_id++;
 		}
 
 	private:
-
-		//---------------------------------------------------------------------
-		// Class Member Methods
-		//---------------------------------------------------------------------
-
-		/**
-		 The guid generator.
-		 */
-		static IdGenerator s_guid_generator;
 
 		//---------------------------------------------------------------------
 		// Member Variables
@@ -123,6 +109,6 @@ namespace mage {
 		/**
 		 The current id of this id generator.
 		 */
-		AtomicU64 m_current_id;
+		std::atomic< T > m_current_id;
 	};
 }

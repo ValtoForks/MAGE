@@ -5,6 +5,7 @@
 //-----------------------------------------------------------------------------
 #pragma region
 
+#include "exception\exception.hpp"
 #include "io\binary_utils.hpp"
 
 #pragma endregion
@@ -15,21 +16,20 @@
 namespace mage {
 
 	/**
-	 Reads the bytes of a binary file.
+	 Reads the bytes of the binary file associated with the given path.
 
-	 @param[in]		fname
-					A reference to the file name.
-	 @param[out]	data
-					A reference to a pointer to a buffer for storing the read 
+	 @param[in]		path
+					A reference to the path.
+	 @param[in,out]	data
+					A reference to a pointer to a buffer for storing the read
 					bytes.
-	 @param[out]	size
+	 @param[in,out]	size
 					A reference to the size of the read bytes.
 	 @throws		Exception
-					Failed to read from the given file.
+					Failed to read from the file.
 	 */
-	void ReadBinaryFile(const wstring& fname, 
-						UniquePtr< U8[] >& data, 
-						size_t& size);
+	void ReadBinaryFile(const std::filesystem::path& path,
+						UniquePtr< U8[] >& data, std::size_t& size);
 
 	//-------------------------------------------------------------------------
 	// BinaryReader
@@ -45,14 +45,14 @@ namespace mage {
 
 		//---------------------------------------------------------------------
 		// Assignment Operators
-		//---------------------------------------------------------------------	
+		//---------------------------------------------------------------------
 
 		/**
 		 Copies the given binary reader to this binary reader.
 
 		 @param[in]		reader
 						A reference to a binary reader to copy.
-		 @return		A reference to the copy of the given binary reader (i.e. 
+		 @return		A reference to the copy of the given binary reader (i.e.
 						this binary reader).
 		 */
 		BinaryReader& operator=(const BinaryReader& reader) = delete;
@@ -62,7 +62,7 @@ namespace mage {
 
 		 @param[in]		reader
 						A reference to a binary reader to move.
-		 @return		A reference to the moved binary reader (i.e. this 
+		 @return		A reference to the moved binary reader (i.e. this
 						binary reader).
 		 */
 		BinaryReader& operator=(BinaryReader&& reader) noexcept;
@@ -72,42 +72,31 @@ namespace mage {
 		//---------------------------------------------------------------------
 
 		/**
-		 Reads from the given file.
+		 Reads from the given file associated with the given path.
 
-		 @param[in]		fname
-						The file name.
+		 @param[in]		path
+						The path.
 		 @param[in]		big_endian
-						Flag indicating whether the given byte array should be 
+						Flag indicating whether the given byte array should be
 						interpreted as big endian or not (i.e. little endian).
 		 @throws		Exception
-						Failed to read from the given file.
+						Failed to read from the file.
 		 */
-		void ReadFromFile(wstring fname, bool big_endian);
-		
+		void ReadFromFile(std::filesystem::path path, bool big_endian);
+
 		/**
 		 Reads the input string.
 
 		 @param[in]		input
 						The input byte string.
 		 @param[in]		big_endian
-						Flag indicating whether the given byte array should be 
+						Flag indicating whether the given byte array should be
 						interpreted as big endian or not (i.e. little endian).
 		 @throws		Exception
 						Failed to read from the given input string.
 		 */
 		void ReadFromMemory(gsl::span< const U8 > input, bool big_endian);
 
-		/**
-		 Returns the current filename of this binary reader.
-
-		 @return		A reference to the current filename of this binary 
-						reader.
-		 */
-		[[nodiscard]]
-		const wstring& GetFilename() const noexcept {
-			return m_fname;
-		}
-		
 	protected:
 
 		//---------------------------------------------------------------------
@@ -118,7 +107,7 @@ namespace mage {
 		 Constructs a binary reader.
 		 */
 		BinaryReader();
-		
+
 		/**
 		 Constructs a binary reader from the given binary reader.
 
@@ -145,9 +134,20 @@ namespace mage {
 		//---------------------------------------------------------------------
 
 		/**
+		 Returns the current path of this binary reader.
+
+		 @return		A reference to the current path of this binary
+						reader.
+		 */
+		[[nodiscard]]
+		const std::filesystem::path& GetPath() const noexcept {
+			return m_path;
+		}
+
+		/**
 		 Checks if there are characters left to read by this binary reader.
 
-		 @return		@c true if there are characters left to read by this 
+		 @return		@c true if there are characters left to read by this
 						binary reader. @c false otherwise.
 		 */
 		[[nodiscard]]
@@ -164,19 +164,19 @@ namespace mage {
 		 @throws		Exception
 						Failed to read @c size bytes.
 		 */
-		NotNull< const_zstring > ReadChars(size_t size);
+		NotNull< const_zstring > ReadChars(std::size_t size);
 
 		/**
-		 Reads a @c DataT element.
+		 Reads a @c T value.
 
-		 @tparam		DataT
+		 @tparam		T
 						The data type.
-		 @return		The @c DataT element read.
+		 @return		The @c T value read.
 		 @throws		Exception
-						Failed to read a @c DataT element.
+						Failed to read a @c T value.
 		 */
-		template< typename DataT >
-		const DataT Read();
+		template< typename T >
+		const T Read();
 
 	private:
 
@@ -197,9 +197,9 @@ namespace mage {
 		//---------------------------------------------------------------------
 
 		/**
-		 The current filename of this line reader.
+		 The current path of this binary reader.
 		 */
-		wstring m_fname;
+		std::filesystem::path m_path;
 
 		/**
 		 A flag indicating whether the current data of this binary reader
@@ -239,22 +239,22 @@ namespace mage {
 
 		//---------------------------------------------------------------------
 		// Assignment Operators
-		//---------------------------------------------------------------------	
+		//---------------------------------------------------------------------
 
 		/**
-		 Copies the given big endian binary reader to this big endian binary 
+		 Copies the given big endian binary reader to this big endian binary
 		 reader.
 
 		 @param[in]		reader
 						A reference to a big endian binary reader to copy.
-		 @return		A reference to the copy of the given big endian binary 
+		 @return		A reference to the copy of the given big endian binary
 						reader (i.e. this big endian binary reader).
 		 */
 		BigEndianBinaryReader& operator=(
 			const BigEndianBinaryReader& reader) = delete;
-		
+
 		/**
-		 Moves the given big endian binary reader to this big endian binary 
+		 Moves the given big endian binary reader to this big endian binary
 		 reader.
 
 		 @param[in]		reader
@@ -270,14 +270,14 @@ namespace mage {
 		//---------------------------------------------------------------------
 
 		/**
-		 Reads from the given file.
+		 Reads from the file associated with the given path.
 
-		 @param[in]		fname
-						The file name.
+		 @param[in]		path
+						The path.
 		 @throws		Exception
-						Failed to read from the given file.
+						Failed to read from the file.
 		 */
-		void ReadFromFile(wstring fname);
+		void ReadFromFile(std::filesystem::path path);
 
 		/**
 		 Reads the input string.
@@ -289,17 +289,6 @@ namespace mage {
 		 */
 		void ReadFromMemory(gsl::span< const U8 > input);
 
-		/**
-		 Returns the current filename of this big endian binary reader.
-
-		 @return		A reference to the current filename of this big endian 
-						binary reader.
-		 */
-		[[nodiscard]]
-		const wstring& GetFilename() const noexcept {
-			return m_fname;
-		}
-
 	protected:
 
 		//---------------------------------------------------------------------
@@ -310,9 +299,9 @@ namespace mage {
 		 Constructs a big endian binary reader.
 		 */
 		BigEndianBinaryReader();
-		
+
 		/**
-		 Constructs a big endian binary reader from the given big endian binary 
+		 Constructs a big endian binary reader from the given big endian binary
 		 reader.
 
 		 @param[in]		reader
@@ -321,7 +310,7 @@ namespace mage {
 		BigEndianBinaryReader(const BigEndianBinaryReader& reader) = delete;
 
 		/**
-		 Constructs a big endian binary reader by moving the given big endian 
+		 Constructs a big endian binary reader by moving the given big endian
 		 binary reader.
 
 		 @param[in]		reader
@@ -339,9 +328,21 @@ namespace mage {
 		//---------------------------------------------------------------------
 
 		/**
-		 Checks if there are characters left to read by this binary reader.
+		 Returns the current path of this big endian binary reader.
 
-		 @return		@c true if there are characters left to read by this 
+		 @return		A reference to the current path of this big endian
+						binary reader.
+		 */
+		[[nodiscard]]
+		const std::filesystem::path& GetPath() const noexcept {
+			return m_path;
+		}
+
+		/**
+		 Checks if there are characters left to read by this big endian binary
+		 reader.
+
+		 @return		@c true if there are characters left to read by this
 						binary reader. @c false otherwise.
 		 */
 		[[nodiscard]]
@@ -350,31 +351,31 @@ namespace mage {
 		}
 
 		/**
-		 Reads a @c DataT element.
+		 Reads a @c T value.
 
-		 @tparam		DataT
+		 @tparam		T
 						The data type.
-		 @return		The @c DataT element read.
+		 @return		The @c T value read.
 		 @throws		Exception
-						Failed to read a @c DataT element.
+						Failed to read a @c T value.
 		 */
-		template< typename DataT >
-		const DataT Read();
-		
-		/**
-		 Reads an array of @c DataT elements.
+		template< typename T >
+		const T Read();
 
-		 @tparam		DataT
+		/**
+		 Reads an array of @c T values.
+
+		 @tparam		T
 						The data type.
 		 @param			count
-						The number of @c DataT elements to read.
-		 @return		A pointer to the array of @c DataT element read.
+						The number of @c T values to read.
+		 @return		A pointer to the array of @c T value read.
 		 @throws		Exception
-						Failed to read @c count @c DataT elements.
+						Failed to read @c count @c T values.
 		 */
-		template< typename DataT >
-		const DataT* ReadArray(size_t count);
-		
+		template< typename T >
+		const T* ReadArray(std::size_t count);
+
 	private:
 
 		//---------------------------------------------------------------------
@@ -394,22 +395,22 @@ namespace mage {
 		//---------------------------------------------------------------------
 
 		/**
-		 The current filename of this line reader.
+		 The current path of this big endian binary reader.
 		 */
-		wstring m_fname;
+		std::filesystem::path m_path;
 
 		/**
-		 A pointer to the current position of this binary reader.
+		 A pointer to the current position of this big endian binary reader.
 		 */
 		const U8* m_pos;
 
 		/**
-		 A pointer to the end position of this binary reader.
+		 A pointer to the end position of this big endian binary reader.
 		 */
 		const U8* m_end;
 
 		/**
-		 A pointer to the data to read of this binary reader.
+		 A pointer to the data to read of this big endian binary reader.
 		 */
 		UniquePtr< U8[] > m_data;
 	};

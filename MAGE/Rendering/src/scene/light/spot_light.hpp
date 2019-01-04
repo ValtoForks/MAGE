@@ -22,7 +22,7 @@ namespace mage::rendering {
 	/**
 	 A class of spotlights.
 	 */
-	class alignas(16) SpotLight final : public Component {
+	class alignas(16) SpotLight : public Component {
 
 	public:
 
@@ -34,7 +34,7 @@ namespace mage::rendering {
 		 Constructs a spotlight.
 		 */
 		SpotLight() noexcept;
-		
+
 		/**
 		 Constructs a spotlight from the given spotlight.
 
@@ -58,14 +58,14 @@ namespace mage::rendering {
 
 		//---------------------------------------------------------------------
 		// Assignment Operators
-		//---------------------------------------------------------------------	
+		//---------------------------------------------------------------------
 
 		/**
 		 Copies the given spotlight to this spotlight.
 
 		 @param[in]		light
 						A reference to the spotlight to copy.
-		 @return		A reference to the copy of the given spotlight (i.e. 
+		 @return		A reference to the copy of the given spotlight (i.e.
 						this spotlight).
 		 */
 		SpotLight& operator=(const SpotLight& light) noexcept;
@@ -75,7 +75,7 @@ namespace mage::rendering {
 
 		 @param[in]		light
 						A reference to the spotlight to move.
-		 @return		A reference to the moved spotlight (i.e. this 
+		 @return		A reference to the moved spotlight (i.e. this
 						spotlight).
 		 */
 		SpotLight& operator=(SpotLight&& light) noexcept;
@@ -117,7 +117,7 @@ namespace mage::rendering {
 
 		/**
 		 Sets the power of this omni light to the given radiance.
-		 
+
 		 @param[in]		power
 						The power in watts.
 		 */
@@ -140,7 +140,7 @@ namespace mage::rendering {
 		/**
 		 Returns the radiant intensity of this spotlight.
 
-		 @return		The radiant intensity in watts per steradians of this 
+		 @return		The radiant intensity in watts per steradians of this
 						spotlight.
 		 */
 		[[nodiscard]]
@@ -149,9 +149,9 @@ namespace mage::rendering {
 		}
 
 		/**
-		 Sets the radiant intensity of this spotlight to the given radial 
+		 Sets the radiant intensity of this spotlight to the given radial
 		 intensity.
-		 
+
 		 @param[in]		intensity
 						The radiant intensity in watts per steradians.
 		 */
@@ -171,7 +171,7 @@ namespace mage::rendering {
 		}
 
 		//---------------------------------------------------------------------
-		// Member Methods: Range
+		// Member Methods: Range and Attenuation
 		//---------------------------------------------------------------------
 
 		/**
@@ -194,10 +194,6 @@ namespace mage::rendering {
 			return m_sphere;
 		}
 
-		//---------------------------------------------------------------------
-		// Member Methods: Attenuation
-		//---------------------------------------------------------------------
-
 		/**
 		 Returns the range of this spotlight expressed in light space.
 
@@ -205,7 +201,7 @@ namespace mage::rendering {
 		 */
 		[[nodiscard]]
 		F32 GetRange() const noexcept {
-			return m_clipping_planes.m_y;
+			return m_clipping_planes[1u];
 		}
 
 		/**
@@ -218,14 +214,14 @@ namespace mage::rendering {
 		F32 GetWorldRange() const noexcept;
 
 		/**
-		 Sets the range of this spotlight to the given value expressed in light 
+		 Sets the range of this spotlight to the given value expressed in light
 		 space.
 
 		 @param[in]		range
 						The range expressed in light space.
 		 */
 		void SetRange(F32 range) noexcept {
-			m_clipping_planes.m_y = range;
+			m_clipping_planes[1u] = range;
 
 			// Update the bounding volumes.
 			UpdateBoundingVolumes();
@@ -240,9 +236,9 @@ namespace mage::rendering {
 		F32 GetStartAngularCutoff() const noexcept {
 			return m_cos_penumbra;
 		}
-		
+
 		/**
-		 Sets the cosine of the penumbra angle of this spotlight to the given 
+		 Sets the cosine of the penumbra angle of this spotlight to the given
 		 value.
 
 		 @param[in]		cos_penumbra
@@ -251,7 +247,7 @@ namespace mage::rendering {
 		void SetStartAngularCutoff(F32 cos_penumbra) noexcept {
 			m_cos_penumbra = cos_penumbra;
 		}
-		
+
 		/**
 		 Returns the cosine of the umbra angle of this spotlight.
 
@@ -261,9 +257,9 @@ namespace mage::rendering {
 		F32 GetEndAngularCutoff() const noexcept {
 			return m_cos_umbra;
 		}
-		
+
 		/**
-		 Sets the cosine of the umbra angle of this spotlight to the given 
+		 Sets the cosine of the umbra angle of this spotlight to the given
 		 value.
 
 		 @param[in]		cos_umbra
@@ -275,9 +271,9 @@ namespace mage::rendering {
 			// Update the bounding volumes.
 			UpdateBoundingVolumes();
 		}
-		
+
 		/**
-		 Sets the cosine of the penumbra and umbra angles of this spotlight to 
+		 Sets the cosine of the penumbra and umbra angles of this spotlight to
 		 the given values.
 
 		 @param[in]		cos_penumbra
@@ -289,13 +285,13 @@ namespace mage::rendering {
 			SetStartAngularCutoff(cos_penumbra);
 			SetEndAngularCutoff(cos_umbra);
 		}
-		
+
 		/**
-		 Returns the cosine range where intensity attenuation occurs of this 
+		 Returns the cosine range where intensity attenuation occurs of this
 		 spotlight.
 
-		 @return		The cosine range where intensity attenuation occurs of 
-						this spotlight. @a GetStartAngularCutoff() - 
+		 @return		The cosine range where intensity attenuation occurs of
+						this spotlight. @a GetStartAngularCutoff() -
 						@a GetEndAngularCutoff().
 		 */
 		[[nodiscard]]
@@ -310,18 +306,18 @@ namespace mage::rendering {
 		 */
 		[[nodiscard]]
 		F32 GetPenumbraAngle() const noexcept {
-			return acos(m_cos_penumbra);
+			return std::acos(m_cos_penumbra);
 		}
-		
+
 		/**
-		 Sets the penumbra angle (in radians) of this spotlight to the given 
+		 Sets the penumbra angle (in radians) of this spotlight to the given
 		 value (in radians).
 
 		 @param[in]		penumbra
 						The penumbra angle (in radians).
 		 */
 		void SetPenumbraAngle(F32 penumbra) noexcept {
-			SetStartAngularCutoff(cos(penumbra));
+			SetStartAngularCutoff(std::cos(penumbra));
 		}
 
 		/**
@@ -331,11 +327,11 @@ namespace mage::rendering {
 		 */
 		[[nodiscard]]
 		F32 GetUmbraAngle() const noexcept {
-			return acos(m_cos_umbra);
+			return std::acos(m_cos_umbra);
 		}
-		
+
 		/**
-		 Sets the umbra angle (in radians) of this spotlight to the given 
+		 Sets the umbra angle (in radians) of this spotlight to the given
 		 value.
 
 		 @pre			cos(@a umbra) must be greater than 0.
@@ -343,11 +339,11 @@ namespace mage::rendering {
 						The umbra angle (in radians).
 		 */
 		void SetUmbraAngle(F32 umbra) noexcept {
-			SetEndAngularCutoff(cos(umbra));
+			SetEndAngularCutoff(std::cos(umbra));
 		}
-		
+
 		/**
-		 Sets the penumbra and umbra angles (in radians) of this spotlight to 
+		 Sets the penumbra and umbra angles (in radians) of this spotlight to
 		 the given values.
 
 		 @pre			cos(@a umbra) must be greater than 0.
@@ -360,7 +356,7 @@ namespace mage::rendering {
 			SetPenumbraAngle(penumbra);
 			SetUmbraAngle(umbra);
 		}
-		
+
 		//---------------------------------------------------------------------
 		// Member Methods: Shadowing
 		//---------------------------------------------------------------------
@@ -368,7 +364,7 @@ namespace mage::rendering {
 		/**
 		 Checks whether shadows should be used for this spotlight.
 
-		 @return		@c true if shadows should be used for this spotlight. 
+		 @return		@c true if shadows should be used for this spotlight.
 						@c false otherwise.
 		 */
 		[[nodiscard]]
@@ -396,32 +392,32 @@ namespace mage::rendering {
 		void ToggleShadows() noexcept {
 			SetShadows(!m_shadows);
 		}
-		
+
 		/**
 		 Sets shadows for this spotlight to the given value.
 
-		 @param[in]		shadows	
-						@c true if shadows should be used for this spotlight. 
+		 @param[in]		shadows
+						@c true if shadows should be used for this spotlight.
 						@c false otherwise.
 		 */
 		void SetShadows(bool shadows) noexcept {
 			m_shadows = shadows;
 		}
-		
+
 		/**
-		 Returns the clipping planes of this spotlight expressed in light 
+		 Returns the clipping planes of this spotlight expressed in light
 		 space.
 
-		 @return		The clipping planes of this spotlight expressed in 
+		 @return		The clipping planes of this spotlight expressed in
 						light space.
 		 */
 		[[nodiscard]]
 		const F32x2 GetClippingPlanes() const noexcept {
 			return m_clipping_planes;
 		}
-		
+
 		/**
-		 Sets the clipping planes of this spotlight expressed in light space to 
+		 Sets the clipping planes of this spotlight expressed in light space to
 		 the given clipping planes.
 
 		 @param[in]		clipping_planes
@@ -429,12 +425,15 @@ namespace mage::rendering {
 		 */
 		void SetClippingPlanes(F32x2 clipping_planes) noexcept {
 			m_clipping_planes = std::move(clipping_planes);
+
+			// Update the bounding volumes.
+			UpdateBoundingVolumes();
 		}
 
 		/**
 		 Returns the (horizontal and vertical) field-of-view of this spotlight.
 
-		 @return		The (horizontal and vertical) field-of-view of this 
+		 @return		The (horizontal and vertical) field-of-view of this
 						spotlight.
 		 */
 		[[nodiscard]]
@@ -443,22 +442,20 @@ namespace mage::rendering {
 		}
 
 		/**
-		 Returns the light-to-projection matrix of the light camera of this spot 
+		 Returns the light-to-projection matrix of the light camera of this spot
 		 light.
 
-		 @return		The light-to-projection matrix of the light camera of 
+		 @return		The light-to-projection matrix of the light camera of
 						this spot light.
 		 */
 		[[nodiscard]]
-		const XMMATRIX XM_CALLCONV 
+		const XMMATRIX XM_CALLCONV
 			GetLightToProjectionMatrix() const noexcept {
 
 			#ifdef DISABLE_INVERTED_Z_BUFFER
-			const auto near_plane = m_clipping_planes.m_x;
-			const auto far_plane  = m_clipping_planes.m_y;
+			const auto [near_plane, far_plane] = m_clipping_planes;
 			#else  // DISABLE_INVERTED_Z_BUFFER
-			const auto near_plane = m_clipping_planes.m_y;
-			const auto far_plane  = m_clipping_planes.m_x;
+			const auto [far_plane, near_plane] = m_clipping_planes;
 			#endif // DISABLE_INVERTED_Z_BUFFER
 
 			const auto fov = 2.0f * GetUmbraAngle();
@@ -482,7 +479,7 @@ namespace mage::rendering {
 		//---------------------------------------------------------------------
 
 		/**
-		 A flag indicating whether shadows should be calculated or not for 
+		 A flag indicating whether shadows should be calculated or not for
 		 this spotlight.
 		 */
 		bool m_shadows;
@@ -508,7 +505,7 @@ namespace mage::rendering {
 		F32 m_intensity;
 
 		/**
-		 The clipping planes of this light expressed in light space.
+		 The clipping planes of this spotlight expressed in light space.
 		 */
 		F32x2 m_clipping_planes;
 

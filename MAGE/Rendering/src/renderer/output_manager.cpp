@@ -13,30 +13,21 @@
 #pragma endregion
 
 //-----------------------------------------------------------------------------
-// System Includes
-//-----------------------------------------------------------------------------
-#pragma region
-
-#include <iterator>
-
-#pragma endregion
-
-//-----------------------------------------------------------------------------
 // Engine Definitions
 //-----------------------------------------------------------------------------
 namespace mage::rendering {
 
-	OutputManager::OutputManager(ID3D11Device& device, 
-								 DisplayConfiguration& display_configuration, 
+	OutputManager::OutputManager(ID3D11Device& device,
+								 DisplayConfiguration& display_configuration,
 								 SwapChain& swap_chain)
 		: m_display_configuration(display_configuration),
-		m_device(device), 
+		m_device(device),
 		m_swap_chain(swap_chain),
-		m_srvs{}, 
-		m_rtvs{}, 
-		m_uavs{}, 
-		m_dsv(), 
-		m_hdr0_to_hdr1(true), 
+		m_srvs{},
+		m_rtvs{},
+		m_uavs{},
+		m_dsv(),
+		m_hdr0_to_hdr1(true),
 		m_msaa(m_display_configuration.get().UsesMSAA()),
 		m_ssaa(m_display_configuration.get().UsesSSAA()) {
 
@@ -51,16 +42,16 @@ namespace mage::rendering {
 		::operator=(OutputManager&& manager) noexcept = default;
 
 	void OutputManager::SetupBuffers() {
-		const auto display_resolution 
+		const auto display_resolution
 			= m_display_configuration.get().GetDisplayResolution();
 		const auto ss_display_resolution
 			= m_display_configuration.get().GetSSDisplayResolution();
 		const auto nb_samples = GetSampleMultiplier(
 			m_display_configuration.get().GetAA());
-		
+
 		const U32x3 setup(display_resolution, 1u);
 		const U32x3 ss_setup(ss_display_resolution, nb_samples);
-		
+
 		// Setup the depth buffer.
 		SetupDepthBuffer(ss_setup);
 
@@ -76,7 +67,7 @@ namespace mage::rendering {
 			        ReleaseAndGetAddressOfRTV(RTVIndex::GBuffer_Material),
 			        nullptr);
 		SetupBuffer(ss_setup,
-					DXGI_FORMAT_R11G11B10_FLOAT,
+					DXGI_FORMAT_R16G16_UNORM,
 			        ReleaseAndGetAddressOfSRV(SRVIndex::GBuffer_Normal),
 			        ReleaseAndGetAddressOfRTV(RTVIndex::GBuffer_Normal),
 			        nullptr);
@@ -96,7 +87,7 @@ namespace mage::rendering {
 				        ReleaseAndGetAddressOfRTV(RTVIndex::HDR),
 				        ReleaseAndGetAddressOfUAV(UAVIndex::HDR));
 		}
-		
+
 		if (m_display_configuration.get().UsesAA()) {
 			SetupBuffer(setup,
 				        DXGI_FORMAT_R16G16B16A16_FLOAT,
@@ -105,12 +96,12 @@ namespace mage::rendering {
 				        ReleaseAndGetAddressOfUAV(UAVIndex::PostProcessing_HDR0));
 		}
 		else {
-			m_srvs[static_cast< size_t >(SRVIndex::PostProcessing_HDR0)]
-				= m_srvs[static_cast< size_t >(SRVIndex::HDR)];
-			m_rtvs[static_cast< size_t >(RTVIndex::PostProcessing_HDR0)]
-				= m_rtvs[static_cast< size_t >(RTVIndex::HDR)];
-			m_uavs[static_cast< size_t >(UAVIndex::PostProcessing_HDR0)]
-				= m_uavs[static_cast< size_t >(UAVIndex::HDR)];
+			m_srvs[static_cast< std::size_t >(SRVIndex::PostProcessing_HDR0)]
+				= m_srvs[static_cast< std::size_t >(SRVIndex::HDR)];
+			m_rtvs[static_cast< std::size_t >(RTVIndex::PostProcessing_HDR0)]
+				= m_rtvs[static_cast< std::size_t >(RTVIndex::HDR)];
+			m_uavs[static_cast< std::size_t >(UAVIndex::PostProcessing_HDR0)]
+				= m_uavs[static_cast< std::size_t >(UAVIndex::HDR)];
 		}
 
 		SetupBuffer(setup,
@@ -125,20 +116,20 @@ namespace mage::rendering {
 				        ReleaseAndGetAddressOfSRV(SRVIndex::PostProcessing_Depth),
 				        nullptr,
 				        ReleaseAndGetAddressOfUAV(UAVIndex::PostProcessing_Depth));
-			
+
 			SetupBuffer(setup,
-				        DXGI_FORMAT_R11G11B10_FLOAT,
+				        DXGI_FORMAT_R16G16_UNORM,
 				        ReleaseAndGetAddressOfSRV(SRVIndex::PostProcessing_Normal),
 				        nullptr,
 				        ReleaseAndGetAddressOfUAV(UAVIndex::PostProcessing_Normal));
 		}
 		else {
-			m_srvs[static_cast< size_t >(SRVIndex::PostProcessing_Depth)]
-				= m_srvs[static_cast< size_t >(SRVIndex::GBuffer_Depth)];
-			m_srvs[static_cast< size_t >(SRVIndex::PostProcessing_Normal)]
-				= m_srvs[static_cast< size_t >(SRVIndex::GBuffer_Normal)];
+			m_srvs[static_cast< std::size_t >(SRVIndex::PostProcessing_Depth)]
+				= m_srvs[static_cast< std::size_t >(SRVIndex::GBuffer_Depth)];
+			m_srvs[static_cast< std::size_t >(SRVIndex::PostProcessing_Normal)]
+				= m_srvs[static_cast< std::size_t >(SRVIndex::GBuffer_Normal)];
 		}
-	
+
 		SetupBuffer(setup,
 					DXGI_FORMAT_R16G16B16A16_FLOAT,
 					ReleaseAndGetAddressOfSRV(SRVIndex::LDR),
@@ -146,20 +137,20 @@ namespace mage::rendering {
 					ReleaseAndGetAddressOfUAV(UAVIndex::LDR));
 	}
 
-	void OutputManager::SetupBuffer(const U32x3& resolution, 
-		                            DXGI_FORMAT format, 
-		                            ID3D11ShaderResourceView** srv, 
-		                            ID3D11RenderTargetView** rtv, 
+	void OutputManager::SetupBuffer(const U32x3& resolution,
+		                            DXGI_FORMAT format,
+		                            ID3D11ShaderResourceView** srv,
+		                            ID3D11RenderTargetView** rtv,
 		                            ID3D11UnorderedAccessView** uav) {
 
 		// Create the texture descriptor.
 		D3D11_TEXTURE2D_DESC texture_desc = {};
-		texture_desc.Width            = resolution.m_x;
-		texture_desc.Height           = resolution.m_y;
+		texture_desc.Width            = resolution[0];
+		texture_desc.Height           = resolution[1];
 		texture_desc.MipLevels        = 1u;
 		texture_desc.ArraySize        = 1u;
 		texture_desc.Format           = format;
-		texture_desc.SampleDesc.Count = resolution.m_z;
+		texture_desc.SampleDesc.Count = resolution[2];
 		texture_desc.Usage            = D3D11_USAGE_DEFAULT;
 		texture_desc.BindFlags        = D3D11_BIND_SHADER_RESOURCE;
 		if (rtv) {
@@ -175,7 +166,7 @@ namespace mage::rendering {
 				texture_desc.Format, texture_desc.SampleDesc.Count,
 				&texture_desc.SampleDesc.Quality);
 			ThrowIfFailed(result,
-				"Multi-sampled texture 2D creation failed: %08X.", result);
+				"Multi-sampled texture 2D creation failed: {:08X}.", result);
 			ThrowIfFailed((0u != texture_desc.SampleDesc.Quality),
 				"Multi-sampled texture 2D creation failed.");
 			--texture_desc.SampleDesc.Quality;
@@ -187,7 +178,7 @@ namespace mage::rendering {
 			// Create the texture.
 			const HRESULT result = m_device.get().CreateTexture2D(
 				&texture_desc, nullptr, texture.ReleaseAndGetAddressOf());
-			ThrowIfFailed(result, "Texture 2D creation failed: %08X.", result);
+			ThrowIfFailed(result, "Texture 2D creation failed: {:08X}.", result);
 		}
 
 		// SRV
@@ -195,7 +186,7 @@ namespace mage::rendering {
 			// Create the SRV.
 			const HRESULT result = m_device.get().CreateShaderResourceView(
 				texture.Get(), nullptr, srv);
-			ThrowIfFailed(result, "SRV creation failed: %08X.", result);
+			ThrowIfFailed(result, "SRV creation failed: {:08X}.", result);
 		}
 
 		// RTV
@@ -203,7 +194,7 @@ namespace mage::rendering {
 			// Create the RTV.
 			const HRESULT result = m_device.get().CreateRenderTargetView(
 				texture.Get(), nullptr, rtv);
-			ThrowIfFailed(result, "RTV creation failed: %08X.", result);
+			ThrowIfFailed(result, "RTV creation failed: {:08X}.", result);
 		}
 
 		// UAV
@@ -211,7 +202,7 @@ namespace mage::rendering {
 			// Create the UAV.
 			const HRESULT result = m_device.get().CreateUnorderedAccessView(
 				texture.Get(), nullptr, uav);
-			ThrowIfFailed(result, "UAV creation failed: %08X.", result);
+			ThrowIfFailed(result, "UAV creation failed: {:08X}.", result);
 		}
 	}
 
@@ -219,14 +210,14 @@ namespace mage::rendering {
 
 		// Create the texture descriptor.
 		D3D11_TEXTURE2D_DESC texture_desc = {};
-		texture_desc.Width            = resolution.m_x;
-		texture_desc.Height           = resolution.m_y;
+		texture_desc.Width            = resolution[0];
+		texture_desc.Height           = resolution[1];
 		texture_desc.MipLevels        = 1u;
 		texture_desc.ArraySize        = 1u;
 		texture_desc.Format           = DXGI_FORMAT_R32_TYPELESS;
-		texture_desc.SampleDesc.Count = resolution.m_z;
+		texture_desc.SampleDesc.Count = resolution[2];
 		texture_desc.Usage            = D3D11_USAGE_DEFAULT;
-		texture_desc.BindFlags        = D3D11_BIND_SHADER_RESOURCE 
+		texture_desc.BindFlags        = D3D11_BIND_SHADER_RESOURCE
 			                          | D3D11_BIND_DEPTH_STENCIL;
 
 		// Sample quality
@@ -234,9 +225,9 @@ namespace mage::rendering {
 			const HRESULT result = m_device.get().CheckMultisampleQualityLevels(
 				texture_desc.Format, texture_desc.SampleDesc.Count,
 				&texture_desc.SampleDesc.Quality);
-			ThrowIfFailed(result, 
-				"Multi-sampled texture 2D creation failed: %08X.", result);
-			ThrowIfFailed((0u != texture_desc.SampleDesc.Quality), 
+			ThrowIfFailed(result,
+				"Multi-sampled texture 2D creation failed: {:08X}.", result);
+			ThrowIfFailed((0u != texture_desc.SampleDesc.Quality),
 				"Multi-sampled texture 2D creation failed.");
 			--texture_desc.SampleDesc.Quality;
 		}
@@ -246,9 +237,9 @@ namespace mage::rendering {
 		{
 			// Create the texture.
 			const HRESULT result = m_device.get().CreateTexture2D(
-				&texture_desc, nullptr, 
+				&texture_desc, nullptr,
 				texture.ReleaseAndGetAddressOf());
-			ThrowIfFailed(result, "Texture 2D creation failed: %08X.", result);
+			ThrowIfFailed(result, "Texture 2D creation failed: {:08X}.", result);
 		}
 
 		// SRV
@@ -263,12 +254,12 @@ namespace mage::rendering {
 				srv_desc.ViewDimension       = D3D11_SRV_DIMENSION_TEXTURE2D;
 				srv_desc.Texture2D.MipLevels = 1u;
 			}
-			
+
 			// Create the SRV.
 			const HRESULT result = m_device.get().CreateShaderResourceView(
 				texture.Get(), &srv_desc,
 				ReleaseAndGetAddressOfSRV(SRVIndex::GBuffer_Depth));
-			ThrowIfFailed(result, "SRV creation failed: %08X.", result);
+			ThrowIfFailed(result, "SRV creation failed: {:08X}.", result);
 		}
 
 		// DSV
@@ -284,7 +275,7 @@ namespace mage::rendering {
 			const HRESULT result = m_device.get().CreateDepthStencilView(
 				texture.Get(), &dsv_desc,
 				m_dsv.ReleaseAndGetAddressOf());
-			ThrowIfFailed(result, "DSV creation failed: %08X.", result);
+			ThrowIfFailed(result, "DSV creation failed: {:08X}.", result);
 		}
 	}
 
@@ -306,11 +297,11 @@ namespace mage::rendering {
 		Pipeline::CS::BindSRV(device_context, SLOT_SRV_IMAGE, nullptr);
 
 		// Clear the GBuffer RTVs.
-		Pipeline::OM::ClearRTV(device_context, 
+		Pipeline::OM::ClearRTV(device_context,
 							   GetRTV(RTVIndex::GBuffer_BaseColor));
-		Pipeline::OM::ClearRTV(device_context, 
+		Pipeline::OM::ClearRTV(device_context,
 							   GetRTV(RTVIndex::GBuffer_Material));
-		Pipeline::OM::ClearRTV(device_context, 
+		Pipeline::OM::ClearRTV(device_context,
 							   GetRTV(RTVIndex::GBuffer_Normal));
 		// Clear the GBuffer DSV.
 		Pipeline::OM::ClearDepthOfDSV(device_context, m_dsv.Get());
@@ -323,7 +314,7 @@ namespace mage::rendering {
 
 	void OutputManager::BindBeginGBuffer(
 		ID3D11DeviceContext& device_context) const noexcept {
-		
+
 		// Collect the GBuffer RTVs.
 		ID3D11RenderTargetView* const rtvs[] = {
 			GetRTV(RTVIndex::GBuffer_BaseColor),
@@ -332,18 +323,18 @@ namespace mage::rendering {
 		};
 
 		// Bind the GBuffer RTVs and GBuffer DSV.
-		Pipeline::OM::BindRTVsAndDSV(device_context, 
-									 static_cast< U32 >(std::size(rtvs)), 
+		Pipeline::OM::BindRTVsAndDSV(device_context,
+									 static_cast< U32 >(std::size(rtvs)),
 									 rtvs, m_dsv.Get());
 	}
-	
+
 	void OutputManager::BindEndGBuffer(
 		ID3D11DeviceContext& device_context) const noexcept {
 
 		// Bind no RTV and no DSV.
 		Pipeline::OM::BindRTVAndDSV(device_context, nullptr, nullptr);
 	}
-	
+
 	void OutputManager::BindBeginDeferred(
 		ID3D11DeviceContext& device_context) const noexcept {
 
@@ -351,34 +342,34 @@ namespace mage::rendering {
 		static_assert(SLOT_SRV_NORMAL   == SLOT_SRV_BASE_COLOR + 2);
 		static_assert(SLOT_SRV_DEPTH    == SLOT_SRV_BASE_COLOR + 3);
 
-		// Collect the GBuffer SRVs. 
+		// Collect the GBuffer SRVs.
 		ID3D11ShaderResourceView* const srvs[] = {
 			GetSRV(SRVIndex::GBuffer_BaseColor),
 			GetSRV(SRVIndex::GBuffer_Material),
 			GetSRV(SRVIndex::GBuffer_Normal),
 			GetSRV(SRVIndex::GBuffer_Depth)
 		};
-		
+
 		if (m_msaa) {
 			// Bind the GBuffer SRVs.
-			Pipeline::PS::BindSRVs(device_context, SLOT_SRV_BASE_COLOR, 
+			Pipeline::PS::BindSRVs(device_context, SLOT_SRV_BASE_COLOR,
 								   static_cast< U32 >(std::size(srvs)), srvs);
 
 			// Bind the HDR RTV and no DSV.
-			Pipeline::OM::BindRTVAndDSV(device_context, 
+			Pipeline::OM::BindRTVAndDSV(device_context,
 										GetRTV(RTVIndex::HDR), nullptr);
 		}
 		else {
 			// Bind the GBuffer SRVs.
-			Pipeline::CS::BindSRVs(device_context, SLOT_SRV_BASE_COLOR, 
+			Pipeline::CS::BindSRVs(device_context, SLOT_SRV_BASE_COLOR,
 								   static_cast< U32 >(std::size(srvs)), srvs);
 
 			// Bind the HDR UAV.
-			Pipeline::CS::BindUAV(device_context, SLOT_UAV_IMAGE, 
+			Pipeline::CS::BindUAV(device_context, SLOT_UAV_IMAGE,
 								  GetUAV(UAVIndex::HDR));
 		}
 	}
-	
+
 	void OutputManager::BindEndDeferred(
 		ID3D11DeviceContext& device_context) const noexcept {
 
@@ -391,7 +382,7 @@ namespace mage::rendering {
 
 		if (m_msaa) {
 			// Bind no GBuffer SRVs.
-			Pipeline::PS::BindSRVs(device_context, SLOT_SRV_BASE_COLOR, 
+			Pipeline::PS::BindSRVs(device_context, SLOT_SRV_BASE_COLOR,
 								   static_cast< U32 >(std::size(srvs)), srvs);
 
 			// Bind no RTV and no DSV.
@@ -399,14 +390,14 @@ namespace mage::rendering {
 		}
 		else {
 			// Bind no GBuffer SRVs.
-			Pipeline::CS::BindSRVs(device_context, SLOT_SRV_BASE_COLOR, 
+			Pipeline::CS::BindSRVs(device_context, SLOT_SRV_BASE_COLOR,
 								   static_cast< U32 >(std::size(srvs)), srvs);
 
 			// Bind no HDR UAV.
 			Pipeline::CS::BindUAV(device_context, SLOT_UAV_IMAGE, nullptr);
 		}
 	}
-	
+
 	void OutputManager::BindBeginForward(
 		ID3D11DeviceContext& device_context) const noexcept {
 
@@ -417,14 +408,14 @@ namespace mage::rendering {
 		};
 
 		// Bind the RTVs and DSV.
-		Pipeline::OM::BindRTVsAndDSV(device_context, 
-									 static_cast< U32 >(std::size(rtvs)), 
+		Pipeline::OM::BindRTVsAndDSV(device_context,
+									 static_cast< U32 >(std::size(rtvs)),
 									 rtvs, m_dsv.Get());
 	}
 
 	void OutputManager::BindEndForward(
 		ID3D11DeviceContext& device_context) const noexcept {
-		
+
 		// Bind no RTV and no DSV.
 		Pipeline::OM::BindRTVAndDSV(device_context, nullptr, nullptr);
 	}
@@ -433,11 +424,11 @@ namespace mage::rendering {
 		ID3D11DeviceContext& device_context) const noexcept {
 
 		// Bind the SRVs.
-		Pipeline::CS::BindSRV(device_context, SLOT_SRV_IMAGE,  
+		Pipeline::CS::BindSRV(device_context, SLOT_SRV_IMAGE,
 							  GetSRV(SRVIndex::HDR));
-		Pipeline::CS::BindSRV(device_context, SLOT_SRV_NORMAL, 
+		Pipeline::CS::BindSRV(device_context, SLOT_SRV_NORMAL,
 							  GetSRV(SRVIndex::GBuffer_Normal));
-		Pipeline::CS::BindSRV(device_context, SLOT_SRV_DEPTH, 
+		Pipeline::CS::BindSRV(device_context, SLOT_SRV_DEPTH,
 							  GetSRV(SRVIndex::GBuffer_Depth));
 
 		static_assert(SLOT_UAV_NORMAL == SLOT_UAV_IMAGE + 1);
@@ -451,7 +442,7 @@ namespace mage::rendering {
 		};
 
 		// Bind the UAVs.
-		Pipeline::CS::BindUAVs(device_context, SLOT_UAV_IMAGE, 
+		Pipeline::CS::BindUAVs(device_context, SLOT_UAV_IMAGE,
 							   static_cast< U32 >(std::size(uavs)), uavs);
 	}
 
@@ -470,16 +461,16 @@ namespace mage::rendering {
 		ID3D11UnorderedAccessView* const uavs[3] = {};
 
 		// Bind no UAVs.
-		Pipeline::CS::BindUAVs(device_context, SLOT_UAV_IMAGE, 
+		Pipeline::CS::BindUAVs(device_context, SLOT_UAV_IMAGE,
 							   static_cast< U32 >(std::size(uavs)), uavs);
 	}
 
 	void OutputManager::BindBeginPostProcessing(
 		ID3D11DeviceContext& device_context) const noexcept {
 
-		Pipeline::CS::BindSRV(device_context, SLOT_SRV_NORMAL, 
+		Pipeline::CS::BindSRV(device_context, SLOT_SRV_NORMAL,
 							  GetSRV(SRVIndex::PostProcessing_Normal));
-		Pipeline::CS::BindSRV(device_context, SLOT_SRV_DEPTH, 
+		Pipeline::CS::BindSRV(device_context, SLOT_SRV_DEPTH,
 							  GetSRV(SRVIndex::PostProcessing_Depth));
 	}
 
@@ -488,21 +479,21 @@ namespace mage::rendering {
 
 		// Bind no HDR UAV.
 		Pipeline::CS::BindUAV(device_context, SLOT_UAV_IMAGE, nullptr);
-		
+
 		if (m_hdr0_to_hdr1) {
 			// Bind HDR UAV.
-			Pipeline::CS::BindUAV(device_context, SLOT_UAV_IMAGE, 
+			Pipeline::CS::BindUAV(device_context, SLOT_UAV_IMAGE,
 								  GetUAV(UAVIndex::PostProcessing_HDR1));
 			// Bind HDR SRV.
-			Pipeline::CS::BindSRV(device_context, SLOT_SRV_IMAGE, 
+			Pipeline::CS::BindSRV(device_context, SLOT_SRV_IMAGE,
 								  GetSRV(SRVIndex::PostProcessing_HDR0));
 		}
 		else {
 			// Bind HDR UAV.
-			Pipeline::CS::BindUAV(device_context, SLOT_UAV_IMAGE, 
+			Pipeline::CS::BindUAV(device_context, SLOT_UAV_IMAGE,
 								  GetUAV(UAVIndex::PostProcessing_HDR0));
 			// Bind HDR SRV.
-			Pipeline::CS::BindSRV(device_context, SLOT_SRV_IMAGE, 
+			Pipeline::CS::BindSRV(device_context, SLOT_SRV_IMAGE,
 								  GetSRV(SRVIndex::PostProcessing_HDR1));
 		}
 
@@ -511,7 +502,7 @@ namespace mage::rendering {
 
 	void OutputManager::BindEndPostProcessing(
 		ID3D11DeviceContext& device_context) const noexcept {
-		
+
 		Pipeline::CS::BindSRV(device_context, SLOT_SRV_NORMAL, nullptr);
 		Pipeline::CS::BindSRV(device_context, SLOT_SRV_DEPTH,  nullptr);
 	}
@@ -551,12 +542,12 @@ namespace mage::rendering {
 		ID3D11DeviceContext& device_context) const noexcept {
 
 		// Bind the back buffer RTV and no DSV.
-		Pipeline::OM::BindRTVAndDSV(device_context, 
-									m_swap_chain.get().GetRTV(),
+		Pipeline::OM::BindRTVAndDSV(device_context,
+									&(m_swap_chain.get().GetRTV()),
 									nullptr);
-		
+
 		// Bind LDR SRV.
-		Pipeline::PS::BindSRV(device_context, SLOT_SRV_IMAGE, 
+		Pipeline::PS::BindSRV(device_context, SLOT_SRV_IMAGE,
 							  GetSRV(SRVIndex::LDR));
 	}
 }

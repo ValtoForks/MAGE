@@ -18,7 +18,7 @@ namespace mage::rendering {
 	/**
 	 A class of sky passes for rendering sky domes to screen.
 	 */
-	class SkyPass final {
+	class SkyPass {
 
 	public:
 
@@ -29,15 +29,15 @@ namespace mage::rendering {
 		/**
 		 Constructs a sky pass.
 
-		 @param[in]		device_context
+		 @param[in,out]	device_context
 						A reference to the device context.
-		 @param[in]		state_manager
+		 @param[in,out]	state_manager
 						A reference to the state manager.
-		 @param[in]		resource_manager
+		 @param[in,out]	resource_manager
 						A reference to the resource manager.
 		 */
-		explicit SkyPass(ID3D11DeviceContext& device_context, 
-						 StateManager& state_manager, 
+		explicit SkyPass(ID3D11DeviceContext& device_context,
+						 StateManager& state_manager,
 						 ResourceManager& resource_manager);
 
 		/**
@@ -70,7 +70,7 @@ namespace mage::rendering {
 
 		 @param[in]		pass
 						A reference to the sky pass to copy.
-		 @return		A reference to the copy of the given sky pass (i.e. 
+		 @return		A reference to the copy of the given sky pass (i.e.
 						this sky pass).
 		 */
 		SkyPass& operator=(const SkyPass& pass) = delete;
@@ -95,7 +95,7 @@ namespace mage::rendering {
 						A pointer to the SRV of the sky.
 		 */
 		void Render(ID3D11ShaderResourceView* sky) const noexcept;
-		
+
 	private:
 
 		//---------------------------------------------------------------------

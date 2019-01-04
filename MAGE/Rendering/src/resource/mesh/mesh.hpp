@@ -62,7 +62,7 @@ namespace mage::rendering {
 
 		 @param[in]		mesh
 						A reference to the mesh to copy.
-		 @return		A reference to the copy of the given mesh (i.e. this 
+		 @return		A reference to the copy of the given mesh (i.e. this
 						mesh).
 		 */
 		Mesh& operator=(const Mesh& mesh) = delete;
@@ -86,7 +86,7 @@ namespace mage::rendering {
 		 @return		The number of vertices of this mesh.
 		 */
 		[[nodiscard]]
-		size_t GetNumberOfVertices() const noexcept {
+		std::size_t GetNumberOfVertices() const noexcept {
 			return m_nb_vertices;
 		}
 
@@ -96,7 +96,7 @@ namespace mage::rendering {
 		 @return		The number of indices of this mesh.
 		 */
 		[[nodiscard]]
-		size_t GetNumberOfIndices() const noexcept {
+		std::size_t GetNumberOfIndices() const noexcept {
 			return m_nb_indices;
 		}
 
@@ -106,7 +106,7 @@ namespace mage::rendering {
 		 @return		The vertex size (in bytes) of this mesh.
 		 */
 		[[nodiscard]]
-		size_t GetVertexSize() const noexcept {
+		std::size_t GetVertexSize() const noexcept {
 			return m_vertex_size;
 		}
 
@@ -123,66 +123,66 @@ namespace mage::rendering {
 		/**
 		 Returns the primitive topology of this mesh.
 
-		 @return		The primitive topology of this mesh.	
+		 @return		The primitive topology of this mesh.
 		 */
 		[[nodiscard]]
 		D3D11_PRIMITIVE_TOPOLOGY GetPrimitiveTopology() const noexcept {
 			return m_primitive_topology;
 		}
-		
+
 		/**
 		 Binds this mesh.
 
-		 The vertex buffer, index buffer and primitive topology of this mesh 
+		 The vertex buffer, index buffer and primitive topology of this mesh
 		 will be bound to the input-assembler stage.
 
-		 @param[in]		device_context
+		 @param[in,out]	device_context
 						A reference to the device context.
 		 */
 		void BindMesh(ID3D11DeviceContext& device_context) const noexcept {
 			BindMesh(device_context, m_primitive_topology);
 		}
-		
+
 		/**
 		 Binds this mesh with given primitive topology.
 
-		 The vertex buffer, index buffer and given primitive topology of this 
+		 The vertex buffer, index buffer and given primitive topology of this
 		 mesh will be bound to the input-assembler stage.
 
-		 @param[in]		device_context
+		 @param[in,out]	device_context
 						A reference to the device context.
 		 @param[in]		topology
 						The primitive topology.
 		 */
-		void BindMesh(ID3D11DeviceContext& device_context, 
+		void BindMesh(ID3D11DeviceContext& device_context,
 			          D3D11_PRIMITIVE_TOPOLOGY topology) const noexcept {
 
-			Pipeline::IA::BindVertexBuffer(device_context, 
-				                           0u, 
-				                           *m_vertex_buffer.Get(), 
+			Pipeline::IA::BindVertexBuffer(device_context,
+				                           0u,
+				                           *m_vertex_buffer.Get(),
 				                           static_cast< U32 >(m_vertex_size));
-			Pipeline::IA::BindIndexBuffer(device_context, 
-				                          *m_index_buffer.Get(), 
+			Pipeline::IA::BindIndexBuffer(device_context,
+				                          *m_index_buffer.Get(),
 				                          m_index_format);
 			Pipeline::IA::BindPrimitiveTopology(device_context, topology);
 		}
-		
+
 		/**
 		 Draws this complete mesh.
 
-		 @param[in]		device_context
+		 @param[in,out]	device_context
 						A reference to the device context.
 		 */
 		void Draw(ID3D11DeviceContext& device_context) const noexcept {
 			Pipeline::DrawIndexed(device_context,
-				                  static_cast< U32 >(m_nb_indices), 
+				                  static_cast< U32 >(m_nb_indices),
 				                  0u);
 		}
-		
+
 		/**
 		 Draws a submesh of this mesh.
 
-		 @param[in]		device_context
+		 @param[in,out]	device_context
 						A reference to the device context.
 		 @param[in]		start_index
 						The start index.
@@ -190,11 +190,11 @@ namespace mage::rendering {
 						The number of indices.
 		 */
 		void Draw(ID3D11DeviceContext& device_context,
-			      size_t start_index, 
-			      size_t nb_indices) const noexcept {
+				  std::size_t start_index,
+				  std::size_t nb_indices) const noexcept {
 
 			Pipeline::DrawIndexed(device_context,
-				                  static_cast< U32 >(nb_indices), 
+				                  static_cast< U32 >(nb_indices),
 				                  static_cast< U32 >(start_index));
 		}
 
@@ -214,8 +214,8 @@ namespace mage::rendering {
 		 @param[in]		primitive_topology
 						The primitive topology.
 		 */
-		explicit Mesh(size_t vertex_size, 
-			          DXGI_FORMAT index_format, 
+		explicit Mesh(std::size_t vertex_size,
+			          DXGI_FORMAT index_format,
 			          D3D11_PRIMITIVE_TOPOLOGY primitive_topology);
 
 		/**
@@ -244,7 +244,7 @@ namespace mage::rendering {
 		 @param[in]		nb_vertices
 						The number of vertices of this mesh.
 		 */
-		void SetNumberOfVertices(size_t nb_vertices) noexcept {
+		void SetNumberOfVertices(std::size_t nb_vertices) noexcept {
 			m_nb_vertices = nb_vertices;
 		}
 
@@ -254,7 +254,7 @@ namespace mage::rendering {
 		 @param[in]		nb_indices
 						The number of indices of this mesh.
 		 */
-		void SetNumberOfIndices(size_t nb_indices) noexcept {
+		void SetNumberOfIndices(std::size_t nb_indices) noexcept {
 			m_nb_indices = nb_indices;
 		}
 
@@ -281,17 +281,17 @@ namespace mage::rendering {
 		/**
 		 The number of vertices of this mesh.
 		 */
-		size_t m_nb_vertices;
+		std::size_t m_nb_vertices;
 
 		/**
 		 The number of indices of this mesh.
 		 */
-		size_t m_nb_indices;
+		std::size_t m_nb_indices;
 
 		/**
 		 The vertex size of this mesh.
 		 */
-		size_t m_vertex_size;
+		std::size_t m_vertex_size;
 
 		/**
 		 The index format of this mesh.

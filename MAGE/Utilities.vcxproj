@@ -18,86 +18,12 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="Utilities\src\collection\vector.hpp" />
-    <ClInclude Include="Utilities\src\exception\exception.hpp" />
-    <ClInclude Include="Utilities\src\file\file_utils.hpp" />
-    <ClInclude Include="Utilities\src\io\binary_reader.hpp" />
-    <ClInclude Include="Utilities\src\io\binary_utils.hpp" />
-    <ClInclude Include="Utilities\src\io\binary_writer.hpp" />
-    <ClInclude Include="Utilities\src\io\line_reader.hpp" />
-    <ClInclude Include="Utilities\src\io\writer.hpp" />
-    <ClInclude Include="Utilities\src\logging\dump.hpp" />
-    <ClInclude Include="Utilities\src\logging\error.hpp" />
-    <ClInclude Include="Utilities\src\logging\logging.hpp" />
-    <ClInclude Include="Utilities\src\logging\progress_reporter.hpp" />
-    <ClInclude Include="Utilities\src\memory\allocation.hpp" />
-    <ClInclude Include="Utilities\src\memory\memory.hpp" />
-    <ClInclude Include="Utilities\src\memory\memory_arena.hpp" />
-    <ClInclude Include="Utilities\src\memory\memory_stack.hpp" />
-    <ClInclude Include="Utilities\src\parallel\atomic.hpp" />
-    <ClInclude Include="Utilities\src\parallel\id_generator.hpp" />
-    <ClInclude Include="Utilities\src\parallel\parallel.hpp" />
-    <ClInclude Include="Utilities\src\platform\windows.hpp" />
-    <ClInclude Include="Utilities\src\platform\windows_utils.hpp" />
-    <ClInclude Include="Utilities\src\resource\resource.hpp" />
-    <ClInclude Include="Utilities\src\resource\resource_pool.hpp" />
-    <ClInclude Include="Utilities\src\string\string.hpp" />
-    <ClInclude Include="Utilities\src\string\string_utils.hpp" />
-    <ClInclude Include="Utilities\src\string\token.hpp" />
-    <ClInclude Include="Utilities\src\system\cpu_monitor.hpp" />
-    <ClInclude Include="Utilities\src\system\system_time.hpp" />
-    <ClInclude Include="Utilities\src\system\system_usage.hpp" />
-    <ClInclude Include="Utilities\src\system\timer.hpp" />
-    <ClInclude Include="Utilities\src\type\scalar_types.hpp" />
-    <ClInclude Include="Utilities\src\type\types.hpp" />
-    <ClInclude Include="Utilities\src\type\vector_types.hpp" />
-    <ClInclude Include="Utilities\src\ui\combo_box.hpp" />
-    <ClInclude Include="Utilities\src\ui\window.hpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="Utilities\src\exception\exception.cpp" />
-    <ClCompile Include="Utilities\src\file\file_utils.cpp" />
-    <ClCompile Include="Utilities\src\io\binary_reader.cpp" />
-    <ClCompile Include="Utilities\src\io\binary_writer.cpp" />
-    <ClCompile Include="Utilities\src\io\line_reader.cpp" />
-    <ClCompile Include="Utilities\src\io\writer.cpp" />
-    <ClCompile Include="Utilities\src\logging\dump.cpp" />
-    <ClCompile Include="Utilities\src\logging\error.cpp" />
-    <ClCompile Include="Utilities\src\logging\logging.cpp" />
-    <ClCompile Include="Utilities\src\logging\progress_reporter.cpp" />
-    <ClCompile Include="Utilities\src\memory\memory_arena.cpp" />
-    <ClCompile Include="Utilities\src\memory\memory_stack.cpp" />
-    <ClCompile Include="Utilities\src\parallel\id_generator.cpp" />
-    <ClCompile Include="Utilities\src\parallel\parallel.cpp" />
-    <ClCompile Include="Utilities\src\string\string_utils.cpp" />
-    <ClCompile Include="Utilities\src\string\token.cpp" />
-    <ClCompile Include="Utilities\src\system\system_time.cpp" />
-    <ClCompile Include="Utilities\src\system\system_usage.cpp" />
-    <ClCompile Include="Utilities\src\ui\combo_box.cpp" />
-    <ClCompile Include="Utilities\src\ui\window.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Utilities\src\file\file_utils.tpp" />
-    <None Include="Utilities\src\io\binary_reader.tpp" />
-    <None Include="Utilities\src\io\binary_utils.tpp" />
-    <None Include="Utilities\src\io\binary_writer.tpp" />
-    <None Include="Utilities\src\io\line_reader.tpp" />
-    <None Include="Utilities\src\memory\memory.tpp" />
-    <None Include="Utilities\src\memory\memory_arena.tpp" />
-    <None Include="Utilities\src\memory\memory_stack.tpp" />
-    <None Include="Utilities\src\platform\windows_utils.tpp" />
-    <None Include="Utilities\src\resource\resource.tpp" />
-    <None Include="Utilities\src\resource\resource_pool.tpp" />
-    <None Include="Utilities\src\string\token.tpp" />
-    <None Include="Utilities\src\system\timer.tpp" />
-  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{E7F1C114-0904-40ED-9E9D-97FD842334C6}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>Utilities</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.16299.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -126,6 +52,7 @@
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
+  <PropertyGroup Label="UserMacros" />
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
   </ImportGroup>
@@ -147,19 +74,114 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="Properties\x64_Release.props" />
   </ImportGroup>
-  <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>$(ProjectName)\src\;GSL\src\;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
+    <IncludePath>$(ProjectName)\src\;fmt\src\;GSL\src\;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
+    <SourcePath>fmt\src\;$(VC_SourcePath);</SourcePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>$(ProjectName)\src\;GSL\src\;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
+    <IncludePath>$(ProjectName)\src\;fmt\src\;GSL\src\;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
+    <SourcePath>fmt\src\;$(VC_SourcePath);</SourcePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>$(ProjectName)\src\;GSL\src\;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
+    <IncludePath>$(ProjectName)\src\;fmt\src\;GSL\src\;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
+    <SourcePath>fmt\src\;$(VC_SourcePath);</SourcePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>$(ProjectName)\src\;GSL\src\;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
+    <IncludePath>$(ProjectName)\src\;fmt\src\;GSL\src\;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
+    <SourcePath>fmt\src\;$(VC_SourcePath);</SourcePath>
   </PropertyGroup>
+  <ItemGroup>
+    <ClInclude Include="Utilities\src\collection\array.hpp" />
+    <ClInclude Include="Utilities\src\collection\collection_utils.hpp" />
+    <ClInclude Include="Utilities\src\collection\dynamic_array.hpp" />
+    <ClInclude Include="Utilities\src\collection\vector.hpp" />
+    <ClInclude Include="Utilities\src\ecs\ecs.hpp" />
+    <ClInclude Include="Utilities\src\exception\exception.hpp" />
+    <ClInclude Include="Utilities\src\io\binary_reader.hpp" />
+    <ClInclude Include="Utilities\src\io\binary_utils.hpp" />
+    <ClInclude Include="Utilities\src\io\binary_writer.hpp" />
+    <ClInclude Include="Utilities\src\io\line_reader.hpp" />
+    <ClInclude Include="Utilities\src\io\writer.hpp" />
+    <ClInclude Include="Utilities\src\loaders\variable_script_loader.hpp" />
+    <ClInclude Include="Utilities\src\loaders\var\var_loader.hpp" />
+    <ClInclude Include="Utilities\src\loaders\var\var_reader.hpp" />
+    <ClInclude Include="Utilities\src\loaders\var\var_tokens.hpp" />
+    <ClInclude Include="Utilities\src\loaders\var\var_writer.hpp" />
+    <ClInclude Include="Utilities\src\logging\dump.hpp" />
+    <ClInclude Include="Utilities\src\logging\logging.tpp" />
+    <ClInclude Include="Utilities\src\logging\logging.hpp" />
+    <ClInclude Include="Utilities\src\logging\progress_reporter.hpp" />
+    <ClInclude Include="Utilities\src\memory\allocation.hpp" />
+    <ClInclude Include="Utilities\src\memory\memory.hpp" />
+    <ClInclude Include="Utilities\src\memory\memory_arena.hpp" />
+    <ClInclude Include="Utilities\src\memory\memory_buffer.hpp" />
+    <ClInclude Include="Utilities\src\memory\memory_stack.hpp" />
+    <ClInclude Include="Utilities\src\parallel\id_generator.hpp" />
+    <ClInclude Include="Utilities\src\parallel\parallel.hpp" />
+    <ClInclude Include="Utilities\src\platform\windows.hpp" />
+    <ClInclude Include="Utilities\src\platform\windows_utils.hpp" />
+    <ClInclude Include="Utilities\src\resource\resource.hpp" />
+    <ClInclude Include="Utilities\src\resource\resource_pool.hpp" />
+    <ClInclude Include="Utilities\src\resource\script\variable_script.hpp" />
+    <ClInclude Include="Utilities\src\resource\script\variable_value.hpp" />
+    <ClInclude Include="Utilities\src\string\format.hpp" />
+    <ClInclude Include="Utilities\src\string\formats.hpp" />
+    <ClInclude Include="Utilities\src\string\string.hpp" />
+    <ClInclude Include="Utilities\src\string\string_utils.hpp" />
+    <ClInclude Include="Utilities\src\system\cpu_monitor.hpp" />
+    <ClInclude Include="Utilities\src\system\game_timer.hpp" />
+    <ClInclude Include="Utilities\src\system\system_time.hpp" />
+    <ClInclude Include="Utilities\src\system\system_usage.hpp" />
+    <ClInclude Include="Utilities\src\system\timer.hpp" />
+    <ClInclude Include="Utilities\src\type\atomic_types.hpp" />
+    <ClInclude Include="Utilities\src\type\scalar_types.hpp" />
+    <ClInclude Include="Utilities\src\type\types.hpp" />
+    <ClInclude Include="Utilities\src\type\vector_types.hpp" />
+    <ClInclude Include="Utilities\src\ui\combo_box.hpp" />
+    <ClInclude Include="Utilities\src\ui\window.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Utilities\src\exception\exception.tpp" />
+    <None Include="Utilities\src\io\binary_reader.tpp" />
+    <None Include="Utilities\src\io\binary_utils.tpp" />
+    <None Include="Utilities\src\io\binary_writer.tpp" />
+    <None Include="Utilities\src\io\line_reader.tpp" />
+    <None Include="Utilities\src\loaders\var\var_reader.tpp" />
+    <None Include="Utilities\src\memory\memory.tpp" />
+    <None Include="Utilities\src\memory\memory_arena.tpp" />
+    <None Include="Utilities\src\memory\memory_stack.tpp" />
+    <None Include="Utilities\src\platform\windows_utils.tpp" />
+    <None Include="Utilities\src\resource\resource.tpp" />
+    <None Include="Utilities\src\resource\resource_pool.tpp" />
+    <None Include="Utilities\src\resource\script\variable_script.tpp" />
+    <None Include="Utilities\src\string\format.tpp" />
+    <None Include="Utilities\src\string\string_utils.tpp" />
+    <None Include="Utilities\src\system\timer.tpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Utilities\src\exception\exception.cpp" />
+    <ClCompile Include="Utilities\src\io\binary_reader.cpp" />
+    <ClCompile Include="Utilities\src\io\binary_writer.cpp" />
+    <ClCompile Include="Utilities\src\io\line_reader.cpp" />
+    <ClCompile Include="Utilities\src\io\writer.cpp" />
+    <ClCompile Include="Utilities\src\loaders\variable_script_loader.cpp" />
+    <ClCompile Include="Utilities\src\loaders\var\var_loader.cpp" />
+    <ClCompile Include="Utilities\src\loaders\var\var_reader.cpp" />
+    <ClCompile Include="Utilities\src\loaders\var\var_writer.cpp" />
+    <ClCompile Include="Utilities\src\logging\dump.cpp" />
+    <ClCompile Include="Utilities\src\logging\logging.cpp" />
+    <ClCompile Include="Utilities\src\logging\progress_reporter.cpp" />
+    <ClCompile Include="Utilities\src\memory\memory_arena.cpp" />
+    <ClCompile Include="Utilities\src\memory\memory_stack.cpp" />
+    <ClCompile Include="Utilities\src\parallel\id_generator.cpp" />
+    <ClCompile Include="Utilities\src\parallel\parallel.cpp" />
+    <ClCompile Include="Utilities\src\resource\script\variable_script.cpp" />
+    <ClCompile Include="Utilities\src\string\string_utils.cpp" />
+    <ClCompile Include="Utilities\src\system\system_time.cpp" />
+    <ClCompile Include="Utilities\src\system\system_usage.cpp" />
+    <ClCompile Include="Utilities\src\ui\combo_box.cpp" />
+    <ClCompile Include="Utilities\src\ui\window.cpp" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

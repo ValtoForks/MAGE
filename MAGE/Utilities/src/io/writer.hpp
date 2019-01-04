@@ -10,6 +10,15 @@
 #pragma endregion
 
 //-----------------------------------------------------------------------------
+// System Includes
+//-----------------------------------------------------------------------------
+#pragma region
+
+#include <filesystem>
+
+#pragma endregion
+
+//-----------------------------------------------------------------------------
 // Engine Declarations and Definitions
 //-----------------------------------------------------------------------------
 namespace mage {
@@ -30,7 +39,7 @@ namespace mage {
 
 		 @param[in]		writer
 						A reference to a writer to copy.
-		 @return		A reference to the copy of the given writer (i.e. this 
+		 @return		A reference to the copy of the given writer (i.e. this
 						writer).
 		 */
 		Writer& operator=(const Writer& writer) = delete;
@@ -49,24 +58,14 @@ namespace mage {
 		//---------------------------------------------------------------------
 
 		/**
-		 Writes to the given file.
+		 Writes to the file associated with the given path.
 
-		 @param[in]		fname
-						The file name.
+		 @param[in]		path
+						The path.
 		 @throws		Exception
-						Failed to write to the given file.
+						Failed to write to the file.
 		 */
-		void WriteToFile(wstring fname);
-
-		/**
-		 Returns the current filename of this writer.
-
-		 @return		A reference to the current filename of this writer.
-		 */
-		[[nodiscard]]
-		const wstring& GetFilename() const noexcept {
-			return m_fname;
-		}
+		void WriteToFile(std::filesystem::path path);
 
 	protected:
 
@@ -105,6 +104,16 @@ namespace mage {
 		//---------------------------------------------------------------------
 
 		/**
+		 Returns the current path of this writer.
+
+		 @return		A reference to the current path of this writer.
+		 */
+		[[nodiscard]]
+		const std::filesystem::path& GetPath() const noexcept {
+			return m_path;
+		}
+
+		/**
 		 Writes the given character.
 
 		 @param[in]		c
@@ -123,7 +132,7 @@ namespace mage {
 						Failed to write the given string.
 		 */
 		void WriteString(NotNull< const_zstring > str);
-		
+
 		/**
 		 Writes the given string and ends the current line.
 
@@ -133,7 +142,7 @@ namespace mage {
 						Failed to write the given string.
 		 */
 		void WriteStringLine(NotNull< const_zstring > str);
-		
+
 	private:
 
 		//---------------------------------------------------------------------
@@ -158,8 +167,8 @@ namespace mage {
 		UniqueFileStream m_file_stream;
 
 		/**
-		 The current filename of this writer.
+		 The current path of this writer.
 		 */
-		wstring m_fname;
+		std::filesystem::path m_path;
 	};
 }

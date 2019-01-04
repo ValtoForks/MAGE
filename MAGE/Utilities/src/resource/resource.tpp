@@ -1,22 +1,15 @@
 #pragma once
 
 //-----------------------------------------------------------------------------
-// Engine Includes
-//-----------------------------------------------------------------------------
-#pragma region
-
-#include "file\file_utils.hpp"
-
-#pragma endregion
-
-//-----------------------------------------------------------------------------
 // Engine Definitions
 //-----------------------------------------------------------------------------
 namespace mage {
 
 	template< typename ResourceT >
-	Resource< ResourceT >::Resource(wstring guid) noexcept
-		: m_guid(std::move(guid)) {}
+	Resource< ResourceT >::Resource(std::wstring guid) noexcept
+		: m_guid(std::move(guid)) {
+		TransformToLowerCase(m_guid);
+	}
 
 	template< typename ResourceT >
 	Resource< ResourceT >::Resource(Resource&& resource) noexcept = default;
@@ -30,13 +23,13 @@ namespace mage {
 
 	template< typename ResourceT >
 	[[nodiscard]]
-	inline const wstring Resource< ResourceT >::GetName() const {
-		return GetFileName(GetFilename());
+	bool Resource< ResourceT >::IsFileResource() const {
+		return std::filesystem::is_regular_file(m_guid);
 	}
 
 	template< typename ResourceT >
 	[[nodiscard]]
-	inline const wstring Resource< ResourceT >::GetPath() const {
-		return GetPathName(GetFilename());
+	inline const std::filesystem::path Resource< ResourceT >::GetPath() const {
+		return m_guid;
 	}
 }

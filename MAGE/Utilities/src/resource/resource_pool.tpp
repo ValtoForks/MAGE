@@ -11,10 +11,10 @@ namespace mage {
 	#pragma region
 
 	template< typename KeyT, typename ResourceT >
-	ResourcePool< KeyT, ResourceT >::ResourcePool(ResourcePool&& pool) noexcept 
+	ResourcePool< KeyT, ResourceT >::ResourcePool(ResourcePool&& pool) noexcept
 		: m_mutex() {
 
-		std::lock_guard< std::mutex > lock(pool.m_mutex);
+		const std::scoped_lock lock(pool.m_mutex);
 
 		m_resource_map = std::move(pool.m_resource_map);
 	}
@@ -22,33 +22,35 @@ namespace mage {
 	template< typename KeyT, typename ResourceT >
 	[[nodiscard]]
 	inline bool ResourcePool< KeyT, ResourceT >::empty() const noexcept {
-		std::lock_guard< std::mutex > lock(m_mutex);
+		const std::scoped_lock lock(m_mutex);
 
-		return m_resource_map.empty();
+		using std::empty;
+		return empty(m_resource_map);
 	}
 
 	template< typename KeyT, typename ResourceT >
 	[[nodiscard]]
-	inline size_t ResourcePool< KeyT, ResourceT >::size() const noexcept {
-		std::lock_guard< std::mutex > lock(m_mutex);
-		
-		return m_resource_map.size();
+	inline std::size_t ResourcePool< KeyT, ResourceT >::size() const noexcept {
+		const std::scoped_lock lock(m_mutex);
+
+		using std::size;
+		return size(m_resource_map);
 	}
 
 	template< typename KeyT, typename ResourceT >
 	[[nodiscard]]
 	bool ResourcePool< KeyT, ResourceT >::Contains(const KeyT& key) noexcept {
-		std::lock_guard< std::mutex > lock(m_mutex);
+		const std::scoped_lock lock(m_mutex);
 
-		if (const auto it = m_resource_map.find(key); 
+		if (const auto it = m_resource_map.find(key);
 			it != m_resource_map.end()) {
 
 			const auto resource = it->second.lock();
-			
+
 			if (resource) {
 				return true;
 			}
-			
+
 			m_resource_map.erase(it);
 		}
 
@@ -59,14 +61,14 @@ namespace mage {
 	[[nodiscard]]
 	SharedPtr< ResourceT > ResourcePool< KeyT, ResourceT >
 		::Get(const KeyT& key) noexcept {
-		
-		std::lock_guard< std::mutex > lock(m_mutex);
 
-		if (const auto it = m_resource_map.find(key); 
+		const std::scoped_lock lock(m_mutex);
+
+		if (const auto it = m_resource_map.find(key);
 			it != m_resource_map.end()) {
 
 			const auto resource = it->second.lock();
-			
+
 			if (resource) {
 				return resource;
 			}
@@ -81,7 +83,7 @@ namespace mage {
 	template< typename... ConstructorArgsT >
 	inline SharedPtr< ResourceT > ResourcePool< KeyT, ResourceT >
 		::GetOrCreate(const KeyT& key, ConstructorArgsT&&... args) {
-		
+
 		return GetOrCreateDerived< ResourceT, ConstructorArgsT... >(
 			key, std::forward< ConstructorArgsT >(args)...);
 	}
@@ -90,34 +92,34 @@ namespace mage {
 	template< typename DerivedResourceT, typename... ConstructorArgsT >
 	SharedPtr< ResourceT > ResourcePool< KeyT, ResourceT >
 		::GetOrCreateDerived(const KeyT& key, ConstructorArgsT&&... args) {
-		
-		std::lock_guard< std::mutex > lock(m_mutex);
 
-		if (const auto it = m_resource_map.find(key); 
+		const std::scoped_lock lock(m_mutex);
+
+		if (const auto it = m_resource_map.find(key);
 			it != m_resource_map.end()) {
 
 			const auto resource = it->second.lock();
 			if (resource) {
 				return resource;
 			}
-			
+
 			m_resource_map.erase(it);
 		}
 
-		const auto new_resource 
+		const auto new_resource
 			= MakeAllocatedShared< Resource< DerivedResourceT > >
 			  (*this, key, std::forward< ConstructorArgsT >(args)...);
-		
+
 		m_resource_map.emplace(key, new_resource);
-		
+
 		return new_resource;
 	}
 
 	template< typename KeyT, typename ResourceT >
 	void ResourcePool< KeyT, ResourceT >::Remove(const KeyT& key) {
-		std::lock_guard< std::mutex > lock(m_mutex);
+		const std::scoped_lock lock(m_mutex);
 
-		if (const auto it = m_resource_map.find(key); 
+		if (const auto it = m_resource_map.find(key);
 			it != m_resource_map.end() && it->second.expired()) {
 
 			m_resource_map.erase(it);
@@ -126,7 +128,7 @@ namespace mage {
 
 	template< typename KeyT, typename ResourceT >
 	inline void ResourcePool< KeyT, ResourceT >::RemoveAll() noexcept {
-		std::lock_guard< std::mutex > lock(m_mutex);
+		const std::scoped_lock lock(m_mutex);
 
 		m_resource_map.clear();
 	}
@@ -142,11 +144,11 @@ namespace mage {
 	template< typename DerivedResourceT >
 	template< typename... ConstructorArgsT >
 	ResourcePool< KeyT, ResourceT >::Resource< DerivedResourceT >
-		::Resource(ResourcePool& resource_pool, 
-			       const KeyT& resource_key, 
+		::Resource(ResourcePool& resource_pool,
+			       const KeyT& resource_key,
 			       ConstructorArgsT&&... args)
 		: DerivedResourceT(std::forward< ConstructorArgsT >(args)...),
-		m_resource_pool(resource_pool), 
+		m_resource_pool(resource_pool),
 		m_resource_key(resource_key) {}
 
 	template< typename KeyT, typename ResourceT >
@@ -159,7 +161,7 @@ namespace mage {
 	template< typename DerivedResourceT >
 	ResourcePool< KeyT, ResourceT >::Resource< DerivedResourceT >
 		::~Resource() {
-		
+
 		m_resource_pool.Remove(m_resource_key);
 	}
 
@@ -175,7 +177,7 @@ namespace mage {
 		::PersistentResourcePool(PersistentResourcePool&& pool) noexcept
 		: m_mutex() {
 
-		std::lock_guard< std::mutex > lock(pool.m_mutex);
+		const std::scoped_lock lock(pool.m_mutex);
 
 		m_resource_map = std::move(pool.m_resource_map);
 	}
@@ -184,27 +186,29 @@ namespace mage {
 	[[nodiscard]]
 	inline bool PersistentResourcePool< KeyT, ResourceT >
 		::empty() const noexcept {
-		
-		std::lock_guard< std::mutex > lock(m_mutex);
 
-		return m_resource_map.empty();
+		const std::scoped_lock lock(m_mutex);
+
+		using std::empty;
+		return empty(m_resource_map);
 	}
 
 	template< typename KeyT, typename ResourceT >
 	[[nodiscard]]
-	inline size_t PersistentResourcePool< KeyT, ResourceT >
+	inline std::size_t PersistentResourcePool< KeyT, ResourceT >
 		::size() const noexcept {
-		
-		std::lock_guard< std::mutex > lock(m_mutex);
-		
-		return m_resource_map.size();
+
+		const std::scoped_lock lock(m_mutex);
+
+		using std::size;
+		return size(m_resource_map);
 	}
 
 	template< typename KeyT, typename ResourceT >
 	[[nodiscard]]bool PersistentResourcePool< KeyT, ResourceT >
 		::Contains(const KeyT& key) noexcept {
-		
-		std::lock_guard< std::mutex > lock(m_mutex);
+
+		const std::scoped_lock lock(m_mutex);
 
 		const auto it = m_resource_map.find(key);
 		return (it != m_resource_map.end());
@@ -213,11 +217,11 @@ namespace mage {
 	template< typename KeyT, typename ResourceT >
 	[[nodiscard]]SharedPtr< ResourceT > PersistentResourcePool< KeyT, ResourceT >
 		::Get(const KeyT& key) noexcept {
-		
-		std::lock_guard< std::mutex > lock(m_mutex);
+
+		const std::scoped_lock lock(m_mutex);
 
 		const auto it = m_resource_map.find(key);
-		return (it != m_resource_map.end()) ? it->second 
+		return (it != m_resource_map.end()) ? it->second
 			                                : SharedPtr< ResourceT >();
 	}
 
@@ -225,7 +229,7 @@ namespace mage {
 	template< typename... ConstructorArgsT >
 	inline SharedPtr< ResourceT > PersistentResourcePool< KeyT, ResourceT >
 		::GetOrCreate(const KeyT& key, ConstructorArgsT&&... args) {
-		
+
 		return GetOrCreateDerived< ResourceT, ConstructorArgsT... >(
 			key, std::forward< ConstructorArgsT >(args)...);
 	}
@@ -234,10 +238,10 @@ namespace mage {
 	template< typename DerivedResourceT, typename... ConstructorArgsT >
 	SharedPtr< ResourceT > PersistentResourcePool< KeyT, ResourceT >
 		::GetOrCreateDerived(const KeyT& key, ConstructorArgsT&&... args) {
-		
-		std::lock_guard< std::mutex > lock(m_mutex);
 
-		if (const auto it = m_resource_map.find(key); 
+		const std::scoped_lock lock(m_mutex);
+
+		if (const auto it = m_resource_map.find(key);
 			it != m_resource_map.end()) {
 
 			return it->second;
@@ -255,9 +259,9 @@ namespace mage {
 	void PersistentResourcePool< KeyT, ResourceT >
 		::Remove(const KeyT& key) {
 
-		std::lock_guard< std::mutex > lock(m_mutex);
+		const std::scoped_lock lock(m_mutex);
 
-		if (const auto it = m_resource_map.find(key); 
+		if (const auto it = m_resource_map.find(key);
 			it != m_resource_map.end()) {
 
 			m_resource_map.erase(it);
@@ -268,7 +272,7 @@ namespace mage {
 	inline void PersistentResourcePool< KeyT, ResourceT >
 		::RemoveAll() noexcept {
 
-		std::lock_guard< std::mutex > lock(m_mutex);
+		const std::scoped_lock lock(m_mutex);
 
 		m_resource_map.clear();
 	}

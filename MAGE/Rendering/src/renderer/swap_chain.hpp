@@ -17,7 +17,7 @@ namespace mage::rendering {
 	/**
 	 A class of swap chains.
 	 */
-	class SwapChain final {
+	class SwapChain {
 
 	public:
 
@@ -28,16 +28,16 @@ namespace mage::rendering {
 		/**
 		 Constructs a swap chain.
 
-		 @param[in]		device
+		 @param[in,out]	device
 						A reference to the device.
-		 @param[in]		device_context
+		 @param[in,out]	device_context
 						A reference to the device context.
 		 @param[in]		window
 						The main window handle.
-		 @param[in]		display_configuration
+		 @param[in,out]	display_configuration
 						A reference to the display configuration.
 		 */
-		explicit SwapChain(ID3D11Device& device, 
+		explicit SwapChain(ID3D11Device& device,
 						   ID3D11DeviceContext& device_context,
 			               NotNull< HWND > window,
 			               DisplayConfiguration& display_configuration);
@@ -72,7 +72,7 @@ namespace mage::rendering {
 
 		 @param[in]		swap_chain
 						A reference to a swap chain to copy.
-		 @return		A reference to the copy of the given swap chain (i.e. 
+		 @return		A reference to the copy of the given swap chain (i.e.
 						this swap chain).
 		 */
 		SwapChain& operator=(const SwapChain& swap_chain) = delete;
@@ -82,7 +82,7 @@ namespace mage::rendering {
 
 		 @param[in]		swap_chain
 						A reference to a swap chain to move.
-		 @return		A reference to the moved swap chain (i.e. this swap 
+		 @return		A reference to the moved swap chain (i.e. this swap
 						chain).
 		 */
 		SwapChain& operator=(SwapChain&& swap_chain) = delete;
@@ -102,26 +102,26 @@ namespace mage::rendering {
 		/**
 		 Checks whether this swap chain displays in windowed mode.
 
-		 @return		@c true if this swap chain displays in windowed mode. 
+		 @return		@c true if this swap chain displays in windowed mode.
 						@c false otherwise.
 		*/
 		[[nodiscard]]
 		bool IsWindowed() const noexcept;
-		
+
 		/**
 		 Checks whether this swap chain displays in full screen mode.
 
-		 @return		@c true if this swap chain displays in full screen mode. 
+		 @return		@c true if this swap chain displays in full screen mode.
 						@c false otherwise.
 		 */
 		[[nodiscard]]
 		bool IsFullScreen() const noexcept;
-		
+
 		/**
-		 Checks whether this swap chain lost its mode, i.e. the tracked mode of 
+		 Checks whether this swap chain lost its mode, i.e. the tracked mode of
 		 this swap chain differs from its actual mode (e.g. ALT + TAB).
 
-		 @return		@c true if this swap chain lost its mode. @c false 
+		 @return		@c true if this swap chain lost its mode. @c false
 						otherwise.
 		 */
 		[[nodiscard]]
@@ -129,23 +129,23 @@ namespace mage::rendering {
 
 		/**
 		 Sets the initial mode of this swap chain.
-		 
+
 		 Call this method before starting the game loop.
 
 		 @throws		Exception
 						Failed to reset up the swap chain.
 		 */
 		void SetInitialMode();
-		
+
 		/**
-		 Recreates the swap chain buffers and switches the mode of this swap 
+		 Recreates the swap chain buffers and switches the mode of this swap
 		 chain. Windowed mode is switched to full screen mode and vice versa.
 
 		 @param[in]		toggle
-						If @c true, then only the swap chain buffers will be 
-						recreated to match the current mode of this swap chain 
-						and no mode switch will occurs. If @c false, then the 
-						swap chain buffers will be recreated and a mode switch 
+						If @c true, then only the swap chain buffers will be
+						recreated to match the current mode of this swap chain
+						and no mode switch will occurs. If @c false, then the
+						swap chain buffers will be recreated and a mode switch
 						will occur.
 		 @throws		Exception
 						Failed to reset up the swap chain.
@@ -159,11 +159,11 @@ namespace mage::rendering {
 		/**
 		 Returns the render target view of the back buffer of this swap chain.
 
-		 @return		A pointer to the render target view of the back buffer 
-						of this swap chain.
+		 @return		A reference to the render target view of the back
+						buffer of this swap chain.
 		 */
 		[[nodiscard]]
-		NotNull< ID3D11RenderTargetView* > GetRTV() const noexcept;
+		ID3D11RenderTargetView& GetRTV() const noexcept;
 
 		/**
 		 Clears the render target view of the back buffer of this swap chain.
@@ -182,10 +182,10 @@ namespace mage::rendering {
 		 @param[in]		fname
 						A reference to the filename.
 		 @throws		Exception
-						Failed to take a screenshot of the current back buffer 
-						of this swap chain. 
+						Failed to take a screenshot of the current back buffer
+						of this swap chain.
 		 */
-		void TakeScreenShot(const wstring& fname) const;
+		void TakeScreenShot(const std::wstring& fname) const;
 
 	private:
 
@@ -198,6 +198,6 @@ namespace mage::rendering {
 		/**
 		 A pointer to the implementation of this swap chain.
 		 */
-		UniquePtr< Impl > m_impl;	
+		UniquePtr< Impl > m_impl;
 	};
 }

@@ -298,7 +298,7 @@ half Max(half3 v) {
  @return		The maximum component value of the given value.
  */
 half Max(half4 v) {
-	return max(max(v.x, v.y), max(v.z, v.w));
+	return Max(max(v.xy, v.zw));
 }
 
 /**
@@ -331,7 +331,7 @@ float Max(float3 v) {
  @return		The maximum component value of the given value.
  */
 float Max(float4 v) {
-	return max(max(v.x, v.y), max(v.z, v.w));
+	return Max(max(v.xy, v.zw));
 }
 
 /**
@@ -364,7 +364,7 @@ double Max(double3 v) {
  @return		The maximum component value of the given value.
  */
 double Max(double4 v) {
-	return max(max(v.x, v.y), max(v.z, v.w));
+	return Max(max(v.xy, v.zw));
 }
 
 /**
@@ -397,7 +397,7 @@ int Max(int3 v) {
  @return		The maximum component value of the given value.
  */
 int Max(int4 v) {
-	return max(max(v.x, v.y), max(v.z, v.w));
+	return Max(max(v.xy, v.zw));
 }
 
 /**
@@ -430,7 +430,7 @@ uint Max(uint3 v) {
  @return		The maximum component value of the given value.
  */
 uint Max(uint4 v) {
-	return max(max(v.x, v.y), max(v.z, v.w));
+	return Max(max(v.xy, v.zw));
 }
 
 //-----------------------------------------------------------------------------
@@ -467,7 +467,7 @@ half Min(half3 v) {
  @return		The minimum component value of the given value.
  */
 half Min(half4 v) {
-	return min(min(v.x, v.y), min(v.z, v.w));
+	return Min(min(v.xy, v.zw));
 }
 
 /**
@@ -500,7 +500,7 @@ float Min(float3 v) {
  @return		The minimum component value of the given value.
  */
 float Min(float4 v) {
-	return min(min(v.x, v.y), min(v.z, v.w));
+	return Min(min(v.xy, v.zw));
 }
 
 /**
@@ -533,7 +533,7 @@ double Min(double3 v) {
  @return		The minimum component value of the given value.
  */
 double Min(double4 v) {
-	return min(min(v.x, v.y), min(v.z, v.w));
+	return Min(min(v.xy, v.zw));
 }
 
 /**
@@ -566,7 +566,7 @@ int Min(int3 v) {
  @return		The minimum component value of the given value.
  */
 int Min(int4 v) {
-	return min(min(v.x, v.y), min(v.z, v.w));
+	return Min(min(v.xy, v.zw));
 }
 
 /**
@@ -599,432 +599,381 @@ uint Min(uint3 v) {
  @return		The minimum component value of the given value.
  */
 uint Min(uint4 v) {
-	return min(min(v.x, v.y), min(v.z, v.w));
+	return Min(min(v.xy, v.zw));
 }
 
 //-----------------------------------------------------------------------------
-// Engine Declarations and Definitions: UNORMtoSNORM
+// Engine Declarations and Definitions: UNormToSNorm
 //-----------------------------------------------------------------------------
 
 /**
- Converts the given unsigned normalized value ([0,1] range) to a signed 
+ Converts the given unsigned normalized value ([0,1] range) to a signed
  normalized value ([-1,1] range).
 
  @pre			The given value is an unsigned normalized value ([0,1] range).
- @param[in]		v
+ @param[in]		v_unorm
 				The unsigned normalized value ([0,1] range).
  @return		The signed normalized value ([-1,1] range).
  */
-half UNORMtoSNORM(half v) {
-	return 2.0h * v - 1.0h;
+half UNormToSNorm(half v_unorm) {
+	return 2.0h * v_unorm - 1.0h;
 }
 
 /**
- Converts the given unsigned normalized value ([0,1] range) to a signed 
+ Converts the given unsigned normalized value ([0,1] range) to a signed
  normalized value ([-1,1] range).
 
  @pre			The given value is an unsigned normalized value ([0,1] range).
- @param[in]		v
+ @param[in]		v_unorm
 				The unsigned normalized value ([0,1] range).
  @return		The signed normalized value ([-1,1] range).
  */
-half2 UNORMtoSNORM(half2 v) {
-	return 2.0h * v - 1.0h;
+half2 UNormToSNorm(half2 v_unorm) {
+	return 2.0h * v_unorm - 1.0h;
 }
 
 /**
- Converts the given unsigned normalized value ([0,1] range) to a signed 
+ Converts the given unsigned normalized value ([0,1] range) to a signed
  normalized value ([-1,1] range).
 
  @pre			The given value is an unsigned normalized value ([0,1] range).
- @param[in]		v
+ @param[in]		v_unorm
 				The unsigned normalized value ([0,1] range).
  @return		The signed normalized value ([-1,1] range).
  */
-half3 UNORMtoSNORM(half3 v) {
-	return 2.0h * v - 1.0h;
+half3 UNormToSNorm(half3 v_unorm) {
+	return 2.0h * v_unorm - 1.0h;
 }
 
 /**
- Converts the given unsigned normalized value ([0,1] range) to a signed 
+ Converts the given unsigned normalized value ([0,1] range) to a signed
  normalized value ([-1,1] range).
 
  @pre			The given value is an unsigned normalized value ([0,1] range).
- @param[in]		x
+ @param[in]		v_unorm
 				The unsigned normalized value ([0,1] range).
  @return		The signed normalized value ([-1,1] range).
  */
-half4 UNORMtoSNORM(half4 v) {
-	return 2.0h * v - 1.0h;
+half4 UNormToSNorm(half4 v_unorm) {
+	return 2.0h * v_unorm - 1.0h;
 }
 
 /**
- Converts the given unsigned normalized value ([0,1] range) to a signed 
+ Converts the given unsigned normalized value ([0,1] range) to a signed
  normalized value ([-1,1] range).
 
  @pre			The given value is an unsigned normalized value ([0,1] range).
- @param[in]		v
+ @param[in]		v_unorm
 				The unsigned normalized value ([0,1] range).
  @return		The signed normalized value ([-1,1] range).
  */
-float UNORMtoSNORM(float v) {
-	return 2.0f * v - 1.0f;
+float UNormToSNorm(float v_unorm) {
+	return 2.0f * v_unorm - 1.0f;
 }
 
 /**
- Converts the given unsigned normalized value ([0,1] range) to a signed 
+ Converts the given unsigned normalized value ([0,1] range) to a signed
  normalized value ([-1,1] range).
 
  @pre			The given value is an unsigned normalized value ([0,1] range).
- @param[in]		v
+ @param[in]		v_unorm
 				The unsigned normalized value ([0,1] range).
  @return		The signed normalized value ([-1,1] range).
  */
-float2 UNORMtoSNORM(float2 v) {
-	return 2.0f * v - 1.0f;
+float2 UNormToSNorm(float2 v_unorm) {
+	return 2.0f * v_unorm - 1.0f;
 }
 
 /**
- Converts the given unsigned normalized value ([0,1] range) to a signed 
+ Converts the given unsigned normalized value ([0,1] range) to a signed
  normalized value ([-1,1] range).
 
  @pre			The given value is an unsigned normalized value ([0,1] range).
- @param[in]		v
+ @param[in]		v_unorm
 				The unsigned normalized value ([0,1] range).
  @return		The signed normalized value ([-1,1] range).
  */
-float3 UNORMtoSNORM(float3 v) {
-	return 2.0f * v - 1.0f;
+float3 UNormToSNorm(float3 v_unorm) {
+	return 2.0f * v_unorm - 1.0f;
 }
 
 /**
- Converts the given unsigned normalized value ([0,1] range) to a signed 
+ Converts the given unsigned normalized value ([0,1] range) to a signed
  normalized value ([-1,1] range).
 
  @pre			The given value is an unsigned normalized value ([0,1] range).
- @param[in]		x
+ @param[in]		v_unorm
 				The unsigned normalized value ([0,1] range).
  @return		The signed normalized value ([-1,1] range).
  */
-float4 UNORMtoSNORM(float4 v) {
-	return 2.0f * v - 1.0f;
+float4 UNormToSNorm(float4 v_unorm) {
+	return 2.0f * v_unorm - 1.0f;
 }
 
 /**
- Converts the given unsigned normalized value ([0,1] range) to a signed 
+ Converts the given unsigned normalized value ([0,1] range) to a signed
  normalized value ([-1,1] range).
 
  @pre			The given value is an unsigned normalized value ([0,1] range).
- @param[in]		v
+ @param[in]		v_unorm
 				The unsigned normalized value ([0,1] range).
  @return		The signed normalized value ([-1,1] range).
  */
-double UNORMtoSNORM(double v) {
-	return 2.0l * v - 1.0l;
+double UNormToSNorm(double v_unorm) {
+	return 2.0l * v_unorm - 1.0l;
 }
 
 /**
- Converts the given unsigned normalized value ([0,1] range) to a signed 
+ Converts the given unsigned normalized value ([0,1] range) to a signed
  normalized value ([-1,1] range).
 
  @pre			The given value is an unsigned normalized value ([0,1] range).
- @param[in]		v
+ @param[in]		v_unorm
 				The unsigned normalized value ([0,1] range).
  @return		The signed normalized value ([-1,1] range).
  */
-double2 UNORMtoSNORM(double2 v) {
-	return 2.0l * v - 1.0l;
+double2 UNormToSNorm(double2 v_unorm) {
+	return 2.0l * v_unorm - 1.0l;
 }
 
 /**
- Converts the given unsigned normalized value ([0,1] range) to a signed 
+ Converts the given unsigned normalized value ([0,1] range) to a signed
  normalized value ([-1,1] range).
 
  @pre			The given value is an unsigned normalized value ([0,1] range).
- @param[in]		v
+ @param[in]		v_unorm
 				The unsigned normalized value ([0,1] range).
  @return		The signed normalized value ([-1,1] range).
  */
-double3 UNORMtoSNORM(double3 v) {
-	return 2.0l * v - 1.0l;
+double3 UNormToSNorm(double3 v_unorm) {
+	return 2.0l * v_unorm - 1.0l;
 }
 
 /**
- Converts the given unsigned normalized value ([0,1] range) to a signed 
+ Converts the given unsigned normalized value ([0,1] range) to a signed
  normalized value ([-1,1] range).
 
  @pre			The given value is an unsigned normalized value ([0,1] range).
- @param[in]		x
+ @param[in]		v_unorm
 				The unsigned normalized value ([0,1] range).
  @return		The signed normalized value ([-1,1] range).
  */
-double4 UNORMtoSNORM(double4 v) {
-	return 2.0l * v - 1.0l;
+double4 UNormToSNorm(double4 v_unorm) {
+	return 2.0l * v_unorm - 1.0l;
 }
 
 //-----------------------------------------------------------------------------
-// Engine Declarations and Definitions: SNORMtoUNORM
+// Engine Declarations and Definitions: SNormToUNorm
 //-----------------------------------------------------------------------------
 
 /**
- Converts the given signed normalized value ([-1,1] range) to an unsigned 
+ Converts the given signed normalized value ([-1,1] range) to an unsigned
  normalized value ([0,1] range).
 
  @pre			The given value is a signed normalized value ([-1,1] range).
- @param[in]		x
+ @param[in]		v_snorm
 				The signed normalized value ([-1,1] range).
  @return		The unsigned normalized value ([0,1] range).
  */
-half SNORMtoUNORM(half v) {
-	return 0.5h * v + 0.5h;
+half SNormToUNorm(half v_snorm) {
+	return 0.5h * v_snorm + 0.5h;
 }
 
 /**
- Converts the given signed normalized value ([-1,1] range) to an unsigned 
+ Converts the given signed normalized value ([-1,1] range) to an unsigned
  normalized value ([0,1] range).
 
  @pre			The given value is a signed normalized value ([-1,1] range).
- @param[in]		v
+ @param[in]		v_snorm
 				The signed normalized value ([-1,1] range).
  @return		The unsigned normalized value ([0,1] range).
  */
-half2 SNORMtoUNORM(half2 v) {
-	return 0.5h * v + 0.5h;
+half2 SNormToUNorm(half2 v_snorm) {
+	return 0.5h * v_snorm + 0.5h;
 }
 
 /**
- Converts the given signed normalized value ([-1,1] range) to an unsigned 
+ Converts the given signed normalized value ([-1,1] range) to an unsigned
  normalized value ([0,1] range).
 
  @pre			The given value is a signed normalized value ([-1,1] range).
- @param[in]		v
+ @param[in]		v_snorm
 				The signed normalized value ([-1,1] range).
  @return		The unsigned normalized value ([0,1] range).
  */
-half3 SNORMtoUNORM(half3 v) {
-	return 0.5h * v + 0.5h;
+half3 SNormToUNorm(half3 v_snorm) {
+	return 0.5h * v_snorm + 0.5h;
 }
 
 /**
- Converts the given signed normalized value ([-1,1] range) to an unsigned 
+ Converts the given signed normalized value ([-1,1] range) to an unsigned
  normalized value ([0,1] range).
 
  @pre			The given value is a signed normalized value ([-1,1] range).
- @param[in]		v
+ @param[in]		v_snorm
 				The signed normalized value ([-1,1] range).
  @return		The unsigned normalized value ([0,1] range).
  */
-half4 SNORMtoUNORM(half4 v) {
-	return 0.5h * v + 0.5h;
+half4 SNormToUNorm(half4 v_snorm) {
+	return 0.5h * v_snorm + 0.5h;
 }
 
 /**
- Converts the given signed normalized value ([-1,1] range) to an unsigned 
+ Converts the given signed normalized value ([-1,1] range) to an unsigned
  normalized value ([0,1] range).
 
  @pre			The given value is a signed normalized value ([-1,1] range).
- @param[in]		x
+ @param[in]		v_snorm
 				The signed normalized value ([-1,1] range).
  @return		The unsigned normalized value ([0,1] range).
  */
-float SNORMtoUNORM(float v) {
-	return 0.5f * v + 0.5f;
+float SNormToUNorm(float v_snorm) {
+	return 0.5f * v_snorm + 0.5f;
 }
 
 /**
- Converts the given signed normalized value ([-1,1] range) to an unsigned 
+ Converts the given signed normalized value ([-1,1] range) to an unsigned
  normalized value ([0,1] range).
 
  @pre			The given value is a signed normalized value ([-1,1] range).
- @param[in]		v
+ @param[in]		v_snorm
 				The signed normalized value ([-1,1] range).
  @return		The unsigned normalized value ([0,1] range).
  */
-float2 SNORMtoUNORM(float2 v) {
-	return 0.5f * v + 0.5f;
+float2 SNormToUNorm(float2 v_snorm) {
+	return 0.5f * v_snorm + 0.5f;
 }
 
 /**
- Converts the given signed normalized value ([-1,1] range) to an unsigned 
+ Converts the given signed normalized value ([-1,1] range) to an unsigned
  normalized value ([0,1] range).
 
  @pre			The given value is a signed normalized value ([-1,1] range).
- @param[in]		v
+ @param[in]		v_snorm
 				The signed normalized value ([-1,1] range).
  @return		The unsigned normalized value ([0,1] range).
  */
-float3 SNORMtoUNORM(float3 v) {
-	return 0.5f * v + 0.5f;
+float3 SNormToUNorm(float3 v_snorm) {
+	return 0.5f * v_snorm + 0.5f;
 }
 
 /**
- Converts the given signed normalized value ([-1,1] range) to an unsigned 
+ Converts the given signed normalized value ([-1,1] range) to an unsigned
  normalized value ([0,1] range).
 
  @pre			The given value is a signed normalized value ([-1,1] range).
- @param[in]		v
+ @param[in]		v_snorm
 				The signed normalized value ([-1,1] range).
  @return		The unsigned normalized value ([0,1] range).
  */
-float4 SNORMtoUNORM(float4 v) {
-	return 0.5f * v + 0.5f;
+float4 SNormToUNorm(float4 v_snorm) {
+	return 0.5f * v_snorm + 0.5f;
 }
 
 /**
- Converts the given signed normalized value ([-1,1] range) to an unsigned 
+ Converts the given signed normalized value ([-1,1] range) to an unsigned
  normalized value ([0,1] range).
 
  @pre			The given value is a signed normalized value ([-1,1] range).
- @param[in]		x
+ @param[in]		v_snorm
 				The signed normalized value ([-1,1] range).
  @return		The unsigned normalized value ([0,1] range).
  */
-double SNORMtoUNORM(double v) {
-	return 0.5l * v + 0.5l;
+double SNormToUNorm(double v_snorm) {
+	return 0.5l * v_snorm + 0.5l;
 }
 
 /**
- Converts the given signed normalized value ([-1,1] range) to an unsigned 
+ Converts the given signed normalized value ([-1,1] range) to an unsigned
  normalized value ([0,1] range).
 
  @pre			The given value is a signed normalized value ([-1,1] range).
- @param[in]		v
+ @param[in]		v_snorm
 				The signed normalized value ([-1,1] range).
  @return		The unsigned normalized value ([0,1] range).
  */
-double2 SNORMtoUNORM(double2 v) {
-	return 0.5l * v + 0.5l;
+double2 SNormToUNorm(double2 v_snorm) {
+	return 0.5l * v_snorm + 0.5l;
 }
 
 /**
- Converts the given signed normalized value ([-1,1] range) to an unsigned 
+ Converts the given signed normalized value ([-1,1] range) to an unsigned
  normalized value ([0,1] range).
 
  @pre			The given value is a signed normalized value ([-1,1] range).
- @param[in]		v
+ @param[in]		v_snorm
 				The signed normalized value ([-1,1] range).
  @return		The unsigned normalized value ([0,1] range).
  */
-double3 SNORMtoUNORM(double3 v) {
-	return 0.5l * v + 0.5l;
+double3 SNormToUNorm(double3 v_snorm) {
+	return 0.5l * v_snorm + 0.5l;
 }
 
 /**
- Converts the given signed normalized value ([-1,1] range) to an unsigned 
+ Converts the given signed normalized value ([-1,1] range) to an unsigned
  normalized value ([0,1] range).
 
  @pre			The given value is a signed normalized value ([-1,1] range).
- @param[in]		v
+ @param[in]		v_snorm
 				The signed normalized value ([-1,1] range).
  @return		The unsigned normalized value ([0,1] range).
  */
-double4 SNORMtoUNORM(double4 v) {
-	return 0.5l * v + 0.5l;
+double4 SNormToUNorm(double4 v_snorm) {
+	return 0.5l * v_snorm + 0.5l;
 }
 
 //-----------------------------------------------------------------------------
-// Engine Declarations and Definitions: Normal Packing/Unpacking
+// Engine Declarations and Definitions: Packing/Unpacking
 //-----------------------------------------------------------------------------
 
 /**
- Converts the given normal from the [0,1] range to the [-1,1] range.
+ Unpacks the given @c uint (R16G16) to a @c float2.
 
- The z component will be positive and will be calculated from the x and y 
- components.
-
- @pre			The given normal is in the [0,1] range.
- @param[in]		n
-				The normal in the [0,1] range to convert.
- @return		The converted normal in the [-1,1] range.
+ @param		u
+			The @c uint (R16G16) to unpack.
+ @return	The corresponding unpacked @c float2.
  */
-float3 UnpackNormal(float2 n) {
-	const float2 c_xy = UNORMtoSNORM(n);
-	const float  c_z  = sqrt(1.0f - dot(c_xy, c_xy));
-	return float3(c_xy, c_z);
+float2 UnpackR16G16(uint u) {
+	const float2 f = 0xFFFFu & uint2(u >> 16u, u);
+	return f * (1.0f / 65535.0f);
 }
 
 /**
- Converts the given normal from the [0,1] range to the [-1,1] range.
+ Unpacks the given @c float2 to a @c uint (R16G16).
 
- @pre			The given normal is in the [0,1] range.
- @param[in]		n
-				The normal in the [0,1] range to convert.
- @return		The converted normal in the [-1,1] range.
- @post			If the given normal was normalized before packing, the converted 
-				normal will be normalized after unpacking.
+ @pre		@a f lies in [0.0,1.0]^2
+ @param		u
+			The @c float2 to pack.
+ @return	The corresponding packed @c uint (R16G16).
  */
-float3 UnpackNormal(float3 n) {
-	return UNORMtoSNORM(n);
+uint PackR16G16(float2 f) {
+	const uint2 u = 65535.0f * f;
+	return (u.x << 16u) | u.y;
 }
 
 /**
- Converts the given normal from the [-1,1] range to the [0,1] range.
+ Unpacks the given @c uint (R8G8B8A8) to a @c float4.
 
- @pre			The given normal is in the [-1,1] range.
- @param[in]		n
-				The normal in the [-1,1] range to convert.
- @return		The converted normal in the [0,1] range.
+ @param		u
+			The @c uint (R8G8B8A8) to unpack.
+ @return	The corresponding unpacked @c float4.
  */
-float3 PackNormal(float3 n) {
-	return SNORMtoUNORM(n);
-}
-
-//-----------------------------------------------------------------------------
-// Engine Declarations and Definitions: Transformations
-//-----------------------------------------------------------------------------
-
-/**
- Apply the homogeneous divide on the given position.
-
- @param[in]		p
-				The position.
- @return		The position after the homogeneous divide (i.e. the implicit w 
-				coordinate is equal to one).
- */
-float3 HomogeneousDivide(float4 p) {
-	const float inv_w = 1.0f / p.w;
-	return p.xyz * inv_w;
+float4 UnpackR8G8B8A8(uint u) {
+	const float4 f = 0xFFu & uint4(u >> 24u, u >> 16u, u >> 8u, u);
+	return f * (1.0f / 255.0f);
 }
 
 /**
- Converts the given (linear) z coordinate expressed in view space to the 
- corresponding (non-linear) z coordinate expressed in NDC space.
+ Unpacks the given @c float4 to a @c uint (R8G8B8A8).
 
- @param[in]		p_view_z
-				The (linear) z coordinate expressed in view space.
- @param[in]		projection_values
-				The projection values of the view-to-projection matrix
-				[view_to_projection22, view_to_projection32].
- @return		The (non-linear) z coordinate expressed in NDC space.
+ @pre		@a f lies in [0.0,1.0]^4
+ @param		u
+			The @c float4 to pack.
+ @return	The corresponding packed @c uint (R8G8B8A8).
  */
-float ViewZtoNDCZ(float p_view_z, float2 projection_values) {
-	return projection_values.x + projection_values.y / p_view_z;
-}
-
-/**
- Converts the given NDC coordinates to UV coordinates.
-
- @param[in]		p_ndc_xy
-				The NDC x and y coordinate.
- @return		The UV u and v coordinates.
- */
-float2 NDCtoUV(float2 p_ndc_xy) {
-	// x: [-1,1] -> [0,1]
-	// y: [-1,1] -> [1,0]
-	return float2(0.5f, -0.5f) * p_ndc_xy + 0.5f;
-}
-
-/**
- Converts the given UV coordinates to NDC coordinates.
-
- @param[in]		uv
-				The UV u and v coordinates.
- @return		The NDC x and y coordinate.
- */
-float2 UVtoNDC(float2 uv) {
-	// x: [0,1] -> [-1,1]
-	// y: [0,1] -> [1,-1]
-	return float2(2.0f, -2.0f) * uv + float2(-1.0f, 1.0f);
+uint PackR8G8B8A8(float4 f) {
+	const uint4 u = 255.0f * f;
+	return (u.x << 24u) | (u.y << 16u) | (u.z << 8u) | u.w;
 }
 
 //-----------------------------------------------------------------------------
@@ -1089,50 +1038,191 @@ uint3 UnflattenIndex(uint index, uint3 count) {
 }
 
 //-----------------------------------------------------------------------------
+// Engine Declarations and Definitions: Transformations
+//-----------------------------------------------------------------------------
+
+/**
+ Apply the homogeneous divide on the given position expressed in projection
+ space.
+
+ @param[in]		p_proj
+				The position expressed in projection space.
+ @return		The position expressed in projection space after the homogeneous
+				divide (i.e. the implicit w coordinate is equal to one).
+ */
+float3 HomogeneousDivide(float4 p_proj) {
+	const float inv_w = 1.0f / p_proj.w;
+	return p_proj.xyz * inv_w;
+}
+
+/**
+ Converts the given (linear) z coordinate expressed in view space to the
+ corresponding (non-linear) z coordinate expressed in NDC space.
+
+ @param[in]		p_view_z
+				The (linear) z coordinate expressed in view space.
+ @param[in]		projection_values
+				The projection values of the view-to-projection matrix
+				[view_to_projection22, view_to_projection32].
+ @return		The (non-linear) z coordinate expressed in NDC space.
+ */
+float ViewZtoNDCZ(float p_view_z, float2 projection_values) {
+	return projection_values.x + projection_values.y / p_view_z;
+}
+
+/**
+ Converts the given position expressed in NDC space to the corresponding
+ position expressed in UV space.
+
+ @param[in]		p_ndc_xy
+				The position expressed in NDC space (x and y coordinates).
+ @return		The position expressed in UV space.
+ */
+float2 NDCtoUV(float2 p_ndc_xy) {
+	// [-1,1]^2 -> [0,1]x[1,0]
+	return float2(0.5f, -0.5f) * p_ndc_xy + 0.5f;
+}
+
+/**
+ Converts the given position expressed in UV space to the corresponding
+ position expressed in NDC space.
+
+ @param[in]		p_uv
+				The position expressed in UV space.
+ @return		The position expressed in NDC space (x and y coordinates).
+ */
+float2 UVtoNDC(float2 p_uv) {
+	// [0,1]^2 -> [-1,1]x[1,-1]
+	return float2(2.0f, -2.0f) * p_uv + float2(-1.0f, 1.0f);
+}
+
+/**
+ Converts the given direction expressed in world space to the corresponding
+ direction expressed in voxel UVW space.
+
+ @param[in]		d_world
+				The direction expressed in world space.
+ @return		The direction expressed in voxel UVW space.
+ */
+float3 WorldToVoxelUVWDirection(float3 d_world) {
+	// [-1,1]^3 -> [-1,1]x[1,-1]x[-1,1]
+	return float3(d_world.x, -d_world.y, d_world.z);
+}
+
+/**
+ Converts the given direction expressed in voxel UVW space to the corresponding
+ direction expressed in world space.
+
+ @param[in]		d_uvw
+				The direction expressed in voxel UVW space.
+ @return		The direction expressed in world space.
+ */
+float3 VoxelUVWtoWorldDirection(float3 d_uvw) {
+	// [-1,1]^3 -> [-1,1]x[1,-1]x[-1,1]
+	return float3(d_uvw.x, -d_uvw.y, d_uvw.z);
+}
+
+//-----------------------------------------------------------------------------
 // Engine Declarations and Definitions: Trigonometry
 //-----------------------------------------------------------------------------
 
 /**
- Calculates the squared tangent from the given squared cosine.
+ Computes the sine of the given cosine.
 
- @param[in]		sqr_cos
+ @param[in]		c
+				The cosine.
+ @return		The sine corresponding to the given cosine.
+ */
+float CosToSin(float c) {
+	return sqrt(1.0f - sqr(c));
+}
+
+/**
+ Computes the cosine of the given sine.
+
+ @param[in]		s
+				The sine.
+ @return		The cosine corresponding to the given sine.
+ */
+float SinToCos(float s) {
+	return sqrt(1.0f - sqr(s));
+}
+
+/**
+ Computes the squared tangent from the given squared cosine.
+
+ @param[in]		sqr_c
 				The squared cosine.
  @return		The squared tangent corresponding to the given squared cosine.
  */
-float SqrCosToSqrTan(float sqr_cos) {
-	return (1.0f - sqr_cos) / sqr_cos;
+float SqrCosToSqrTan(float sqr_c) {
+	return (1.0f - sqr_c) / sqr_c;
 }
 
 /**
- Calculates the squared tangent from the given squared sine.
+ Computes the squared tangent from the given squared sine.
 
- @param[in]		sqr_sin
+ @param[in]		sqr_s
 				The squared sine.
  @return		The squared tangent corresponding to the given squared sine.
  */
-float SqrSinToSqrTan(float sqr_sin) {
-	return sqr_sin / (1.0f - sqr_sin);
+float SqrSinToSqrTan(float sqr_s) {
+	return sqr_s / (1.0f - sqr_s);
 }
 
 //-----------------------------------------------------------------------------
-// Engine Declarations and Definitions
+// Engine Declarations and Definitions: Geometry
 //-----------------------------------------------------------------------------
 
 /**
- Calculates an orthonormal basis from a given unit vector with the method 
- of Hughes and Möller.
+ Calculates the dot product of the two given directions and clamps negative
+ values to 0.
 
- @pre			@a n is normalized.
- @param[in]		n
-				A basis vector of the orthonormal basis.
- @return		An orthonormal basis.
+ @pre			@a d1 is normalized.
+ @pre			@a d2 is normalized.
+ @param[in]		d1
+				The first direction.
+ @param[in]		d2
+				The second direction.
+ @return		The dot product of the two given directions clamped between 0
+				and 1 (i.e. clamped cosine).
  */
-float3x3 OrthonormalBasis(float3 n) {
-	const float3 n_ortho = (0.1f < abs(n.x)) ? float3(0.0f, 1.0f, 0.0f) 
-		                                     : float3(1.0f, 0.0f, 0.0f);
-	const float3 t = normalize(cross(n_ortho, n));
-	const float3 b = cross(n, t);
-	return float3x3(t, b, n);
+float sat_dot(float3 d1, float3 d2) {
+	return saturate(dot(d1, d2));
 }
 
-#endif //MAGE_HEADER_MATH
+/**
+ Calculates the reflected direction of the given direction about the given
+ normal.
+
+ @pre			@a n is normalized.
+ @pre			@a l is normalized.
+ @param[in]		n
+				The normal.
+ @param[in]		l
+				The direction.
+ @return		The normalized reflected vector of the given direction about
+				the given normal.
+ */
+float3 ReflectedDirection(float3 n, float3 l) {
+	// r := 2 * n_dot_l * n - l
+	return reflect(-l, n);
+}
+
+/**
+ Calculates the half direction between the two given directions.
+
+ @pre			@a d1 is normalized.
+ @pre			@a d2 is normalized.
+ @param[in]		d1
+				The first direction.
+ @param[in]		d2
+				The second direction.
+ @return		The normalized half direction between the two given directions.
+ */
+float3 HalfDirection(float3 d1, float3 d2) {
+	// h := d1+d2 / ||d1+d2||
+	return normalize(d1 + d2);
+}
+
+#endif // MAGE_HEADER_MATH

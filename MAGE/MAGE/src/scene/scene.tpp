@@ -14,11 +14,11 @@ namespace mage {
 	inline typename std::enable_if_t< std::is_same_v< Node, ElementT >,
 		ProxyPtr< ElementT > > Scene::Create(ConstructorArgsT&&... args) {
 
-		const auto ptr = AddElement(m_nodes, 
+		const auto ptr = AddElement(m_nodes,
 									std::forward< ConstructorArgsT >(args)...);
-		
+
 		ptr->Set(ptr);
-		
+
 		return ptr;
 	}
 
@@ -39,17 +39,17 @@ namespace mage {
 
 	template< typename ElementT >
 	[[nodiscard]]
-	inline size_t Scene::GetNumberOf() const noexcept {
-		size_t count = 0;
+	inline std::size_t Scene::GetNumberOf() const noexcept {
+		std::size_t count = 0u;
 		ForEach< ElementT >([&count](
 			[[maybe_unused]] const ElementT& element) noexcept {
 				++count;
 			}
 		);
-		
+
 		return count;
 	}
-	
+
 	#pragma endregion
 
 	//-------------------------------------------------------------------------
@@ -58,7 +58,7 @@ namespace mage {
 	#pragma region
 
 	template< typename ElementT, typename ActionT >
-	void Scene::ForEach(ActionT action) {
+	void Scene::ForEach(ActionT&& action) {
 
 		if constexpr (std::is_same_v< Node, ElementT >) {
 			for (auto& element : m_nodes) {
@@ -78,7 +78,7 @@ namespace mage {
 	}
 
 	template< typename ElementT, typename ActionT >
-	void Scene::ForEach(ActionT action) const {
+	void Scene::ForEach(ActionT&& action) const {
 
 		if constexpr (std::is_same_v< Node, ElementT >) {
 			for (const auto& element : m_nodes) {

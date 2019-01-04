@@ -14,68 +14,65 @@
 //-----------------------------------------------------------------------------
 namespace mage::rendering::loader {
 
-	MTLReader::MTLReader(ResourceManager& resource_manager, 
+	MTLReader::MTLReader(ResourceManager& resource_manager,
 						 std::vector< Material >& material_buffer)
-		: LineReader(), 
-		m_resource_manager(resource_manager), 
+		: LineReader(),
+		m_resource_manager(resource_manager),
 		m_material_buffer(material_buffer) {}
 
 	MTLReader::MTLReader(MTLReader&& reader) noexcept = default;
 
 	MTLReader::~MTLReader() = default;
 
-	void MTLReader::ReadLine(NotNull< zstring > line) {
-		m_context = nullptr;
-		const auto* const token
-			= strtok_s(line, GetDelimiters().c_str(), &m_context);
+	void MTLReader::ReadLine() {
+		const auto token = Read< std::string_view >();
 
-		if (!token || g_mtl_token_comment == token[0]) {
+		if (g_mtl_token_comment == token[0]) {
 			return;
 		}
-
-		if (str_equals(token, g_mtl_token_material_declaration)) {
+		else if (g_mtl_token_material_declaration == token) {
 			ReadMTLMaterialName();
 		}
-		else if (str_equals(token, g_mtl_token_base_color)) {
+		else if (g_mtl_token_base_color           == token) {
 			ReadMTLBaseColor();
 		}
-		else if (str_equals(token, g_mtl_token_roughness)) {
+		else if (g_mtl_token_roughness            == token) {
 			ReadMTLRoughness();
 		}
-		else if (str_equals(token, g_mtl_token_metalness)) {
+		else if (g_mtl_token_metalness            == token) {
 			ReadMTLMetalness();
 		}
-		else if (str_equals(token, g_mtl_token_base_color_texture)) {
+		else if (g_mtl_token_radiance             == token) {
+			ReadMTLRadiance();
+		}
+		else if (g_mtl_token_base_color_texture   == token) {
 			ReadMTLBaseColorTexture();
 		}
-		else if (str_equals(token, g_mtl_token_material_texture)) {
+		else if (g_mtl_token_material_texture     == token) {
 			ReadMTLMaterialTexture();
 		}
-		else if (str_equals(token, g_mtl_token_normal_texture)) {
+		else if (g_mtl_token_normal_texture       == token) {
 			ReadMTLNormalTexture();
 		}
-		else if (str_equals(token, g_mtl_token_transparent)) {
+		else if (g_mtl_token_transparent          == token) {
 			m_material_buffer.back().SetTransparent();
 		}
-		else if (str_equals(token, g_mtl_token_opaque)) {
+		else if (g_mtl_token_opaque               == token) {
 			m_material_buffer.back().SetOpaque();
 		}
-		else if (str_equals(token, g_mtl_token_emissive)) {
-			m_material_buffer.back().DissableLightInteraction();
-		}
 		else {
-			Warning("%ls: line %u: unsupported keyword token: %s.", 
-				    GetFilename().c_str(), GetCurrentLineNumber(), token);
+			Warning("{}: line {}: unsupported keyword token: {}.",
+					GetPath(), GetCurrentLineNumber(), token);
 			return;
 		}
 
-		ReadLineRemaining();
+		ReadRemainingTokens();
 	}
 
 	void MTLReader::ReadMTLMaterialName() {
 		auto& material = m_material_buffer.emplace_back(
 			CreateDefaultMaterial(m_resource_manager));
-		material.SetName(Read< string >());
+		material.SetName(Read< std::string >());
 	}
 
 	void MTLReader::ReadMTLBaseColor() {
@@ -90,6 +87,11 @@ namespace mage::rendering::loader {
 	void MTLReader::ReadMTLMetalness() {
 		const auto metalness = Read< F32 >();
 		m_material_buffer.back().SetMetalness(metalness);
+	}
+
+	void MTLReader::ReadMTLRadiance() {
+		const auto radiance = Read< F32 >();
+		m_material_buffer.back().SetRadiance(radiance);
 	}
 
 	void MTLReader::ReadMTLBaseColorTexture() {
@@ -115,7 +117,7 @@ namespace mage::rendering::loader {
 			blue  = Read< F32 >();
 		}
 
-		return SRGB(red, green, blue);
+		return { red, green, blue };
 	}
 
 	[[nodiscard]]
@@ -130,16 +132,17 @@ namespace mage::rendering::loader {
 		}
 
 		const auto alpha = Contains< F32 >() ? Read< F32 >() : 1.0f;
-		
-		return SRGBA(red, green, blue, alpha);
+
+		return { red, green, blue, alpha };
 	}
 
 	[[nodiscard]]
 	TexturePtr MTLReader::ReadMTLTexture() {
 		// "-options args" are not supported and are not allowed.
-		const auto texture_path  = mage::GetPathName(GetFilename());
-		const auto texture_name  = str_convert(Read< string >());
-		const auto texture_fname = mage::GetFilename(texture_path, texture_name);
-		return m_resource_manager.GetOrCreate< Texture >(texture_fname);
+		const UTF8toUTF16 texture_name(Read< std::string_view >());
+		auto texture_path = GetPath();
+		texture_path.replace_filename(std::wstring_view(texture_name));
+
+		return m_resource_manager.GetOrCreate< Texture >(texture_path);
 	}
 }

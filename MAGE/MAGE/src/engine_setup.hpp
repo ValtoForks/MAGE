@@ -17,7 +17,7 @@ namespace mage {
 	/**
 	 A class of engine setups.
 	 */
-	class EngineSetup final {
+	class EngineSetup {
 
 	public:
 
@@ -33,8 +33,8 @@ namespace mage {
 		 @param[in]		name
 						The name of the application.
 		 */
-		explicit EngineSetup(NotNull< HINSTANCE > instance, 
-			                 wstring name = L"MAGE")
+		explicit EngineSetup(NotNull< HINSTANCE > instance,
+							 std::wstring name = L"MAGE")
 			: m_instance(instance),
 			m_name(std::move(name)) {}
 
@@ -61,14 +61,14 @@ namespace mage {
 
 		//---------------------------------------------------------------------
 		// Assignment Operators
-		//---------------------------------------------------------------------	
+		//---------------------------------------------------------------------
 
 		/**
 		 Copies the given engine setup to this engine setup.
 
 		 @param[in]		setup
 						A reference to the engine setup to copy from.
-		 @return		A reference to the copy of the given engine setup (i.e. 
+		 @return		A reference to the copy of the given engine setup (i.e.
 						this engine setup).
 		 */
 		EngineSetup& operator=(const EngineSetup& setup) = default;
@@ -78,7 +78,7 @@ namespace mage {
 
 		 @param[in]		setup
 						A reference to the engine setup to copy from.
-		 @return		A reference to the moved engine setup (i.e. this engine 
+		 @return		A reference to the moved engine setup (i.e. this engine
 						setup).
 		 */
 		EngineSetup& operator=(EngineSetup&& setup) noexcept = default;
@@ -100,10 +100,10 @@ namespace mage {
 		/**
 		 Returns the name of the application.
 
-		 @return		A reference to the name of the application.
+		 @return		The name of the application.
 		 */
 		[[nodiscard]]
-		const wstring& GetApplicationName() const noexcept {
+		const std::wstring_view GetApplicationName() const noexcept {
 			return m_name;
 		}
 
@@ -121,6 +121,6 @@ namespace mage {
 		/**
 		 The name of the application.
 		 */
-		wstring m_name;
+		std::wstring m_name;
 	};
 }

@@ -14,7 +14,7 @@
 //-----------------------------------------------------------------------------
 namespace mage::script {
 
-	class ManhattanMotorScript final : public BehaviorScript {
+	class ManhattanMotorScript : public BehaviorScript {
 
 	public:
 
@@ -41,9 +41,7 @@ namespace mage::script {
 		//---------------------------------------------------------------------
 
 		virtual void Load([[maybe_unused]] Engine& engine) override;
-		
-		virtual void Update([[maybe_unused]] Engine& engine, 
-							[[maybe_unused]] F64 delta_time) override;
+		virtual void Update([[maybe_unused]] Engine& engine) override;
 
 		[[nodiscard]]
 		F32 GetVelocity() const noexcept {

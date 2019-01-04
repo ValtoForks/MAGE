@@ -13,8 +13,8 @@
 namespace mage {
 
 	BigEndianBinaryWriter::BigEndianBinaryWriter()
-		: m_file_stream(nullptr), 
-		m_fname() {}
+		: m_file_stream(nullptr),
+		m_path() {}
 
 	BigEndianBinaryWriter::BigEndianBinaryWriter(
 		BigEndianBinaryWriter&& writer) noexcept = default;
@@ -24,14 +24,13 @@ namespace mage {
 	BigEndianBinaryWriter& BigEndianBinaryWriter
 		::operator=(BigEndianBinaryWriter&& writer) noexcept = default;
 
-	void BigEndianBinaryWriter::WriteToFile(wstring fname) {
-		m_fname = std::move(fname);
+	void BigEndianBinaryWriter::WriteToFile(std::filesystem::path path) {
+		m_path = std::move(path);
 
-		FILE* file;
+		std::FILE* file;
 		{
-			const errno_t result = _wfopen_s(&file, m_fname.c_str(), L"wb");
-			ThrowIfFailed((0 == result), 
-						  "%ls: could not open file.", m_fname.c_str());
+			const errno_t result = _wfopen_s(&file, m_path.c_str(), L"wb");
+			ThrowIfFailed((0 == result), "{}: could not open file.", m_path);
 		}
 
 		m_file_stream.reset(file);
@@ -40,14 +39,14 @@ namespace mage {
 	}
 
 	void BigEndianBinaryWriter::WriteCharacter(char c) {
-		const int result = fputc(c, m_file_stream.get());
-		ThrowIfFailed((EOF != result), 
-					  "%ls: could not write to file.", GetFilename().c_str());
+		const int result = std::fputc(c, m_file_stream.get());
+		ThrowIfFailed((EOF != result),
+					  "{}: could not write to file.", GetPath());
 	}
 
 	void BigEndianBinaryWriter::WriteString(NotNull< const_zstring > str) {
-		const int result = fputs(str, m_file_stream.get());
-		ThrowIfFailed((EOF != result), 
-					  "%ls: could not write to file.", GetFilename().c_str());
+		const int result = std::fputs(str, m_file_stream.get());
+		ThrowIfFailed((EOF != result),
+					  "{}: could not write to file.", GetPath());
 	}
 }

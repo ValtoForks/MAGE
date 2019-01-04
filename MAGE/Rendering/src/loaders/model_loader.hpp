@@ -21,15 +21,15 @@ namespace mage::rendering {
 namespace mage::rendering::loader {
 
 	/**
-	 Imports the model from the given file.
+	 Imports the model from the file associated with the given path.
 
 	 @tparam		VertexT
 					The vertex type.
 	 @tparam		IndexT
 					The index type.
-	 @param[in]		fname
-					A reference to the filename.
-	 @param[in]		resource_manager
+	 @param[in]		path
+					A reference to the path.
+	 @param[in,out]	resource_manager
 					A reference to the resource manager.
 	 @param[in,out]	model_output
 					A reference to the model output.
@@ -39,28 +39,28 @@ namespace mage::rendering::loader {
 					Failed to import the model from file.
 	 */
 	template< typename VertexT, typename IndexT >
-	void ImportModelFromFile(const wstring& fname, 
-							 ResourceManager& resource_manager,  
-							 ModelOutput< VertexT, IndexT >& model_output, 
-							 const MeshDescriptor< VertexT, IndexT >& 
+	void ImportModelFromFile(const std::filesystem::path& path,
+							 ResourceManager& resource_manager,
+							 ModelOutput< VertexT, IndexT >& model_output,
+							 const MeshDescriptor< VertexT, IndexT >&
 							 mesh_desc = MeshDescriptor< VertexT, IndexT >());
 
 	/**
-	 Exports the model to the given file.
+	 Exports the model to the file associated with the given path.
 
 	 @tparam		VertexT
 					The vertex type.
 	 @tparam		IndexT
 					The index type.
-	 @param[in]		fname
-					A reference to the filename.
+	 @param[in]		path
+					A reference to the path.
 	 @param[in]		model_output
 					A reference to the model output.
 	 @throws		Exception
 					Failed to export the model to file.
 	 */
 	template< typename VertexT, typename IndexT >
-	void ExportModelToFile(const wstring& fname, 
+	void ExportModelToFile(const std::filesystem::path& path,
 						   const ModelOutput< VertexT, IndexT >& model_output);
 }
 

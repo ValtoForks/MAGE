@@ -5,7 +5,17 @@
 //-----------------------------------------------------------------------------
 #pragma region
 
-#include "string\token.hpp"
+#include "exception\exception.hpp"
+
+#pragma endregion
+
+//-----------------------------------------------------------------------------
+// System Includes
+//-----------------------------------------------------------------------------
+#pragma region
+
+#include <istream>
+#include <regex>
 
 #pragma endregion
 
@@ -22,15 +32,40 @@ namespace mage {
 	public:
 
 		//---------------------------------------------------------------------
+		// Class Member Types
+		//---------------------------------------------------------------------
+
+		/**
+		 The selection function type for extracting one @a std::ssub_match from
+		 a given @a std::smatch.
+		 */
+		using SelectionFunction
+			= std::function< const std::ssub_match(const std::smatch&) >;
+
+		//---------------------------------------------------------------------
+		// Class Member Variables
+		//---------------------------------------------------------------------
+
+		/**
+		 The default (line) regex for line readers.
+		 */
+		static const std::regex s_default_regex;
+
+		/**
+		 The default selection function for line readers.
+		 */
+		static const SelectionFunction s_default_selection_function;
+
+		//---------------------------------------------------------------------
 		// Assignment Operators
-		//---------------------------------------------------------------------	
+		//---------------------------------------------------------------------
 
 		/**
 		 Copies the given line reader to this line reader.
 
 		 @param[in]		reader
 						A reference to a line reader to copy.
-		 @return		A reference to the copy of the given line reader (i.e. 
+		 @return		A reference to the copy of the given line reader (i.e.
 						this line reader).
 		 */
 		LineReader& operator=(const LineReader& reader) = delete;
@@ -40,7 +75,7 @@ namespace mage {
 
 		 @param[in]		reader
 						A reference to a line reader to move.
-		 @return		A reference to the moved line reader (i.e. this line 
+		 @return		A reference to the moved line reader (i.e. this line
 						reader).
 		 */
 		LineReader& operator=(LineReader&& reader) noexcept;
@@ -50,54 +85,38 @@ namespace mage {
 		//---------------------------------------------------------------------
 
 		/**
-		 Reads from the given file.
+		 Reads from the file associated with the given path.
 
-		 @param[in]		fname
-						The file name.
-		 @param[in]		delimiters
-						The string containing the token delimiters (single 
-						characters).
+		 @param[in]		path
+						The path.
+		 @param[in]		regex
+						The (line) regex.
+		 @param[in]		selection_function
+						The selection function.
 		 @throws		Exception
-						Failed to read from the given file.
+						Failed to read from the file.
 		 */
-		void ReadFromFile(wstring fname, 
-						  string delimiters = g_default_delimiters);
-		
+		void ReadFromFile(std::filesystem::path path,
+						  std::regex regex = s_default_regex,
+						  SelectionFunction selection_function
+						  = s_default_selection_function);
+
 		/**
-		 Reads the input string.
+		 Reads from the given input string.
 
 		 @param[in]		input
-						A pointer to the input null-terminated byte string.
-		 @param[in]		delimiters
-						The string containing the token delimiters (single 
-						characters).
+						A reference to the input string.
+		 @param[in]		regex
+						The (line) regex.
+		 @param[in]		selection_function
+						The selection function.
 		 @throws		Exception
 						Failed to read from the given input string.
 		 */
-		void ReadFromMemory(NotNull< const_zstring > input, 
-							string delimiters = g_default_delimiters);
-
-		/**
-		 Returns the current filename of this line reader.
-
-		 @return		A reference to the current filename of this line 
-						reader.
-		 */
-		[[nodiscard]]
-		const wstring& GetFilename() const noexcept {
-			return m_fname;
-		}
-
-		/**
-		 Returns the current delimiters of this line reader.
-
-		 @return		A reference to the current delimiters of this line 
-						reader.
-		 */
-		[[nodiscard]]
-		const string& GetDelimiters() const noexcept {
-			return m_delimiters;
-		}
+		void ReadFromMemory(const std::string &input,
+							std::regex regex = s_default_regex,
+							SelectionFunction selection_function
+							= s_default_selection_function);
 
 	protected:
 
@@ -136,6 +155,16 @@ namespace mage {
 		//---------------------------------------------------------------------
 
 		/**
+		 Returns the current path of this line reader.
+
+		 @return		A reference to the current path of this line reader.
+		 */
+		[[nodiscard]]
+		const std::filesystem::path& GetPath() const noexcept {
+			return m_path;
+		}
+
+		/**
 		 Returns the current line number of this line reader.
 
 		 @return		The current line number of this line reader.
@@ -144,88 +173,66 @@ namespace mage {
 		U32 GetCurrentLineNumber() const noexcept {
 			return m_line_number;
 		}
-		
+
+		/**
+		 Reads and converts the current token of this line reader to
+		 @c T value.
+
+		 @tparam		T
+						The data type.
+		 @return		The @c T represented by the current token of this line
+						reader.
+		 @throws		Exception
+						There is no current token or the current token does not
+						represent a @c T value.
+		 */
+		template< typename T >
+		const T Read();
+
+		/**
+		 Reads and converts the current @c N tokens of this line reader to an
+		 @c Array.
+
+		 @@tparam		T
+						The data type.
+		 @tparam		N
+						The number of values in the array.
+		 @tparam		A
+						The alignment of the array.
+		 @return		The @c Array represented by the current @c N tokens of
+						this line reader.
+		 @throws		Exception
+						There are no @c N current tokens or the current
+						@c N tokens do not represent a @c T value.
+		 */
+		template< typename T, std::size_t N, size_t A = alignof(T) >
+		const Array< T, N, A > Read();
+
 		/**
 		 Reads the remaining tokens of the current line of this line reader.
 		 */
-		void ReadLineRemaining();
+		void ReadRemainingTokens();
 
 		/**
-		 Reads and converts the next token of this line reader to a string.
+		 Checks whether the current token of this line reader is a @c T value.
 
-		 @return		The string represented by the next token of this line 
-						reader.
-		 @throws		Exception
-						There is no next token.
-		 */
-		NotNull< const_zstring > ReadChars();
-
-		/**
-		 Reads and converts the next token of this line reader to a quoted 
-		 string.
-
-		 @return		The quoted string represented by the next token of this 
-						line reader.
-		 @throws		Exception
-						There is no next token or the next token does not 
-						represent a quoted string.
-		 */
-		const string ReadQuotedString();
-		
-		/**
-		 Reads and converts the next token of this line reader to @c DataT 
-		 element.
-
-		 @tparam		DataT
+		 @tparam		T
 						The data type.
-		 @return		The @c DataT represented by the next token of this line 
-						reader.
-		 @throws		Exception
-						There is no next token or the next token does not 
-						represent a @c DataT element.
+		 @return		@c true if the current token of this line reader is a
+						@c T value. @c false otherwise.
 		 */
-		template< typename DataT >
-		const DataT Read();
+		template< typename T >
+		[[nodiscard]]
+		bool Contains() const noexcept;
 
 		/**
-		 Checks whether this line reader has a next token.
+		 Checks whether this line reader has a current token.
 
-		 @return		@c true if this line reader has a next token. @c false
-						otherwise.
+		 @return		@c true if this line reader has a current token.
+						@c false otherwise.
 		 */
 		[[nodiscard]]
-		bool ContainsChars() const;
-		
-		/**
-		 Checks whether the next token of this line reader is a quoted string.
-
-		 @return		@c true if the next token of this line reader is a 
-						quoted string. @c false otherwise.
-		 */
-		[[nodiscard]]
-		bool ContainsQuotedString() const;
-
-		/**
-		 Checks whether the next token of this line reader is a @c DataT 
-		 element.
-
-		 @tparam		DataT
-						The data type.
-		 @return		@c true if the next token of this line reader is a 
-						@c DataT element. @c false otherwise.
-		 */
-		template< typename DataT >
-		[[nodiscard]]
-		bool Contains() const;
-
-		//---------------------------------------------------------------------
-		// Member Variables
-		//---------------------------------------------------------------------
-
-		/**
-		 The current context of this line reader.
-		 */
-		zstring m_context;
+		bool ContainsTokens() const noexcept;
 
 	private:
 
@@ -234,49 +241,72 @@ namespace mage {
 		//---------------------------------------------------------------------
 
 		/**
-		 Pre-processes before reading the current file of this line reader.
+		 Pre-processes before reading.
 
 		 @throws		Exception
 						Failed to finish the pre-processing successfully.
 		 */
-		virtual void Preprocess() {}
+		virtual void Preprocess();
 
 		/**
-		 Reads the given line.
+		 Processes the given input stream (line by line).
 
-		 @param[in,out] line
-						A pointer to the null-terminated string to read.
+		 @param[in]		stream
+						A reference to the input stream.
 		 @throws		Exception
-						Failed to read the given line.
+						Failed to process the given input stream.
 		 */
-		virtual void ReadLine(NotNull< zstring > line) = 0;
+		void Process(std::istream& stream);
 
 		/**
-		 Post-processes after reading the current file of this line reader.
+		 Reads the current line of this line reader.
+
+		 @throws		Exception
+						Failed to the current line of this line reader.
+		 */
+		virtual void ReadLine() = 0;
+
+		/**
+		 Post-processes after reading.
 
 		 @throws		Exception
 						Failed to finish post-processing successfully.
 		 */
-		virtual void Postprocess() {}
+		virtual void Postprocess();
+
+		/**
+		 Returns the current token of this line reader.
+
+		 @return		The current token of this line reader.
+		 */
+		[[nodiscard]]
+		const std::string_view GetCurrentToken() const noexcept;
 
 		//---------------------------------------------------------------------
 		// Member Variables
 		//---------------------------------------------------------------------
 
 		/**
-		 A pointer to the file stream of this line reader.
+		 The current (line) regex of this line reader.
 		 */
-		UniqueFileStream m_file_stream;
+		std::regex m_regex;
 
 		/**
-		 The current filename of this line reader.
+		 The function for selecting the target submatch from the match of the
+		 regular expression represented by the regex of this strategy.
 		 */
-		wstring m_fname;
+		SelectionFunction m_selection_function;
 
 		/**
-		 The current delimiters of this line reader.
+		 The current path of this line reader.
 		 */
-		string m_delimiters;
+		std::filesystem::path m_path;
+
+		/**
+		 An iterator to the current token of the current line of this line
+		 reader.
+		 */
+		std::sregex_iterator m_iterator;
 
 		/**
 		 The current line number of this line reader.

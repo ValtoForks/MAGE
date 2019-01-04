@@ -32,14 +32,14 @@ namespace mage {
 
 		//---------------------------------------------------------------------
 		// Assignment Operators
-		//---------------------------------------------------------------------	
+		//---------------------------------------------------------------------
 
 		/**
 		 Copies the given behavior script to this behavior script.
 
 		 @param[in]		script
 						A reference to the behavior script to copy.
-		 @return		A reference to the copy of the given behavior script 
+		 @return		A reference to the copy of the given behavior script
 						(i.e. this behavior script).
 		 */
 		BehaviorScript& operator=(const BehaviorScript& script) noexcept;
@@ -49,7 +49,7 @@ namespace mage {
 
 		 @param[in]		script
 						A reference to the behavior script to move.
-		 @return		A reference to the moved behavior script (i.e. this 
+		 @return		A reference to the moved behavior script (i.e. this
 						behavior script).
 		 */
 		BehaviorScript& operator=(BehaviorScript&& script) noexcept;
@@ -59,10 +59,10 @@ namespace mage {
 		//---------------------------------------------------------------------
 
 		/**
-		 Loads this behavior script. Allows this behavior script to preform any 
+		 Loads this behavior script. Allows this behavior script to preform any
 		 pre-processing.
 
-		 @param[in]		engine
+		 @param[in,out]	engine
 						A reference to the engine.
 		 @throws		Exception
 						Failed to load this behavior script.
@@ -71,11 +71,11 @@ namespace mage {
 
 		/**
 		 Updates this behavior script.
-		 
-		 This method can be called zero, one or multiple times per frame 
+
+		 This method can be called zero, one or multiple times per frame
 		 depending on the fixed delta time used by the engine.
 
-		 @param[in]		engine
+		 @param[in,out]	engine
 						A reference to the engine.
 		 @throws		Exception
 						Failed to update this behavior script.
@@ -84,24 +84,21 @@ namespace mage {
 
 		/**
 		 Updates this behavior script.
-		 
+
 		 This method is called once per frame.
 
-		 @param[in]		engine
+		 @param[in,out]	engine
 						A reference to the engine.
-		 @param[in]		delta_time
-						The elapsed time since the previous update.
 		 @throws		Exception
 						Failed to update this behavior script.
 		 */
-		virtual void Update([[maybe_unused]] Engine& engine, 
-							[[maybe_unused]] F64 delta_time);
+		virtual void Update([[maybe_unused]] Engine& engine);
 
 		/**
-		 Closes this behavior script. Allows this behavior script to preform any 
+		 Closes this behavior script. Allows this behavior script to preform any
 		 post-processing destruction.
 
-		 @param[in]		engine
+		 @param[in,out]	engine
 						A reference to the engine.
 		 @throws		Exception
 						Failed to close this behavior script.

@@ -12,8 +12,7 @@
 //-----------------------------------------------------------------------------
 #pragma region
 
-#include <AtlBase.h>
-#include <atlconv.h>
+#include <limits>
 
 #pragma endregion
 
@@ -21,174 +20,60 @@
 // Engine Definitions
 //-----------------------------------------------------------------------------
 namespace mage {
-	
-	[[nodiscard]]
-	zstring str_escape_first(NotNull< zstring > str, char c) noexcept {
-		auto input = str;
-		while (true) {
-			auto result = strchr(input, static_cast< int >(c));
-			
-			if (nullptr == result) {
-				// No match found.
-				return nullptr;
-			}
-			if (str == result) {
-				// Current match is not escaped (first character).
-				return result;
-			}
-			if ('\\' != *(result - 1)) {
-				// Current match is not escaped.
-				return result;
-			}
 
-			// Continue search (current match is escaped).
-			input = result + 1;
+	DWORD UTF8toUTF16::Convert(std::string_view s) {
+		if (static_cast< std::size_t >(std::numeric_limits< int >::max()) < s.size()) {
+			return ERROR_INVALID_PARAMETER;
 		}
+		const auto s_size = static_cast< int >(s.size());
+
+		if (0 == s_size) {
+			m_buffer.resize(1u);
+			return 0u;
+		}
+
+		const int required_size = MultiByteToWideChar(
+			CP_UTF8, MB_ERR_INVALID_CHARS, s.data(), s_size, nullptr, 0);
+		if (0 == required_size) {
+			return GetLastError();
+		}
+
+		m_buffer.resize(static_cast< std::size_t >(required_size) + 1u);
+
+		const int written_size = MultiByteToWideChar(
+			CP_UTF8, MB_ERR_INVALID_CHARS, s.data(), s_size, m_buffer.data(), required_size);
+		if (0 == written_size) {
+			return GetLastError();
+		}
+
+		return 0u;
 	}
 
-	[[nodiscard]]
-	const_zstring str_escape_first(NotNull< const_zstring > str, 
-								   char c) noexcept {
-		auto input = str;
-		while (true) {
-			const auto result = strchr(input, static_cast< int >(c));
-
-			if (nullptr == result) {
-				// No match found.
-				return nullptr;
-			}
-			if (str == result) {
-				// Current match is not escaped (first character).
-				return result;
-			}
-			if ('\\' != *(result - 1)) {
-				// Current match is not escaped.
-				return result;
-			}
-
-			// Continue search (current match is escaped).
-			input = result + 1;
+	DWORD UTF16toUTF8::Convert(std::wstring_view s) {
+		if (static_cast< std::size_t >(std::numeric_limits< int >::max()) < s.size()) {
+			return ERROR_INVALID_PARAMETER;
 		}
-	}
+		const auto s_size = static_cast< int >(s.size());
 
-	[[nodiscard]]
-	wzstring str_escape_first(NotNull< wzstring > str, wchar_t c) noexcept {
-		auto input = str;
-		while (true) {
-			auto result = wcschr(input, c);
-
-			if (nullptr == result) {
-				// No match found.
-				return nullptr;
-			}
-			if (str == result) {
-				// Current match is not escaped (first character).
-				return result;
-			}
-			if (L'\\' != *(result - 1)) {
-				// Current match is not escaped.
-				return result;
-			}
-
-			// Continue search (current match is escaped).
-			input = result + 1;
-		}
-	}
-
-	[[nodiscard]]
-	const_wzstring str_escape_first(NotNull< const_wzstring > str, 
-									wchar_t c) noexcept {
-		auto input = str;
-		while (true) {
-			const auto result = wcschr(input, c);
-
-			if (nullptr == result) {
-				// No match found.
-				return nullptr;
-			}
-			if (str == result) {
-				// Current match is not escaped (first character).
-				return result;
-			}
-			if (L'\\' != *(result - 1)) {
-				// Current match is not escaped.
-				return result;
-			}
-
-			// Continue search (current match is escaped).
-			input = result + 1;
-		}
-	}
-
-	[[nodiscard]]
-	zstring str_gets(NotNull< char* > str,
-					 size_t num,
-					 NotNull< NotNull< const_zstring >* > input) noexcept {
-
-		char* buffer     = str;
-		const char* next = *input;
-		size_t num_read  = 0u;
-		
-		while (num_read + 1u < num && *next) {
-			// '\n' terminates the line but is included.
-			const auto is_new_line = ('\n' == *next);
-
-			*buffer++ = *next++;
-			++num_read;
-
-			if (is_new_line) {
-				break;
-			}
+		if (0 == s_size) {
+			m_buffer.resize(1u);
+			return 0u;
 		}
 
-		if (0u == num_read) {
-			// "eof"
-			return nullptr;
+		const int required_size = WideCharToMultiByte(
+			CP_UTF8, 0u, s.data(), s_size, nullptr, 0, nullptr, nullptr);
+		if (0 == required_size) {
+			return GetLastError();
 		}
 
-		*str   = '\0';
-		*input = next;
-		return str;
-	}
+		m_buffer.resize(static_cast< std::size_t >(required_size) + 1u);
 
-	[[nodiscard]]
-	wzstring str_gets(NotNull< wchar_t* > str,
-					  size_t num,
-					  NotNull< NotNull< const_wzstring >* > input) noexcept {
-
-		wchar_t* buffer     = str;
-		const wchar_t* next = *input;
-		size_t num_read     = 0u;
-		
-		while (num_read + 1u < num && *next) {
-			// '\n' terminates the line but is included.
-			const auto is_new_line = (L'\n' == *next);
-
-			*buffer++ = *next++;
-			++num_read;
-
-			if (is_new_line) {
-				break;
-			}
+		const int written_size = WideCharToMultiByte(
+			CP_UTF8, 0u, s.data(), s_size, m_buffer.data(), required_size, nullptr, nullptr);
+		if (0 == written_size) {
+			return GetLastError();
 		}
 
-		if (0u == num_read) {
-			// "eof"
-			return nullptr;
-		}
-
-		*str   = L'\0';
-		*input = next;
-		return str;
-	}
-
-	[[nodiscard]]
-	const wstring str_convert(const string& str) {
-		return wstring(CA2W(str.c_str()));
-	}
-
-	[[nodiscard]]
-	const string str_convert(const wstring& str) {
-		return string(CW2A(str.c_str()));
+		return 0u;
 	}
 }

@@ -30,7 +30,7 @@ namespace mage {
 	/**
 	 A struct of RGB color spectra.
 	 */
-	struct RGB final : public F32x3 {
+	struct RGB : public F32x3 {
 
 	public:
 
@@ -46,7 +46,7 @@ namespace mage {
 		 */
 		constexpr explicit RGB(F32 rgb = 0.0f) noexcept
 			: RGB(rgb, rgb, rgb) {}
-		
+
 		/**
 		 Constructs a RGB spectrum from the given spectrum components.
 
@@ -67,7 +67,7 @@ namespace mage {
 						A reference to the RGB spectrum to copy.
 		 */
 		constexpr RGB(const RGB& rgb) noexcept = default;
-		
+
 		/**
 		 Constructs a RGB spectrum by moving the given RGB spectrum.
 
@@ -83,7 +83,7 @@ namespace mage {
 						A reference to the sRGB spectrum to copy.
 		 */
 		explicit RGB(const SRGB& srgb) noexcept;
-		
+
 		/**
 		 Constructs a RGB spectrum from the given XYZ spectrum.
 
@@ -108,30 +108,95 @@ namespace mage {
 
 		//---------------------------------------------------------------------
 		// Assignment Operators
-		//---------------------------------------------------------------------	
+		//---------------------------------------------------------------------
 
 		/**
 		 Copies the given RGB spectrum to this RGB spectrum.
 
 		 @param[in]		rgb
 						A reference to the RGB spectrum to copy.
-		 @return		A reference to the copy of the given RGB spectrum (i.e. 
+		 @return		A reference to the copy of the given RGB spectrum (i.e.
 						this RGB spectrum).
 		 */
-		constexpr RGB& operator=(const RGB& rgb) noexcept = default;
+		RGB& operator=(const RGB& rgb) noexcept = default;
 
 		/**
 		 Moves the given RGB spectrum to this RGB spectrum.
 
 		 @param[in]		rgb
 						A reference to the RGB spectrum to move.
-		 @return		A reference to the moved RGB spectrum (i.e. this RGB 
+		 @return		A reference to the moved RGB spectrum (i.e. this RGB
 						spectrum).
 		 */
-		constexpr RGB& operator=(RGB&& rgb) noexcept = default;
+		RGB& operator=(RGB&& rgb) noexcept = default;
+
+		//---------------------------------------------------------------------
+		// Member Methods
+		//---------------------------------------------------------------------
+
+		/**
+		 Returns the red component of this RGB spectrum.
+
+		 @return		A reference to the red component of this RGB spectrum.
+		 */
+		[[nodiscard]]
+		F32& R() noexcept {
+			return operator[](0);
+		}
+
+		/**
+		 Returns the red component of this RGB spectrum.
+
+		 @return		The red component of this RGB spectrum.
+		 */
+		[[nodiscard]]
+		constexpr F32 R() const noexcept {
+			return operator[](0);
+		}
+
+		/**
+		 Returns the green component of this RGB spectrum.
+
+		 @return		A reference to the green component of this RGB
+						spectrum.
+		 */
+		[[nodiscard]]
+		F32& G() noexcept {
+			return operator[](1);
+		}
+
+		/**
+		 Returns the green component of this RGB spectrum.
+
+		 @return		The green component of this RGB spectrum.
+		 */
+		[[nodiscard]]
+		constexpr F32 G() const noexcept {
+			return operator[](1);
+		}
+
+		/**
+		 Returns the blue component of this RGB spectrum.
+
+		 @return		A reference to the blue component of this RGB spectrum.
+		 */
+		[[nodiscard]]
+		F32& B() noexcept {
+			return operator[](2);
+		}
+
+		/**
+		 Returns the blue component of this RGB spectrum.
+
+		 @return		The blue component of this RGB spectrum.
+		 */
+		[[nodiscard]]
+		constexpr F32 B() const noexcept {
+			return operator[](2);
+		}
 	};
 
-	static_assert(sizeof(RGB) == sizeof(F32x3), "RGB/F32x3 mismatch");
+	static_assert(sizeof(RGB) == sizeof(F32x3));
 
 	#pragma endregion
 
@@ -147,7 +212,7 @@ namespace mage {
 	/**
 	 A struct of sRGB color spectra.
 	 */
-	struct SRGB final : public F32x3 {
+	struct SRGB : public F32x3 {
 
 	public:
 
@@ -163,7 +228,7 @@ namespace mage {
 		 */
 		constexpr explicit SRGB(F32 srgb = 0.0f) noexcept
 			: SRGB(srgb, srgb, srgb) {}
-		
+
 		/**
 		 Constructs a sRGB spectrum from the given spectrum components.
 
@@ -184,7 +249,7 @@ namespace mage {
 						A reference to the sRGB spectrum to copy.
 		 */
 		constexpr SRGB(const SRGB& srgb) noexcept = default;
-		
+
 		/**
 		 Constructs a sRGB spectrum by moving the given sRGB spectrum.
 
@@ -192,7 +257,7 @@ namespace mage {
 						A reference to the sRGB spectrum to move.
 		 */
 		constexpr SRGB(SRGB&& srgb) noexcept = default;
-		
+
 		/**
 		 Constructs a sRGB spectrum from the given RGB spectrum.
 
@@ -217,30 +282,96 @@ namespace mage {
 
 		//---------------------------------------------------------------------
 		// Assignment Operators
-		//---------------------------------------------------------------------	
+		//---------------------------------------------------------------------
 
 		/**
 		 Copies the given sRGB spectrum to this sRGB spectrum.
 
 		 @param[in]		srgb
 						A reference to the sRGB spectrum to copy.
-		 @return		A reference to the copy of the given sRGB spectrum (i.e. 
+		 @return		A reference to the copy of the given sRGB spectrum (i.e.
 						this sRGB spectrum).
 		 */
-		constexpr SRGB& operator=(const SRGB& srgb) noexcept = default;
+		SRGB& operator=(const SRGB& srgb) noexcept = default;
 
 		/**
 		 Moves the given sRGB spectrum to this sRGB spectrum.
 
 		 @param[in]		srgb
 						A reference to the sRGB spectrum to move.
-		 @return		A reference to the moved sRGB spectrum (i.e. this sRGB 
+		 @return		A reference to the moved sRGB spectrum (i.e. this sRGB
 						spectrum).
 		 */
-		constexpr SRGB& operator=(SRGB&& srgb) noexcept = default;
+		SRGB& operator=(SRGB&& srgb) noexcept = default;
+
+		//---------------------------------------------------------------------
+		// Member Methods
+		//---------------------------------------------------------------------
+
+		/**
+		 Returns the red component of this sRGB spectrum.
+
+		 @return		A reference to the red component of this sRGB spectrum.
+		 */
+		[[nodiscard]]
+		F32& R() noexcept {
+			return operator[](0);
+		}
+
+		/**
+		 Returns the red component of this sRGB spectrum.
+
+		 @return		The red component of this sRGB spectrum.
+		 */
+		[[nodiscard]]
+		constexpr F32 R() const noexcept {
+			return operator[](0);
+		}
+
+		/**
+		 Returns the green component of this sRGB spectrum.
+
+		 @return		A reference to the green component of this sRGB
+						spectrum.
+		 */
+		[[nodiscard]]
+		F32& G() noexcept {
+			return operator[](1);
+		}
+
+		/**
+		 Returns the green component of this sRGB spectrum.
+
+		 @return		The green component of this sRGB spectrum.
+		 */
+		[[nodiscard]]
+		constexpr F32 G() const noexcept {
+			return operator[](1);
+		}
+
+		/**
+		 Returns the blue component of this sRGB spectrum.
+
+		 @return		A reference to the blue component of this sRGB
+						spectrum.
+		 */
+		[[nodiscard]]
+		F32& B() noexcept {
+			return operator[](2);
+		}
+
+		/**
+		 Returns the blue component of this sRGB spectrum.
+
+		 @return		The blue component of this sRGB spectrum.
+		 */
+		[[nodiscard]]
+		constexpr F32 B() const noexcept {
+			return operator[](2);
+		}
 	};
 
-	static_assert(sizeof(SRGB) == sizeof(F32x3), "SRGB/F32x3 mismatch");
+	static_assert(sizeof(SRGB) == sizeof(F32x3));
 
 	#pragma endregion
 
@@ -256,7 +387,7 @@ namespace mage {
 	/**
 	 A struct of XYZ color spectra.
 	 */
-	struct XYZ final : public F32x3 {
+	struct XYZ : public F32x3 {
 
 	public:
 
@@ -272,7 +403,7 @@ namespace mage {
 		 */
 		constexpr explicit XYZ(F32 xyz = 0.0f) noexcept
 			: XYZ(xyz, xyz, xyz) {}
-		
+
 		/**
 		 Constructs a XYZ spectrum from the given spectrum components.
 
@@ -293,7 +424,7 @@ namespace mage {
 						A reference to the XYZ spectrum to copy.
 		 */
 		constexpr XYZ(const XYZ& xyz) noexcept = default;
-		
+
 		/**
 		 Constructs a XYZ spectrum by moving the given XYZ spectrum.
 
@@ -301,7 +432,7 @@ namespace mage {
 						A reference to the XYZ spectrum to move.
 		 */
 		constexpr XYZ(XYZ&& xyz) noexcept = default;
-		
+
 		/**
 		 Constructs a XYZ spectrum from the given RGB spectrum.
 
@@ -309,7 +440,7 @@ namespace mage {
 						A reference to the RGB spectrum to copy.
 		 */
 		explicit XYZ(const RGB& rgb) noexcept;
-		
+
 		/**
 		 Constructs a XYZ spectrum from the given components.
 
@@ -326,30 +457,94 @@ namespace mage {
 
 		//---------------------------------------------------------------------
 		// Assignment Operators
-		//---------------------------------------------------------------------	
+		//---------------------------------------------------------------------
 
 		/**
 		 Copies the given XYZ spectrum to this XYZ spectrum.
 
 		 @param[in]		xyz
 						A reference to the XYZ spectrum to copy.
-		 @return		A reference to the copy of the given XYZ spectrum (i.e. 
+		 @return		A reference to the copy of the given XYZ spectrum (i.e.
 						this XYZ spectrum).
 		 */
-		constexpr XYZ& operator=(const XYZ& xyz) noexcept = default;
+		XYZ& operator=(const XYZ& xyz) noexcept = default;
 
 		/**
 		 Moves the given XYZ spectrum to this XYZ spectrum.
 
 		 @param[in]		xyz
 						A reference to the XYZ spectrum to move.
-		 @return		A reference to the moved XYZ spectrum (i.e. this XYZ 
+		 @return		A reference to the moved XYZ spectrum (i.e. this XYZ
 						spectrum).
 		 */
-		constexpr XYZ& operator=(XYZ&& xyz) noexcept = default;
+		XYZ& operator=(XYZ&& xyz) noexcept = default;
+
+		//---------------------------------------------------------------------
+		// Member Methods
+		//---------------------------------------------------------------------
+
+		/**
+		 Returns the x component of this XYZ spectrum.
+
+		 @return		A reference to the x component of this XYZ spectrum.
+		 */
+		[[nodiscard]]
+		F32& X() noexcept {
+			return operator[](0);
+		}
+
+		/**
+		 Returns the x component of this XYZ spectrum.
+
+		 @return		The x component of this XYZ spectrum.
+		 */
+		[[nodiscard]]
+		constexpr F32 X() const noexcept {
+			return operator[](0);
+		}
+
+		/**
+		 Returns the y component of this XYZ spectrum.
+
+		 @return		A reference to the y component of this XYZ spectrum.
+		 */
+		[[nodiscard]]
+		F32& Y() noexcept {
+			return operator[](1);
+		}
+
+		/**
+		 Returns the y component of this XYZ spectrum.
+
+		 @return		The y component of this XYZ spectrum.
+		 */
+		[[nodiscard]]
+		constexpr F32 Y() const noexcept {
+			return operator[](1);
+		}
+
+		/**
+		 Returns the z component of this XYZ spectrum.
+
+		 @return		A reference to the z component of this XYZ spectrum.
+		 */
+		[[nodiscard]]
+		F32& Z() noexcept {
+			return operator[](2);
+		}
+
+		/**
+		 Returns the z component of this XYZA spectrum.
+
+		 @return		The z component of this XYZA spectrum.
+		 */
+		[[nodiscard]]
+		constexpr F32 Z() const noexcept {
+			return operator[](2);
+		}
 	};
 
-	static_assert(sizeof(XYZ) == sizeof(F32x3), "XYZ/F32x3 mismatch");
+	static_assert(sizeof(XYZ) == sizeof(F32x3));
 
 	#pragma endregion
 
@@ -369,7 +564,7 @@ namespace mage {
 	/**
 	 A struct of RGBA color spectra.
 	 */
-	struct RGBA final : public F32x4 {
+	struct RGBA : public F32x4 {
 
 	public:
 
@@ -385,7 +580,7 @@ namespace mage {
 		 */
 		constexpr explicit RGBA(F32 rgba = 0.0f) noexcept
 			: RGBA(rgba, rgba, rgba, rgba) {}
-		
+
 		/**
 		 Constructs a RGBA spectrum from the given spectrum components.
 
@@ -408,7 +603,7 @@ namespace mage {
 						A reference to the RGBA spectrum to copy.
 		 */
 		constexpr RGBA(const RGBA& rgba) noexcept = default;
-		
+
 		/**
 		 Constructs a RGBA spectrum by moving the given RGBA spectrum.
 
@@ -416,7 +611,7 @@ namespace mage {
 						A reference to the RGBA spectrum to move.
 		 */
 		constexpr RGBA(RGBA&& rgba) noexcept = default;
-		
+
 		/**
 		 Constructs a RGBA spectrum from the given RGB spectrum.
 
@@ -460,30 +655,118 @@ namespace mage {
 
 		//---------------------------------------------------------------------
 		// Assignment Operators
-		//---------------------------------------------------------------------	
+		//---------------------------------------------------------------------
 
 		/**
 		 Copies the given RGBA spectrum to this RGBA spectrum.
 
 		 @param[in]		rgba
 						A reference to the RGBA spectrum to copy.
-		 @return		A reference to the copy of the given RGBA spectrum 
+		 @return		A reference to the copy of the given RGBA spectrum
 						(i.e. this RGBA spectrum).
 		 */
-		constexpr RGBA& operator=(const RGBA& rgba) noexcept = default;
+		RGBA& operator=(const RGBA& rgba) noexcept = default;
 
 		/**
 		 Moves the given RGBA spectrum to this RGBA spectrum.
 
 		 @param[in]		rgba
 						A reference to the RGBA spectrum to move.
-		 @return		A reference to the moved RGBA spectrum (i.e. this RGBA 
+		 @return		A reference to the moved RGBA spectrum (i.e. this RGBA
 						spectrum).
 		 */
-		constexpr RGBA& operator=(RGBA&& rgba) noexcept = default;
+		RGBA& operator=(RGBA&& rgba) noexcept = default;
+
+		//---------------------------------------------------------------------
+		// Member Methods
+		//---------------------------------------------------------------------
+
+		/**
+		 Returns the red component of this RGBA spectrum.
+
+		 @return		A reference to the red component of this RGBA
+						spectrum.
+		 */
+		[[nodiscard]]
+		F32& R() noexcept {
+			return operator[](0);
+		}
+
+		/**
+		 Returns the red component of this RGBA spectrum.
+
+		 @return		The red component of this RGBA spectrum.
+		 */
+		[[nodiscard]]
+		constexpr F32 R() const noexcept {
+			return operator[](0);
+		}
+
+		/**
+		 Returns the green component of this RGBA spectrum.
+
+		 @return		A reference to the green component of this RGBA
+						spectrum.
+		 */
+		[[nodiscard]]
+		F32& G() noexcept {
+			return operator[](1);
+		}
+
+		/**
+		 Returns the green component of this RGBA spectrum.
+
+		 @return		The green component of this RGBA spectrum.
+		 */
+		[[nodiscard]]
+		constexpr F32 G() const noexcept {
+			return operator[](1);
+		}
+
+		/**
+		 Returns the blue component of this RGBA spectrum.
+
+		 @return		A reference to the blue component of this RGBA
+						spectrum.
+		 */
+		[[nodiscard]]
+		F32& B() noexcept {
+			return operator[](2);
+		}
+
+		/**
+		 Returns the blue component of this RGBA spectrum.
+
+		 @return		The blue component of this RGBA spectrum.
+		 */
+		[[nodiscard]]
+		constexpr F32 B() const noexcept {
+			return operator[](2);
+		}
+
+		/**
+		 Returns the alpha component of this RGBA spectrum.
+
+		 @return		A reference to the alpha component of this RGBA
+						spectrum.
+		 */
+		[[nodiscard]]
+		F32& A() noexcept {
+			return operator[](3);
+		}
+
+		/**
+		 Returns the alpha component of this RGBA spectrum.
+
+		 @return		The alpha component of this RGBA spectrum.
+		 */
+		[[nodiscard]]
+		constexpr F32 A() const noexcept {
+			return operator[](3);
+		}
 	};
 
-	static_assert(sizeof(RGBA) == sizeof(F32x4), "RGBA/F32x4 mismatch");
+	static_assert(sizeof(RGBA) == sizeof(F32x4));
 
 	#pragma endregion
 
@@ -499,7 +782,7 @@ namespace mage {
 	/**
 	 A struct of sRGBA color spectra.
 	 */
-	struct SRGBA final : public F32x4 {
+	struct SRGBA : public F32x4 {
 
 	public:
 
@@ -515,7 +798,7 @@ namespace mage {
 		 */
 		constexpr explicit SRGBA(F32 rgba = 0.0f) noexcept
 			: SRGBA(rgba, rgba, rgba, rgba) {}
-		
+
 		/**
 		 Constructs a sRGBA spectrum from the given spectrum components.
 
@@ -538,7 +821,7 @@ namespace mage {
 						A reference to the sRGBA spectrum to copy.
 		 */
 		constexpr SRGBA(const SRGBA& rgba) noexcept = default;
-		
+
 		/**
 		 Constructs a sRGBA spectrum by moving the given sRGBA spectrum.
 
@@ -546,7 +829,7 @@ namespace mage {
 						A reference to the sRGBA spectrum to move.
 		 */
 		constexpr SRGBA(SRGBA&& rgba) noexcept = default;
-		
+
 		/**
 		 Constructs a sRGBA spectrum from the given sRGB spectrum.
 
@@ -582,31 +865,119 @@ namespace mage {
 
 		//---------------------------------------------------------------------
 		// Assignment Operators
-		//---------------------------------------------------------------------	
+		//---------------------------------------------------------------------
 
 		/**
 		 Copies the given sRGBA spectrum to this sRGBA spectrum.
 
 		 @param[in]		rgba
 						A reference to the sRGBA spectrum to copy.
-		 @return		A reference to the copy of the given sRGBA spectrum 
+		 @return		A reference to the copy of the given sRGBA spectrum
 						(i.e. this sRGBA spectrum).
 		 */
-		constexpr SRGBA& operator=(const SRGBA& rgba) noexcept = default;
+		SRGBA& operator=(const SRGBA& rgba) noexcept = default;
 
 		/**
 		 Moves the given sRGBA spectrum to this sRGBA spectrum.
 
 		 @param[in]		rgba
 						A reference to the sRGBA spectrum to move.
-		 @return		A reference to the moved sRGBA spectrum (i.e. this sRGBA 
+		 @return		A reference to the moved sRGBA spectrum (i.e. this sRGBA
 						spectrum).
 		 */
-		constexpr SRGBA& operator=(SRGBA&& rgba) noexcept = default;
+		SRGBA& operator=(SRGBA&& rgba) noexcept = default;
+
+		//---------------------------------------------------------------------
+		// Member Methods
+		//---------------------------------------------------------------------
+
+		/**
+		 Returns the red component of this sRGBA spectrum.
+
+		 @return		A reference to the red component of this sRGBA
+						spectrum.
+		 */
+		[[nodiscard]]
+		F32& R() noexcept {
+			return operator[](0);
+		}
+
+		/**
+		 Returns the red component of this sRGBA spectrum.
+
+		 @return		The red component of this sRGBA spectrum.
+		 */
+		[[nodiscard]]
+		constexpr F32 R() const noexcept {
+			return operator[](0);
+		}
+
+		/**
+		 Returns the green component of this sRGBA spectrum.
+
+		 @return		A reference to the green component of this sRGBA
+						spectrum.
+		 */
+		[[nodiscard]]
+		F32& G() noexcept {
+			return operator[](1);
+		}
+
+		/**
+		 Returns the green component of this sRGBA spectrum.
+
+		 @return		The green component of this sRGBA spectrum.
+		 */
+		[[nodiscard]]
+		constexpr F32 G() const noexcept {
+			return operator[](1);
+		}
+
+		/**
+		 Returns the blue component of this sRGBA spectrum.
+
+		 @return		A reference to the blue component of this sRGBA
+						spectrum.
+		 */
+		[[nodiscard]]
+		F32& B() noexcept {
+			return operator[](2);
+		}
+
+		/**
+		 Returns the blue component of this sRGBA spectrum.
+
+		 @return		The blue component of this sRGBA spectrum.
+		 */
+		[[nodiscard]]
+		constexpr F32 B() const noexcept {
+			return operator[](2);
+		}
+
+		/**
+		 Returns the alpha component of this sRGBA spectrum.
+
+		 @return		A reference to the alpha component of this sRGBA
+						spectrum.
+		 */
+		[[nodiscard]]
+		F32& A() noexcept {
+			return operator[](3);
+		}
+
+		/**
+		 Returns the alpha component of this sRGBA spectrum.
+
+		 @return		The alpha component of this sRGBA spectrum.
+		 */
+		[[nodiscard]]
+		constexpr F32 A() const noexcept {
+			return operator[](3);
+		}
 	};
 
-	static_assert(sizeof(SRGBA) == sizeof(F32x4), "SRGBA/F32x4 mismatch");
-	
+	static_assert(sizeof(SRGBA) == sizeof(F32x4));
+
 	#pragma endregion
 
 	//-------------------------------------------------------------------------
@@ -621,7 +992,7 @@ namespace mage {
 	/**
 	 A struct of XYZA color spectra.
 	 */
-	struct XYZA final : public F32x4 {
+	struct XYZA : public F32x4 {
 
 	public:
 
@@ -637,7 +1008,7 @@ namespace mage {
 		 */
 		constexpr explicit XYZA(F32 xyza = 0.0f) noexcept
 			: XYZA(xyza, xyza, xyza, xyza) {}
-		
+
 		/**
 		 Constructs a XYZA spectrum from the given spectrum components.
 
@@ -660,7 +1031,7 @@ namespace mage {
 						A reference to the XYZA spectrum to copy.
 		 */
 		constexpr XYZA(const XYZA& xyza) noexcept = default;
-		
+
 		/**
 		 Constructs a XYZA spectrum by moving the given XYZA spectrum.
 
@@ -668,7 +1039,7 @@ namespace mage {
 						A reference to the XYZA spectrum to move.
 		 */
 		constexpr XYZA(XYZA&& xyza) noexcept = default;
-		
+
 		/**
 		 Constructs a XYZA spectrum from the given XYZ spectrum.
 
@@ -704,30 +1075,115 @@ namespace mage {
 
 		//---------------------------------------------------------------------
 		// Assignment Operators
-		//---------------------------------------------------------------------	
+		//---------------------------------------------------------------------
 
 		/**
 		 Copies the given XYZA spectrum to this XYZA spectrum.
 
 		 @param[in]		xyza
 						A reference to the XYZA spectrum to copy.
-		 @return		A reference to the copy of the given XYZA spectrum 
+		 @return		A reference to the copy of the given XYZA spectrum
 						(i.e. this XYZA spectrum).
 		 */
-		constexpr XYZA& operator=(const XYZA& xyza) noexcept = default;
+		XYZA& operator=(const XYZA& xyza) noexcept = default;
 
 		/**
 		 Moves the given XYZA spectrum to this XYZA spectrum.
 
 		 @param[in]		xyza
 						A reference to the XYZA spectrum to move.
-		 @return		A reference to the moved XYZA spectrum (i.e. this 
+		 @return		A reference to the moved XYZA spectrum (i.e. this
 						XYZA spectrum).
 		 */
-		constexpr XYZA& operator=(XYZA&& xyza) noexcept = default;
+		XYZA& operator=(XYZA&& xyza) noexcept = default;
+
+		//---------------------------------------------------------------------
+		// Member Methods
+		//---------------------------------------------------------------------
+
+		/**
+		 Returns the x component of this XYZA spectrum.
+
+		 @return		A reference to the x component of this XYZA spectrum.
+		 */
+		[[nodiscard]]
+		F32& X() noexcept {
+			return operator[](0);
+		}
+
+		/**
+		 Returns the x component of this XYZA spectrum.
+
+		 @return		The x component of this XYZA spectrum.
+		 */
+		[[nodiscard]]
+		constexpr F32 X() const noexcept {
+			return operator[](0);
+		}
+
+		/**
+		 Returns the y component of this XYZA spectrum.
+
+		 @return		A reference to the y component of this XYZA spectrum.
+		 */
+		[[nodiscard]]
+		F32& Y() noexcept {
+			return operator[](1);
+		}
+
+		/**
+		 Returns the y component of this XYZA spectrum.
+
+		 @return		The y component of this XYZA spectrum.
+		 */
+		[[nodiscard]]
+		constexpr F32 Y() const noexcept {
+			return operator[](1);
+		}
+
+		/**
+		 Returns the z component of this XYZA spectrum.
+
+		 @return		A reference to the z component of this XYZA spectrum.
+		 */
+		[[nodiscard]]
+		F32& Z() noexcept {
+			return operator[](2);
+		}
+
+		/**
+		 Returns the z component of this XYZA spectrum.
+
+		 @return		The z component of this XYZA spectrum.
+		 */
+		[[nodiscard]]
+		constexpr F32 Z() const noexcept {
+			return operator[](2);
+		}
+
+		/**
+		 Returns the alpha component of this XYZA spectrum.
+
+		 @return		A reference to the alpha component of this XYZA
+						spectrum.
+		 */
+		[[nodiscard]]
+		F32& A() noexcept {
+			return operator[](3);
+		}
+
+		/**
+		 Returns the alpha component of this XYZA spectrum.
+
+		 @return		The alpha component of this XYZA spectrum.
+		 */
+		[[nodiscard]]
+		constexpr F32 A() const noexcept {
+			return operator[](3);
+		}
 	};
 
-	static_assert(sizeof(XYZA) == sizeof(F32x4), "XYZA/F32x4 mismatch");
+	static_assert(sizeof(XYZA) == sizeof(F32x4));
 
 	#pragma endregion
 
@@ -746,14 +1202,13 @@ namespace mage {
 	 */
 	[[nodiscard]]
 	inline const XMVECTOR XM_CALLCONV RGBtoSRGB(FXMVECTOR rgb) noexcept {
-		// Frostbite's conversion
 		static constexpr auto exp = 1.0f / 2.4f;
-		
+
 		const auto low  = rgb * 12.92f;
 		const auto high = 1.055f * XMVectorPow(rgb, XMVectorReplicate(exp))
 			            - XMVectorReplicate(0.055f);
 		const auto comp = XMVectorLessOrEqual(rgb, XMVectorReplicate(0.0031308f));
-		
+
 		return XMVectorSetW(XMVectorSelect(high, low, comp), XMVectorGetW(rgb));
 	}
 
@@ -767,7 +1222,6 @@ namespace mage {
 	 */
 	[[nodiscard]]
 	inline const XMVECTOR XM_CALLCONV SRGBtoRGB(FXMVECTOR srgb) noexcept {
-		// Frostbite's conversion
 		static constexpr auto mlow  = 1.0f / 12.92f;
 		static constexpr auto mhigh = 1.0f / 1.055f;
 
@@ -832,7 +1286,7 @@ namespace mage {
 		// Convert XYZ to ITU-R Recommendation BT.709 linear RGB.
 		static const XMMATRIX transform = {
 			 3.240479f, -0.969256f,  0.055648f, 0.0f,
-			-1.537150f,  1.875992f, -0.204043f, 0.0f, 
+			-1.537150f,  1.875992f, -0.204043f, 0.0f,
 			-0.498535f,  0.041556f,  1.057311f, 0.0f,
 			 0.0f,       0.0f,       0.0f,      1.0f
 		};
@@ -851,6 +1305,123 @@ namespace mage {
 
 	inline XYZA::XYZA(const RGBA& rgba) noexcept
 		: XYZA(XMStore< F32x4 >(RGBtoXYZ(XMLoad(rgba)))) {}
+
+	#pragma endregion
+}
+
+namespace std {
+
+	//-------------------------------------------------------------------------
+	// (linear) RGB
+	//-------------------------------------------------------------------------
+	#pragma region
+
+	template<>
+	struct tuple_size< mage::RGB >
+		: public integral_constant< std::size_t, mage::RGB::s_size > {};
+
+	template< std::size_t I >
+	struct tuple_element< I, mage::RGB > {
+
+	public:
+
+		using type = typename mage::RGB::value_type;
+	};
+
+	#pragma endregion
+
+	//-------------------------------------------------------------------------
+	// SRGB
+	//-------------------------------------------------------------------------
+	#pragma region
+
+	template<>
+	struct tuple_size< mage::SRGB >
+		: public integral_constant< std::size_t, mage::SRGB::s_size > {};
+
+	template< std::size_t I >
+	struct tuple_element< I, mage::SRGB > {
+
+	public:
+
+		using type = typename mage::SRGB::value_type;
+	};
+
+	#pragma endregion
+
+	//-------------------------------------------------------------------------
+	// XYZ
+	//-------------------------------------------------------------------------
+	#pragma region
+
+	template<>
+	struct tuple_size< mage::XYZ >
+		: public integral_constant< std::size_t, mage::XYZ::s_size > {};
+
+	template< std::size_t I >
+	struct tuple_element< I, mage::XYZ > {
+
+	public:
+
+		using type = typename mage::XYZ::value_type;
+	};
+
+	#pragma endregion
+
+	//-------------------------------------------------------------------------
+	// (linear) RGBA
+	//-------------------------------------------------------------------------
+	#pragma region
+
+	template<>
+	struct tuple_size< mage::RGBA >
+		: public integral_constant< std::size_t, mage::RGBA::s_size > {};
+
+	template< std::size_t I >
+	struct tuple_element< I, mage::RGBA > {
+
+	public:
+
+		using type = typename mage::RGBA::value_type;
+	};
+
+	#pragma endregion
+
+	//-------------------------------------------------------------------------
+	// SRGBA
+	//-------------------------------------------------------------------------
+	#pragma region
+
+	template<>
+	struct tuple_size< mage::SRGBA >
+		: public integral_constant< std::size_t, mage::SRGBA::s_size > {};
+
+	template< std::size_t I >
+	struct tuple_element< I, mage::SRGBA > {
+
+	public:
+
+		using type = typename mage::SRGBA::value_type;
+	};
+
+	#pragma endregion
+
+	//-------------------------------------------------------------------------
+	// XYZA
+	//-------------------------------------------------------------------------
+	#pragma region
+
+	template<>
+	struct tuple_size< mage::XYZA >
+		: public integral_constant< std::size_t, mage::XYZA::s_size > {};
+
+	template< std::size_t I >
+	struct tuple_element< I, mage::XYZA > {
+
+	public:
+
+		using type = typename mage::XYZA::value_type;
+	};
 
 	#pragma endregion
 }

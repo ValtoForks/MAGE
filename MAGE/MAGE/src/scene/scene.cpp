@@ -9,20 +9,11 @@
 #pragma endregion
 
 //-----------------------------------------------------------------------------
-// System Includes
-//-----------------------------------------------------------------------------
-#pragma region
-
-#include <map>
-
-#pragma endregion
-
-//-----------------------------------------------------------------------------
 // Engine Definitions
 //-----------------------------------------------------------------------------
 namespace mage {
 
-	Scene::Scene(string name)
+	Scene::Scene(std::string name)
 		: m_name(std::move(name)),
 		m_nodes(),
 		m_scripts() {}
@@ -32,7 +23,7 @@ namespace mage {
 	Scene::~Scene() = default;
 
 	Scene& Scene::operator=(Scene&& scene) noexcept = default;
-	
+
 	//-------------------------------------------------------------------------
 	// Scene Member Methods: Lifecycle
 	//-------------------------------------------------------------------------
@@ -46,13 +37,13 @@ namespace mage {
 			script.Load(engine);
 		});
 	}
-	
+
 	void Scene::Uninitialize(Engine& engine) {
 		// Closes the behavior scripts of this scene.
 		ForEach< BehaviorScript >([&engine](BehaviorScript& script) {
 			script.Close(engine);
 		});
-		
+
 		// Closes this scene.
 		Close(engine);
 
@@ -63,7 +54,7 @@ namespace mage {
 	}
 
 	void Scene::Load([[maybe_unused]] Engine& engine) {}
-	
+
 	void Scene::Close([[maybe_unused]] Engine& engine) {}
 
 	void Scene::Clear() noexcept {
@@ -75,45 +66,45 @@ namespace mage {
 	// Scene Member Methods
 	//-------------------------------------------------------------------------
 
-	ProxyPtr< Node > Scene::Import(Engine& engine, 
+	ProxyPtr< Node > Scene::Import(Engine& engine,
 								   const rendering::ModelDescriptor& desc) {
 		std::vector< ProxyPtr< Node > > nodes;
 		return Import(engine, desc, nodes);
 	}
 
-	ProxyPtr< Node > Scene::Import(Engine& engine, 
+	ProxyPtr< Node > Scene::Import(Engine& engine,
 								   const rendering::ModelDescriptor& desc,
 								   std::vector< ProxyPtr< Node > >& nodes) {
 
 		using namespace rendering;
 		using ModelPtr = ProxyPtr< Model >;
 		using NodePtr  = ProxyPtr< Node >;
-		using NodePair = std::pair< NodePtr, string >;
 
-		std::map< string, NodePair > mapping;
 		NodePtr root;
-		size_t nb_root_childs = 0;
+		std::size_t nb_root_childs = 0u;
+		std::map< std::string_view, NodePtr > mapping;
+		std::size_t first_index = nodes.size();
 
 		auto& rendering_manager = engine.GetRenderingManager();
-		auto& world             = rendering_manager.GetWorld();
+		auto& world = rendering_manager.GetWorld();
 		auto& resource_manager  = rendering_manager.GetResourceManager();
 		auto default_material   = CreateDefaultMaterial(resource_manager);
-		
+
 		// Create the nodes with their model components.
 		desc.ForEachModelPart([&](const rendering::ModelPart& model_part) {
 			// Create the node.
 			auto node = Create< Node >(model_part.m_child);
-			
+
 			// Create the model component.
 			auto model = world.Create< Model >();
-			
+
 			// Set the mesh of the model component.
-			model->SetMesh(desc.GetMesh(), 
-						   model_part.m_start_index, 
-						   model_part.m_nb_indices, 
-						   model_part.m_aabb, 
+			model->SetMesh(desc.GetMesh(),
+						   model_part.m_start_index,
+						   model_part.m_nb_indices,
+						   model_part.m_aabb,
 						   model_part.m_sphere);
-			
+
 			// Set the material of the model component.
 			const auto material = desc.GetMaterial(model_part.m_material);
 			model->GetMaterial() = (material) ? *material : default_material;
@@ -131,40 +122,40 @@ namespace mage {
 			}
 
 			// Add the node to the mapping.
-			mapping.emplace(model_part.m_child, 
-							NodePair(node, model_part.m_parent));
-			
+			// Actual parent nodes must have a unique name.
+			mapping.emplace(model_part.m_child, node);
+
 			// Add the node to the collection to return.
-			nodes.push_back(std::move(node));
+			nodes.push_back(node);
 		});
 
 		// There must be at least one root node.
-		ThrowIfFailed((0 != nb_root_childs), 
-					  "%ls: no root node fount.", desc.GetGuid().c_str());
+		ThrowIfFailed((0u != nb_root_childs),
+					  "{}: no root node fount.", desc.GetGuid());
 
-		// An additional root node needs to be created if multiple root nodes 
+		// An additional root node needs to be created if multiple root nodes
 		// are present.
-		const bool create_root_model_node = (1 < nb_root_childs);
+		const bool create_root_model_node = (1u < nb_root_childs);
 		if (create_root_model_node) {
 			// Create the root node.
 			root = Create< Node >("model");
-			
+
 			// Add the node to the collection to return.
 			nodes.push_back(root);
 		}
 
 		// Connect the nodes.
-		for (const auto& model_pair : mapping) {
-			const auto& [child, parent] = model_pair.second;
-			if (ModelPart::s_default_parent == parent) {
+		desc.ForEachModelPart([&](const rendering::ModelPart& model_part) {
+			auto child = nodes[first_index++];
+			if (model_part.HasDefaultParent()) {
 				if (create_root_model_node) {
 					root->AddChild(child);
 				}
 			}
 			else {
-				mapping[parent].first->AddChild(child);
+				mapping[model_part.m_parent]->AddChild(child);
 			}
-		}
+		});
 
 		return root;
 	}

@@ -17,10 +17,10 @@ namespace mage::rendering::loader {
 
 	template< typename VertexT, typename IndexT >
 	MSHReader< VertexT, IndexT >
-		::MSHReader(std::vector< VertexT >& vertices, 
+		::MSHReader(std::vector< VertexT >& vertices,
 		            std::vector< IndexT >& indices)
-		: BigEndianBinaryReader(), 
-		m_vertices(vertices), 
+		: BigEndianBinaryReader(),
+		m_vertices(vertices),
 		m_indices(indices) {}
 
 	template< typename VertexT, typename IndexT >
@@ -32,17 +32,21 @@ namespace mage::rendering::loader {
 
 	template< typename VertexT, typename IndexT >
 	void MSHReader< VertexT, IndexT >::ReadData() {
+		using std::empty;
+		ThrowIfFailed(empty(m_vertices),
+					  "{}: vertex buffer must be empty.", GetPath());
+		ThrowIfFailed(empty(m_indices),
+					  "{}: index buffer must be empty.", GetPath());
 
 		// Read the header.
 		{
 			const bool result = IsHeaderValid();
-			ThrowIfFailed(result, 
-						  "%ls: invalid mesh header.", GetFilename().c_str());
+			ThrowIfFailed(result, "{}: invalid mesh header.", GetPath());
 		}
 
 		const auto nb_vertices = Read< U32 >();
 		const auto nb_indices  = Read< U32 >();
-		
+
 		const auto vertices = ReadArray< VertexT >(nb_vertices);
 		m_vertices.assign(vertices, vertices + nb_vertices);
 

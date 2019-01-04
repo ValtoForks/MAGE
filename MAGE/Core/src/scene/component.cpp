@@ -15,12 +15,12 @@ namespace mage {
 
 	Component::Component() noexcept
 		: m_state(State::Active),
-		m_guid(IdGenerator::GetNextGuid()),
+		m_guid(GetNextGuid()),
 		m_owner() {}
 
 	Component::Component(const Component& component) noexcept
 		: m_state(component.m_state),
-		m_guid(IdGenerator::GetNextGuid()),
+		m_guid(GetNextGuid()),
 		m_owner() {}
 
 	Component::Component(Component&& component) noexcept = default;
@@ -38,7 +38,7 @@ namespace mage {
 		if (State::Terminated == state) {
 			return;
 		}
-		
+
 		if (HasOwner() && State::Terminated == m_owner->GetState()) {
 			m_state = State::Terminated;
 		}

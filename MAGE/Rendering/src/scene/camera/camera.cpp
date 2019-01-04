@@ -27,14 +27,23 @@ namespace mage::rendering {
 	#pragma endregion
 
 	//-------------------------------------------------------------------------
+	// CameraSettings
+	//-------------------------------------------------------------------------
+	#pragma region
+
+	F32 CameraSettings::s_gamma = 2.2f;
+
+	#pragma endregion
+
+	//-------------------------------------------------------------------------
 	// Camera
 	//-------------------------------------------------------------------------
 	#pragma region
 
-	Camera::Camera(ID3D11Device& device) 
-		: Component(), 
+	Camera::Camera(ID3D11Device& device)
+		: Component(),
 		m_buffer(device),
-		m_clipping_planes(0.01f, 100.0f), 
+		m_clipping_planes(0.01f, 100.0f),
 		m_lens(),
 		m_viewport(),
 		m_settings() {}
@@ -45,7 +54,7 @@ namespace mage::rendering {
 
 	Camera& Camera::operator=(Camera&& camera) noexcept = default;
 
-	void Camera::UpdateBuffer(ID3D11DeviceContext& device_context, 
+	void Camera::UpdateBuffer(ID3D11DeviceContext& device_context,
 							  AntiAliasing aa) const {
 		Assert(HasOwner());
 
@@ -58,7 +67,7 @@ namespace mage::rendering {
 			const auto  camera_to_world      = transform.GetObjectToWorldMatrix();
 			const auto  camera_to_projection = GetCameraToProjectionMatrix();
 			const auto  projection_to_camera = GetProjectionToCameraMatrix();
-			
+
 			buffer.m_world_to_camera         = XMMatrixTranspose(world_to_camera);
 			buffer.m_camera_to_projection    = XMMatrixTranspose(camera_to_projection);
 			buffer.m_projection_to_camera    = XMMatrixTranspose(projection_to_camera);
@@ -67,25 +76,21 @@ namespace mage::rendering {
 
 		// Viewport
 		{
-			buffer.m_viewport_top_left   = m_viewport.GetTopLeft();
-			auto viewport_resolution     = m_viewport.GetSize();
-			buffer.m_viewport_inv_resolution_minus1 
-				= F32x2(1.0f / (viewport_resolution.m_x - 1u), 
-						1.0f / (viewport_resolution.m_y - 1u));
-			buffer.m_viewport_resolution = std::move(viewport_resolution);
+			buffer.m_viewport_top_left       = static_cast< F32x2 >(m_viewport.GetTopLeft());
+			buffer.m_viewport_resolution     = m_viewport.GetSize();
+			buffer.m_viewport_inv_resolution = XMStore< F32x2 >(
+				XMVectorReciprocal(XMLoad(buffer.m_viewport_resolution)));
 		}
-		
+
 		// SS Viewport
 		{
-			const auto ss_viewport          = Viewport(m_viewport, aa);
-			buffer.m_ss_viewport_top_left   = ss_viewport.GetTopLeft();
-			auto ss_viewport_resolution     = ss_viewport.GetSize();
-			buffer.m_ss_viewport_inv_resolution_minus1 
-				= F32x2(1.0f / (ss_viewport_resolution.m_x - 1u), 
-						1.0f / (ss_viewport_resolution.m_y - 1u));
-			buffer.m_ss_viewport_resolution = std::move(ss_viewport_resolution);
+			const auto ss_viewport              = Viewport(m_viewport, aa);
+			buffer.m_ss_viewport_top_left       = static_cast< F32x2 >(ss_viewport.GetTopLeft());
+			buffer.m_ss_viewport_resolution     = ss_viewport.GetSize();
+			buffer.m_ss_viewport_inv_resolution = XMStore< F32x2 >(
+				XMVectorReciprocal(XMLoad(buffer.m_ss_viewport_resolution)));
 		}
-		
+
 		// Fog and Sky
 		{
 			const auto& fog           = m_settings.GetFog();
@@ -96,35 +101,19 @@ namespace mage::rendering {
 			buffer.m_sky_dome_scale_z = sky.GetScaleZ();
 		}
 
-		// Voxelization and Voxel Cone Tracing
+		// Voxel Cone Tracing
 		{
-			buffer.m_voxel_grid_center 
-				= VoxelizationSettings::GetVoxelGridCenter();
-			buffer.m_voxel_grid_resolution  
-				= VoxelizationSettings::GetVoxelGridResolution();
-			buffer.m_voxel_grid_inv_resolution 
-				= 1.0f / buffer.m_voxel_grid_resolution;
-			buffer.m_voxel_size 
-				= VoxelizationSettings::GetVoxelSize();
-			buffer.m_voxel_inv_size 
-				= 1.0f / buffer.m_voxel_size;
-			buffer.m_voxel_texture_max_mip_level 
-				= VoxelizationSettings::GetMaxVoxelTextureMipLevel();
-			
-			const auto& vct               = m_settings.GetVoxelizationSettings();
-			buffer.m_nb_cones             = vct.GetNumberOfCones();
-			buffer.m_cone_step_multiplier = vct.GetConeStepMultiplier();
-			buffer.m_max_cone_distance    = vct.GetMaxConeDistance();
+			const auto& vct            = m_settings.GetVoxelizationSettings();
+			buffer.m_cone_step         = vct.GetConeStep();
+			buffer.m_max_cone_distance = vct.GetMaxConeDistance();
 		}
 
 		// Post-processing
 		{
-			buffer.m_lens_radius    = m_lens.GetLensRadius();
-			buffer.m_focal_length   = m_lens.GetFocalLength();
-			buffer.m_max_coc_radius = m_lens.GetMaximumCoCRadius();
+			buffer.m_aperture_radius = m_lens.GetApertureRadius();
+			buffer.m_focal_length    = m_lens.GetFocalLength();
+			buffer.m_focus_distance  = m_lens.GetFocusDistance();
 		}
-		
-		buffer.m_inv_gamma = 1.0f / m_settings.GetGamma();
 
 		// Update the camera buffer.
 		m_buffer.UpdateData(device_context, buffer);

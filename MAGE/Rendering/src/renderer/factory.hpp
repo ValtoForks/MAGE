@@ -25,7 +25,7 @@ namespace mage::rendering {
 
 	 @tparam		VertexT
 					The vertex type.
-	 @param[in]		device
+	 @param[in,out]	device
 					A reference to the device.
 	 @param[out]	buffer
 					A pointer to a pointer to the buffer.
@@ -35,16 +35,16 @@ namespace mage::rendering {
 	 */
 	template< typename VertexT >
 	[[nodiscard]]
-	HRESULT CreateStaticVertexBuffer(ID3D11Device& device, 
+	HRESULT CreateStaticVertexBuffer(ID3D11Device& device,
 									 NotNull< ID3D11Buffer** > buffer,
 									 gsl::span< const VertexT > vertices) noexcept;
-	
+
 	/**
 	 Creates a dynamic vertex buffer.
 
 	 @tparam		VertexT
 					The vertex type.
-	 @param[in]		device
+	 @param[in,out]	device
 					A reference to the device.
 	 @param[out]	buffer
 					A pointer to a pointer to the buffer.
@@ -63,7 +63,7 @@ namespace mage::rendering {
 
 	 @tparam		VertexT
 					The vertex type.
-	 @param[in]		device
+	 @param[in,out]	device
 					A reference to the device.
 	 @param[out]	buffer
 					A pointer to a pointer to the buffer.
@@ -75,14 +75,14 @@ namespace mage::rendering {
 	[[nodiscard]]
 	HRESULT CreateDynamicVertexBuffer(ID3D11Device& device,
 									  NotNull< ID3D11Buffer** > buffer,
-									  size_t nb_vertices) noexcept;
-	
+									  std::size_t nb_vertices) noexcept;
+
 	/**
 	 Creates a static index buffer.
 
 	 @tparam		IndexT
 					The index type.
-	 @param[in]		device
+	 @param[in,out]	device
 					A reference to the device.
 	 @param[out]	buffer
 					A pointer to a pointer to the buffer.
@@ -92,16 +92,16 @@ namespace mage::rendering {
 	 */
 	template< typename IndexT >
 	[[nodiscard]]
-	HRESULT CreateStaticIndexBuffer(ID3D11Device& device, 
+	HRESULT CreateStaticIndexBuffer(ID3D11Device& device,
 									NotNull< ID3D11Buffer** > buffer,
 									gsl::span< const IndexT > indices) noexcept;
-	
+
 	/**
 	 Creates a static constant buffer.
 
-	 @tparam		DataT
+	 @tparam		T
 					The data type.
-	 @param[in]		device
+	 @param[in,out]	device
 					A reference to the device.
 	 @param[out]	buffer
 					A pointer to a pointer to the buffer.
@@ -109,18 +109,18 @@ namespace mage::rendering {
 					The data.
 	 @return		A success/error value.
 	 */
-	template< typename DataT >
+	template< typename T >
 	[[nodiscard]]
-	HRESULT CreateStaticConstantBuffer(ID3D11Device& device, 
+	HRESULT CreateStaticConstantBuffer(ID3D11Device& device,
 									   NotNull< ID3D11Buffer** > buffer,
-									   gsl::span< const DataT > data) noexcept;
-	
+									   gsl::span< const T > data) noexcept;
+
 	/**
 	 Creates a dynamic constant buffer.
 
-	 @tparam		DataT
+	 @tparam		T
 					The data type.
-	 @param[in]		device
+	 @param[in,out]	device
 					A reference to the device.
 	 @param[out]	buffer
 					A pointer to a pointer to the buffer.
@@ -128,18 +128,18 @@ namespace mage::rendering {
 					The data.
 	 @return		A success/error value.
 	 */
-	template< typename DataT >
+	template< typename T >
 	[[nodiscard]]
-	HRESULT CreateDynamicConstantBuffer(ID3D11Device& device, 
+	HRESULT CreateDynamicConstantBuffer(ID3D11Device& device,
 										NotNull< ID3D11Buffer** > buffer,
-										gsl::span< const DataT > data) noexcept;
+										gsl::span< const T > data) noexcept;
 
 	/**
 	 Creates a dynamic constant buffer.
 
-	 @tparam		DataT
+	 @tparam		T
 					The data type.
-	 @param[in]		device
+	 @param[in,out]	device
 					A reference to the device.
 	 @param[out]	buffer
 					A pointer to a pointer to the buffer.
@@ -147,18 +147,18 @@ namespace mage::rendering {
 					The number of data elements.
 	 @return		A success/error value.
 	 */
-	template< typename DataT >
+	template< typename T >
 	[[nodiscard]]
-	HRESULT CreateDynamicConstantBuffer(ID3D11Device& device, 
+	HRESULT CreateDynamicConstantBuffer(ID3D11Device& device,
 										NotNull< ID3D11Buffer** > buffer,
-										size_t nb_data_elements = 1u) noexcept;
-	
+										std::size_t nb_data_elements = 1u) noexcept;
+
 	/**
 	 Creates a static structured buffer.
 
-	 @tparam		DataT
+	 @tparam		T
 					The data type.
-	 @param[in]		device
+	 @param[in,out]	device
 					A reference to the device.
 	 @param[out]	buffer
 					A pointer to a pointer to the buffer.
@@ -166,18 +166,18 @@ namespace mage::rendering {
 					The data.
 	 @return		A success/error value.
 	 */
-	template< typename DataT >
+	template< typename T >
 	[[nodiscard]]
-	HRESULT CreateStaticStructuredBuffer(ID3D11Device& device, 
+	HRESULT CreateStaticStructuredBuffer(ID3D11Device& device,
 										 NotNull< ID3D11Buffer** > buffer,
-										 gsl::span< const DataT > data) noexcept;
-	
+										 gsl::span< const T > data) noexcept;
+
 	/**
 	 Creates a dynamic structured buffer.
 
-	 @tparam		DataT
+	 @tparam		T
 					The data type.
-	 @param[in]		device
+	 @param[in,out]	device
 					A reference to the device.
 	 @param[out]	buffer
 					A pointer to a pointer to the buffer.
@@ -185,18 +185,18 @@ namespace mage::rendering {
 					The data.
 	 @return		A success/error value.
 	 */
-	template< typename DataT >
+	template< typename T >
 	[[nodiscard]]
-	HRESULT CreateDynamicStructuredBuffer(ID3D11Device& device, 
+	HRESULT CreateDynamicStructuredBuffer(ID3D11Device& device,
 										  NotNull< ID3D11Buffer** > buffer,
-										  gsl::span< const DataT > data) noexcept;
+										  gsl::span< const T > data) noexcept;
 
 	/**
 	 Creates a dynamic structured buffer.
 
-	 @tparam		DataT
+	 @tparam		T
 					The data type.
-	 @param[in]		device
+	 @param[in,out]	device
 					A reference to the device.
 	 @param[out]	buffer
 					A pointer to a pointer to the buffer.
@@ -204,11 +204,11 @@ namespace mage::rendering {
 					The number of data elements.
 	 @return		A success/error value.
 	 */
-	template< typename DataT >
+	template< typename T >
 	[[nodiscard]]
-	HRESULT CreateDynamicStructuredBuffer(ID3D11Device& device, 
+	HRESULT CreateDynamicStructuredBuffer(ID3D11Device& device,
 										  NotNull< ID3D11Buffer** > buffer,
-										  size_t nb_data_elements) noexcept;
+										  std::size_t nb_data_elements) noexcept;
 
 	#pragma endregion
 
@@ -221,10 +221,9 @@ namespace mage::rendering {
 	 Creates an opaque blend state (i.e. no blending).
 
 	 The blend formula (i.e. no blending) is defined as:
-	 (source.rgb × 1) + (destination.rgb × 0) = source.rgb
-	 (source.a   × 1) + (destination.a   × 0) = source.a.
+	 (source.rgba Ã— 1) + (destination.rgba Ã— 0) = source.rgba.
 
-	 @param[in]		device
+	 @param[in,out]	device
 					A reference to the device.
 	 @param[out]	state
 					A pointer to a pointer to the blend state.
@@ -233,15 +232,14 @@ namespace mage::rendering {
 	[[nodiscard]]
 	HRESULT CreateOpaqueBlendState(
 		ID3D11Device& device, NotNull< ID3D11BlendState** > state) noexcept;
-	
+
 	/**
 	 Creates an alpha blend state.
 
 	 The blend formula is defined as:
-	 (source.rgb ×  source.alpha    ) + (destination.rgb × (1-source.alpha))
-	 (source.a   × (1-destination.a)) + (destination.a   ×  1              ).
+	 (source.rgba Ã— source.a) + (destination.rgba Ã— (1-source.a)).
 
-	 @param[in]		device
+	 @param[in,out]	device
 					A reference to the device.
 	 @param[out]	state
 					A pointer to a pointer to the blend state.
@@ -250,15 +248,14 @@ namespace mage::rendering {
 	[[nodiscard]]
 	HRESULT CreateAlphaBlendState(
 		ID3D11Device& device, NotNull< ID3D11BlendState** > state) noexcept;
-	
+
 	/**
 	 Creates an additive blend state.
 
 	 The blend formula is defined as:
-	 (source.rgb ×  1               ) + (destination.rgb × 1)
-	 (source.a   × (1-destination.a)) + (destination.a   × 1).
+	 (source.rgba Ã— 1) + (destination.rgba Ã— 1).
 
-	 @param[in]		device
+	 @param[in,out]	device
 					A reference to the device.
 	 @param[out]	state
 					A pointer to a pointer to the blend state.
@@ -267,15 +264,14 @@ namespace mage::rendering {
 	[[nodiscard]]
 	HRESULT CreateAdditiveBlendState(
 		ID3D11Device& device, NotNull< ID3D11BlendState** > state) noexcept;
-	
+
 	/**
 	 Creates a multiplicative blend state.
 
 	 The blend formula is defined as:
-	 (source.rgb ×  0               ) + (destination.rgb × source.rgb)
-	 (source.a   × (1-destination.a)) + (destination.a   × 1         ).
+	 (source.rgba Ã— 0) + (destination.rgba Ã— source.rgba).
 
-	 @param[in]		device
+	 @param[in,out]	device
 					A reference to the device.
 	 @param[out]	state
 					A pointer to a pointer to the blend state.
@@ -289,10 +285,9 @@ namespace mage::rendering {
 	 Creates a bi-multiplicative blend state.
 
 	 The blend formula is defined as:
-	 (source.rgb ×  destination.rgb ) + (destination.rgb × source.rgb)
-	 (source.a   × (1-destination.a)) + (destination.a   × 1         ).
+	 (source.rgba Ã— destination.rgba ) + (destination.rgba Ã— source.rgba).
 
-	 @param[in]		device
+	 @param[in,out]	device
 					A reference to the device.
 	 @param[out]	state
 					A pointer to a pointer to the blend state.
@@ -306,13 +301,11 @@ namespace mage::rendering {
 	 Creates an transparency blend state.
 
 	 The blend formula for the first RTV is defined as:
-	 (source.rgb ×  1               ) + (destination.rgb × 1)
-	 (source.a   × (1-destination.a)) + (destination.a   × 1).
+	 (source.rgba Ã— source.a) + (destination.rgba Ã— (1-source.a)).
 	 The blend formula (i.e. no blending) for the remaining RTVs is defined as:
-	 (source.rgb × 1) + (destination.rgb × 0) = source.rgb
-	 (source.a   × 1) + (destination.a   × 0) = source.a.
+	 (source.rgba Ã— 1       ) + (destination.rgba Ã— 0           ) = source.rgba.
 
-	 @param[in]		device
+	 @param[in,out]	device
 					A reference to the device.
 	 @param[out]	state
 					A pointer to a pointer to the blend state.
@@ -325,7 +318,7 @@ namespace mage::rendering {
 	/**
 	 Creates a alpha-to-coverage blend state.
 
-	 @param[in]		device
+	 @param[in,out]	device
 					A reference to the device.
 	 @param[out]	state
 					A pointer to a pointer to the blend state.
@@ -345,7 +338,7 @@ namespace mage::rendering {
 	/**
 	 Creates a no-read-no-write depth stencil state.
 
-	 @param[in]		device
+	 @param[in,out]	device
 					A reference to the device.
 	 @param[out]	state
 					A pointer to a pointer to the depth stencil state.
@@ -354,11 +347,11 @@ namespace mage::rendering {
 	[[nodiscard]]
 	HRESULT CreateDepthNoneDepthStencilState(
 		ID3D11Device& device, NotNull< ID3D11DepthStencilState** > state) noexcept;
-	
+
 	/**
 	 Creates a read-write depth stencil state.
 
-	 @param[in]		device
+	 @param[in,out]	device
 					A reference to the device.
 	 @param[out]	state
 					A pointer to a pointer to the depth stencil state.
@@ -370,11 +363,11 @@ namespace mage::rendering {
 	HRESULT CreateDepthReadWriteDepthStencilState(
 		ID3D11Device& device, NotNull< ID3D11DepthStencilState** > state,
 		D3D11_COMPARISON_FUNC func) noexcept;
-	
+
 	/**
 	 Creates a read-only depth stencil state.
 
-	 @param[in]		device
+	 @param[in,out]	device
 					A reference to the device.
 	 @param[out]	state
 					A pointer to a pointer to the depth stencil state.
@@ -384,7 +377,7 @@ namespace mage::rendering {
 	 */
 	[[nodiscard]]
 	HRESULT CreateDepthReadDepthStencilState(
-		ID3D11Device& device, NotNull< ID3D11DepthStencilState** > state, 
+		ID3D11Device& device, NotNull< ID3D11DepthStencilState** > state,
 		D3D11_COMPARISON_FUNC func) noexcept;
 
 	#pragma endregion
@@ -397,7 +390,7 @@ namespace mage::rendering {
 	/**
 	 Creates a rasterizer state.
 
-	 @param[in]		device
+	 @param[in,out]	device
 					A reference to the device.
 	 @param[out]	state
 					A pointer to a pointer to the rasterizer state.
@@ -414,18 +407,18 @@ namespace mage::rendering {
 	 @return		A success/error value.
 	 */
 	[[nodiscard]]
-	HRESULT CreateRasterizerState(ID3D11Device& device, 
+	HRESULT CreateRasterizerState(ID3D11Device& device,
 								  NotNull< ID3D11RasterizerState** > state,
-								  D3D11_CULL_MODE cull_mode, 
-								  D3D11_FILL_MODE fill_mode, 
+								  D3D11_CULL_MODE cull_mode,
+								  D3D11_FILL_MODE fill_mode,
 								  S32 depth_bias = 0,
-								  F32 slope_scaled_depth_bias = 0.0f, 
+								  F32 slope_scaled_depth_bias = 0.0f,
 								  F32 depth_bias_clamp = 0.0f) noexcept;
-	
+
 	/**
 	 Creates a no-culling (solid) rasterizer state.
 
-	 @param[in]		device
+	 @param[in,out]	device
 					A reference to the device.
 	 @param[out]	state
 					A pointer to a pointer to the rasterizer state.
@@ -444,11 +437,11 @@ namespace mage::rendering {
 		S32 depth_bias = 0,
 		F32 slope_scaled_depth_bias = 0.0f,
 		F32 depth_bias_clamp = 0.0f) noexcept;
-	
+
 	/**
 	 Creates a clockwise-culling (solid) rasterizer state.
 
-	 @param[in]		device
+	 @param[in,out]	device
 					A reference to the device.
 	 @param[out]	state
 					A pointer to a pointer to the rasterizer state.
@@ -467,11 +460,11 @@ namespace mage::rendering {
 		S32 depth_bias = 0,
 		F32 slope_scaled_depth_bias = 0.0f,
 		F32 depth_bias_clamp = 0.0f) noexcept;
-	
+
 	/**
 	 Creates a counter-clockwise-culling (solid) rasterizer state.
 
-	 @param[in]		device
+	 @param[in,out]	device
 					A reference to the device.
 	 @param[out]	state
 					A pointer to a pointer to the rasterizer state.
@@ -485,16 +478,16 @@ namespace mage::rendering {
 	 */
 	[[nodiscard]]
 	HRESULT CreateCullCounterClockwiseRasterizerState(
-		ID3D11Device& device, 
-		NotNull< ID3D11RasterizerState** > state, 
-		S32 depth_bias = 0, 
-		F32 slope_scaled_depth_bias = 0.0f, 
+		ID3D11Device& device,
+		NotNull< ID3D11RasterizerState** > state,
+		S32 depth_bias = 0,
+		F32 slope_scaled_depth_bias = 0.0f,
 		F32 depth_bias_clamp = 0.0f) noexcept;
-	
+
 	/**
 	 Creates a wireframe rasterizer state.
 
-	 @param[in]		device
+	 @param[in,out]	device
 					A reference to the device.
 	 @param[out]	state
 					A pointer to a pointer to the rasterizer state.
@@ -524,27 +517,27 @@ namespace mage::rendering {
 	/**
 	 Creates a sampling state.
 
-	 @param[in]		device
+	 @param[in,out]	device
 					A reference to the device.
 	 @param[out]	state
 					A pointer to a pointer to the sampler state.
 	 @param[in]		filter
 					The filtering options during texture sampling.
 	 @param[in]		address_mode
-					The resolving of texture coordinates that are outside of 
+					The resolving of texture coordinates that are outside of
 					the boundaries of a texture.
 	 @return		A success/error value.
 	 */
 	[[nodiscard]]
-	HRESULT CreateSamplerState(ID3D11Device& device, 
+	HRESULT CreateSamplerState(ID3D11Device& device,
 							   NotNull< ID3D11SamplerState** > state,
-							   D3D11_FILTER filter, 
+							   D3D11_FILTER filter,
 							   D3D11_TEXTURE_ADDRESS_MODE address_mode) noexcept;
-	
+
 	/**
 	 Creates a point sampling state with wrapping.
 
-	 @param[in]		device
+	 @param[in,out]	device
 					A reference to the device.
 	 @param[out]	state
 					A pointer to a pointer to the sampler state.
@@ -553,11 +546,11 @@ namespace mage::rendering {
 	[[nodiscard]]
 	HRESULT CreatePointWrapSamplerState(
 		ID3D11Device& device, NotNull< ID3D11SamplerState** > state) noexcept;
-	
+
 	/**
 	Creates a point sampling state with clamping.
 
-	@param[in]		device
+	@param[in,out]	device
 					A reference to the device.
 	@param[out]		state
 					A pointer to a pointer to the sampler state.
@@ -570,7 +563,7 @@ namespace mage::rendering {
 	/**
 	Creates a point sampling state with mirroring.
 
-	@param[in]		device
+	@param[in,out]	device
 					A reference to the device.
 	@param[out]		state
 					A pointer to a pointer to the sampler state.
@@ -579,11 +572,11 @@ namespace mage::rendering {
 	[[nodiscard]]
 	HRESULT CreatePointMirrorSamplerState(
 		ID3D11Device& device, NotNull< ID3D11SamplerState** > state) noexcept;
-	
+
 	/**
 	 Creates a linear sampling state with wrapping.
 
-	 @param[in]		device
+	 @param[in,out]	device
 					A reference to the device.
 	 @param[out]	state
 					A pointer to a pointer to the sampler state.
@@ -592,11 +585,11 @@ namespace mage::rendering {
 	[[nodiscard]]
 	HRESULT CreateLinearWrapSamplerState(
 		ID3D11Device& device, NotNull< ID3D11SamplerState** > state) noexcept;
-	
+
 	/**
 	 Creates a linear sampling state with clamping.
 
-	 @param[in]		device
+	 @param[in,out]	device
 					A reference to the device.
 	 @param[out]	state
 					A pointer to a pointer to the sampler state.
@@ -609,7 +602,7 @@ namespace mage::rendering {
 	/**
 	 Creates a linear sampling state with mirroring.
 
-	 @param[in]		device
+	 @param[in,out]	device
 					A reference to the device.
 	 @param[out]	state
 					A pointer to a pointer to the sampler state.
@@ -618,11 +611,11 @@ namespace mage::rendering {
 	[[nodiscard]]
 	HRESULT CreateLinearMirrorSamplerState(
 		ID3D11Device& device, NotNull< ID3D11SamplerState** > state) noexcept;
-	
+
 	/**
 	 Creates an anisotropic sampling state with wrapping.
 
-	 @param[in]		device
+	 @param[in,out]	device
 					A reference to the device.
 	 @param[out]	state
 					A pointer to a pointer to the sampler state.
@@ -635,7 +628,7 @@ namespace mage::rendering {
 	/**
 	 Creates an anisotropic sampling state with clamping.
 
-	 @param[in]		device
+	 @param[in,out]	device
 					A reference to the device.
 	 @param[out]	state
 					A pointer to a pointer to the sampler state.
@@ -648,7 +641,7 @@ namespace mage::rendering {
 	/**
 	 Creates an anisotropic sampling state with mirroring.
 
-	 @param[in]		device
+	 @param[in,out]	device
 					A reference to the device.
 	 @param[out]	state
 					A pointer to a pointer to the sampler state.
@@ -661,7 +654,7 @@ namespace mage::rendering {
 	/**
 	 Creates a PCF sampling state.
 
-	 @param[in]		device
+	 @param[in,out]	device
 					A reference to the device.
 	 @param[out]	state
 					A pointer to a pointer to the sampler state.

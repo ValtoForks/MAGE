@@ -18,7 +18,7 @@ namespace mage::rendering::loader {
 	/**
 	 A class of MTL file readers for reading materials.
 	 */
-	class MTLReader final : private LineReader {
+	class MTLReader : private LineReader {
 
 	public:
 
@@ -28,14 +28,14 @@ namespace mage::rendering::loader {
 
 		/**
 		 Constructs a MTL reader.
-		 
-		 @param[in]		resource_manager
+
+		 @param[in,out]	resource_manager
 						A reference to the resource manager.
-		 @param[in]		material_buffer
-						A reference to a vector for storing the read materials 
+		 @param[in,out]	material_buffer
+						A reference to a vector for storing the read materials
 						from file.
 		 */
-		explicit MTLReader(ResourceManager& resource_manager, 
+		explicit MTLReader(ResourceManager& resource_manager,
 						   std::vector< Material >& material_buffer);
 
 		/**
@@ -68,7 +68,7 @@ namespace mage::rendering::loader {
 
 		 @param[in]		reader
 						A reference to a MTL reader to copy.
-		 @return		A reference to the copy of the given MTL reader (i.e. 
+		 @return		A reference to the copy of the given MTL reader (i.e.
 						this MTL reader).
 		 */
 		MTLReader& operator=(const MTLReader& reader) = delete;
@@ -78,7 +78,7 @@ namespace mage::rendering::loader {
 
 		 @param[in]		reader
 						A reference to a MTL reader to move.
-		 @return		A reference to the moved MTL reader (i.e. this MTL 
+		 @return		A reference to the moved MTL reader (i.e. this MTL
 						reader).
 		 */
 		MTLReader& operator=(MTLReader&& reader) = delete;
@@ -91,10 +91,6 @@ namespace mage::rendering::loader {
 
 		using LineReader::ReadFromMemory;
 
-		using LineReader::GetFilename;
-
-		using LineReader::GetDelimiters;
-
 	private:
 
 		//---------------------------------------------------------------------
@@ -102,14 +98,12 @@ namespace mage::rendering::loader {
 		//---------------------------------------------------------------------
 
 		/**
-		 Reads the given line.
+		 Reads the current line of this MTL reader.
 
-		 @param[in,out] line
-						A pointer to the null-terminated string to read.
 		 @throws		Exception
-						Failed to read the given line.
+						Failed to the current line of this MTL reader.
 		 */
-		virtual void ReadLine(NotNull< zstring > line) override;
+		virtual void ReadLine() override;
 
 		/**
 		 Reads a Material Name definition.
@@ -144,6 +138,14 @@ namespace mage::rendering::loader {
 		void ReadMTLMetalness();
 
 		/**
+		 Reads a Radiance definition.
+
+		 @throws		Exception
+						Failed to read a Radiance definition.
+		 */
+		void ReadMTLRadiance();
+
+		/**
 		 Reads a Base Color Texture definition.
 
 		 @throws		Exception
@@ -170,7 +172,7 @@ namespace mage::rendering::loader {
 		/**
 		 Reads an sRGB spectrum.
 
-		 @return		The sRGB spectrum represented by the next token of 
+		 @return		The sRGB spectrum represented by the next token of
 						this MTL reader.
 		 @throws		Exception
 						Failed to read a sRGB spectrum.
@@ -181,7 +183,7 @@ namespace mage::rendering::loader {
 		/**
 		 Reads an sRGBA spectrum.
 
-		 @return		The sRGBA spectrum represented by the next token of 
+		 @return		The sRGBA spectrum represented by the next token of
 						this MTL reader.
 		 @throws		Exception
 						Failed to read a sRGBA spectrum.
@@ -210,7 +212,7 @@ namespace mage::rendering::loader {
 		ResourceManager& m_resource_manager;
 
 		/**
-		 A reference to a vector containing the read materials of this MTL 
+		 A reference to a vector containing the read materials of this MTL
 		 reader.
 		 */
 		std::vector< Material >& m_material_buffer;

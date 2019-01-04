@@ -44,7 +44,7 @@ namespace mage::rendering {
 		/**
 		 Constructs a primitive batch mesh.
 
-		 @param[in]		device
+		 @param[in,out]	device
 						A reference to the device.
 		 @param[in]		nb_vertices
 						The number of vertices.
@@ -53,16 +53,16 @@ namespace mage::rendering {
 		 @param[in]		primitive_topology
 						The primitive topology.
 		 @throws		Exception
-						Failed to setup the vertex buffer of the primitive batch 
+						Failed to setup the vertex buffer of the primitive batch
 						mesh.
 		 @throws		Exception
-						Failed to setup the index buffer of the primitive batch 
+						Failed to setup the index buffer of the primitive batch
 						mesh.
 		 */
-		explicit PrimitiveBatchMesh(ID3D11Device& device, 
-			                        size_t nb_vertices,
+		explicit PrimitiveBatchMesh(ID3D11Device& device,
+									std::size_t nb_vertices,
 			                        const std::vector< IndexT >& indices,
-			                        D3D11_PRIMITIVE_TOPOLOGY primitive_topology 
+			                        D3D11_PRIMITIVE_TOPOLOGY primitive_topology
 			                        = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 		/**
@@ -74,7 +74,7 @@ namespace mage::rendering {
 		PrimitiveBatchMesh(const PrimitiveBatchMesh& mesh) = delete;
 
 		/**
-		 Constructs a primitive batch mesh by moving the given primitive batch 
+		 Constructs a primitive batch mesh by moving the given primitive batch
 		 mesh.
 
 		 @param[in]		mesh
@@ -96,7 +96,7 @@ namespace mage::rendering {
 
 		 @param[in]		mesh
 						A reference to the primitive batch mesh to copy.
-		 @return		A reference to the copy of the given primitive batch 
+		 @return		A reference to the copy of the given primitive batch
 						mesh (i.e. this primitive batch mesh).
 		 */
 		PrimitiveBatchMesh& operator=(const PrimitiveBatchMesh& mesh) = delete;
@@ -106,7 +106,7 @@ namespace mage::rendering {
 
 		 @param[in]		mesh
 						A reference to the primitive batch mesh to move.
-		 @return		A reference to the moved primitive batch mesh (i.e. 
+		 @return		A reference to the moved primitive batch mesh (i.e.
 						this primitive batch mesh).
 		 */
 		PrimitiveBatchMesh& operator=(PrimitiveBatchMesh&& mesh) noexcept;
@@ -118,24 +118,24 @@ namespace mage::rendering {
 		/**
 		 Locks the vertex buffer of this primitive batch mesh.
 
-		 @param[in]		device_context
+		 @param[in,out]	device_context
 						A reference to the device context.
 		 @param[in]		map_type
-						The map type specifying the CPU's read and write 
-						permissions for the vertex buffer of this primitive 
+						The map type specifying the CPU's read and write
+						permissions for the vertex buffer of this primitive
 						batch mesh.
-		 @param[out]	mapped_buffer
-						A reference to map the vertex buffer of this primitive 
+		 @param[in,out]	mapped_buffer
+						A reference to map the vertex buffer of this primitive
 						batch mesh to.
 		 @throws		Exception
-						Failed to map the vertex buffer of this primitive batch 
+						Failed to map the vertex buffer of this primitive batch
 						mesh.
 		 */
-		BufferLock Lock(ID3D11DeviceContext& device_context,
-			            D3D11_MAP map_type,
-			            D3D11_MAPPED_SUBRESOURCE& mapped_buffer) {
+		const BufferLock Lock(ID3D11DeviceContext& device_context,
+							  D3D11_MAP map_type,
+							  D3D11_MAPPED_SUBRESOURCE& mapped_buffer) {
 
-			return BufferLock(device_context, *m_vertex_buffer.Get(), 
+			return BufferLock(device_context, *m_vertex_buffer.Get(),
 				              map_type, mapped_buffer);
 		}
 
@@ -148,28 +148,28 @@ namespace mage::rendering {
 		/**
 		 Sets up the vertex buffer of this primitive batch mesh.
 
-		 @param[in]		device
+		 @param[in,out]	device
 						A reference to the device.
 		 @param[in]		nb_vertices
 						The number of vertices.
 		 @throws		Exception
-						Failed to setup the vertex buffer of this primitive 
+						Failed to setup the vertex buffer of this primitive
 						batch mesh.
 		 */
-		void SetupVertexBuffer(ID3D11Device& device, size_t nb_vertices);
+		void SetupVertexBuffer(ID3D11Device& device, std::size_t nb_vertices);
 
 		/**
 		 Sets up the index buffer of this primitive batch mesh.
 
-		 @param[in]		device
+		 @param[in,out]	device
 						A reference to the device.
 		 @param[in]		indices
 						A reference to the vector containing the indices.
 		 @throws		Exception
-						Failed to setup the index buffer of this primitive 
+						Failed to setup the index buffer of this primitive
 						batch mesh.
 		 */
-		void SetupIndexBuffer(ID3D11Device& device, 
+		void SetupIndexBuffer(ID3D11Device& device,
 			                  const std::vector< IndexT >& indices);
 	};
 }

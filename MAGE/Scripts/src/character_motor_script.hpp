@@ -14,14 +14,14 @@
 //-----------------------------------------------------------------------------
 namespace mage::script {
 
-	class CharacterMotorScript final : public BehaviorScript {
+	class CharacterMotorScript : public BehaviorScript {
 
 	public:
 
 		//---------------------------------------------------------------------
 		// Constructors and Destructors
 		//---------------------------------------------------------------------
-		
+
 		CharacterMotorScript();
 		CharacterMotorScript(const CharacterMotorScript& script) noexcept;
 		CharacterMotorScript(CharacterMotorScript&& script) noexcept;
@@ -41,9 +41,7 @@ namespace mage::script {
 		//---------------------------------------------------------------------
 
 		virtual void Load([[maybe_unused]] Engine& engine) override;
-		
-		virtual void Update([[maybe_unused]] Engine& engine, 
-							[[maybe_unused]] F64 delta_time) override;
+		virtual void Update([[maybe_unused]] Engine& engine) override;
 
 		[[nodiscard]]
 		F32 GetVelocity() const noexcept {

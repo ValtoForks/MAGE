@@ -14,13 +14,10 @@
 //-----------------------------------------------------------------------------
 namespace mage::rendering {
 
-	#pragma warning( push )
-	#pragma warning( disable : 4201 ) // Anonymous struct.
-
 	/**
 	 A struct of glyphs.
 	 */
-	struct Glyph final {
+	struct Glyph {
 
 	public:
 
@@ -63,7 +60,7 @@ namespace mage::rendering {
 
 		 @param[in]		glyph
 						A reference to the glyph to copy.
-		 @return		A reference to copy of the given glyph (i.e. this 
+		 @return		A reference to copy of the given glyph (i.e. this
 						glyph).
 		 */
 		Glyph& operator=(const Glyph& glyph) noexcept = default;
@@ -102,12 +99,12 @@ namespace mage::rendering {
 		}
 
 		/**
-		 Checks whether this glyph's character is smaller than the given 
+		 Checks whether this glyph's character is smaller than the given
 		 glyph's character.
 
 		 @param[in]		rhs
 						A reference to the glyph to compare against.
-		 @return		@c true if the this glyph's character is smaller than 
+		 @return		@c true if the this glyph's character is smaller than
 						the given glyph's character. @c false otherwise.
 		 */
 		[[nodiscard]]
@@ -116,12 +113,12 @@ namespace mage::rendering {
 		}
 
 		/**
-		 Checks whether this glyph's character is smaller than the given 
+		 Checks whether this glyph's character is smaller than the given
 		 character.
 
 		 @param[in]		rhs
 						The character to compare against.
-		 @return		@c true if the this glyph's character is smaller than 
+		 @return		@c true if the this glyph's character is smaller than
 						the given character. @c false otherwise.
 		 */
 		[[nodiscard]]
@@ -142,32 +139,15 @@ namespace mage::rendering {
 		 The subrectangle of this glyph.
 		 */
 		RECT m_sub_rectangle;
-		
-		union {
-			struct {
 
-				/**
-				 The offset of this glyph from the left.
-				 */
-				F32 m_offset_x;
-
-				/**
-				 The offset of this glyph from the top.
-				 */
-				F32 m_offset_y;
-			};
-
-			/**
-			 The offsets of this glyph.
-			 */
-			F32 m_offsets[2];
-		};
+		/**
+		 The offset of this glyph [from the left, from the top].
+		 */
+		F32x2 m_offset;
 
 		/**
 		 The offset of this glyph to the right.
 		 */
 		F32 m_advance_x;
 	};
-
-	#pragma warning( pop )
 }

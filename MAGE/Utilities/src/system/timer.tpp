@@ -9,8 +9,8 @@ namespace mage {
 	Timer< ClockT >::Timer() noexcept
 		: m_clock(),
 		m_last_timestamp(TimeStamp::min()),
-		m_delta_time(TimeInterval::min()),
-		m_total_delta_time(TimeInterval::min()),
+		m_delta_time(TimeInterval::zero()),
+		m_total_delta_time(TimeInterval::zero()),
 		m_running(false) {}
 
 	template< typename ClockT >
@@ -50,37 +50,49 @@ namespace mage {
 	}
 
 	template< typename ClockT >
-	inline F64 Timer< ClockT >::GetDeltaTime() const noexcept {
+	inline TimeIntervalSeconds Timer< ClockT >::GetDeltaTime() noexcept {
 		if (m_running) {
 			UpdateDeltaTime();
 		}
 
-		using Seconds = std::chrono::duration< F64 >;
-		return std::chrono::duration_cast< Seconds >(m_delta_time).count();
+		return std::chrono::duration_cast< TimeIntervalSeconds >(m_delta_time);
 	}
 
 	template< typename ClockT >
-	inline F64 Timer< ClockT >::GetTotalDeltaTime() const noexcept {
+	inline TimeIntervalSeconds Timer< ClockT >::GetTotalDeltaTime() noexcept {
 		if (m_running) {
 			UpdateDeltaTime();
 		}
 
-		using Seconds = std::chrono::duration< F64 >;
-		return std::chrono::duration_cast< Seconds >(m_total_delta_time).count();
+		return std::chrono::duration_cast< TimeIntervalSeconds >(m_total_delta_time);
 	}
 
 	template< typename ClockT >
-	inline void Timer< ClockT >::ResetDeltaTime() const noexcept {
+	inline const std::pair< TimeIntervalSeconds, TimeIntervalSeconds >
+		Timer< ClockT >::GetTime() noexcept {
+
+		if (m_running) {
+			UpdateDeltaTime();
+		}
+
+		return {
+			std::chrono::duration_cast< TimeIntervalSeconds >(m_delta_time),
+			std::chrono::duration_cast< TimeIntervalSeconds >(m_total_delta_time)
+		};
+	}
+
+	template< typename ClockT >
+	inline void Timer< ClockT >::ResetDeltaTime() noexcept {
 		// Resets the delta time of this timer.
-		m_delta_time       = TimeInterval::min();
+		m_delta_time       = TimeInterval::zero();
 		// Resets the total delta time of this timer.
-		m_total_delta_time = TimeInterval::min();
+		m_total_delta_time = TimeInterval::zero();
 		// Resets the last timestamp of this timer.
 		m_last_timestamp   = m_clock.now();
 	}
 
 	template< typename ClockT >
-	inline void Timer< ClockT >::UpdateDeltaTime() const noexcept {
+	inline void Timer< ClockT >::UpdateDeltaTime() noexcept {
 		// Get the current timestamp of this timer.
 		const auto current_timestamp = m_clock.now();
 

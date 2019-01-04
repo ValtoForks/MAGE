@@ -29,7 +29,7 @@ namespace mage::rendering::loader {
 					The index type.
 	 */
 	template< typename VertexT, typename IndexT >
-	class MDLReader final : private LineReader {
+	class MDLReader : private LineReader {
 
 	public:
 
@@ -40,15 +40,15 @@ namespace mage::rendering::loader {
 		/**
 		 Constructs a MDL reader.
 
-		 @param[in]		resource_manager
+		 @param[in,out]	resource_manager
 						A reference to the resource manager.
-		 @param[in]		model_output
-						A reference to the model output for storing the model 
+		 @param[in,out]	model_output
+						A reference to the model output for storing the model
 						data from file.
 		 */
-		explicit MDLReader(ResourceManager& resource_manager, 
+		explicit MDLReader(ResourceManager& resource_manager,
 						   ModelOutput< VertexT, IndexT >& model_output);
-		
+
 		/**
 		 Constructs a MDL reader from the given MDL reader.
 
@@ -79,7 +79,7 @@ namespace mage::rendering::loader {
 
 		 @param[in]		reader
 						A reference to a MDL reader to copy.
-		 @return		A reference to the copy of the given MDL reader (i.e. 
+		 @return		A reference to the copy of the given MDL reader (i.e.
 						this MDL reader).
 		 */
 		MDLReader& operator=(const MDLReader& reader) = delete;
@@ -89,7 +89,7 @@ namespace mage::rendering::loader {
 
 		 @param[in]		reader
 						A reference to a MDL reader to move.
-		 @return		A reference to the moved MDL reader (i.e. this MDL 
+		 @return		A reference to the moved MDL reader (i.e. this MDL
 						reader).
 		 */
 		MDLReader& operator=(MDLReader&& reader) = delete;
@@ -101,10 +101,6 @@ namespace mage::rendering::loader {
 		using LineReader::ReadFromFile;
 
 		using LineReader::ReadFromMemory;
-
-		using LineReader::GetFilename;
-
-		using LineReader::GetDelimiters;
 
 	private:
 
@@ -121,25 +117,20 @@ namespace mage::rendering::loader {
 		virtual void Preprocess() override;
 
 		/**
-		 Reads the given line.
+		 Reads the current line of this MDL reader.
 
-		 @param[in,out] line
-						A pointer to the null-terminated string to read.
 		 @throws		Exception
-						Failed to read the given line.
+						Failed to the current line of this MDL reader.
 		 */
-		virtual void ReadLine(NotNull< zstring > line) override;
+		virtual void ReadLine() override;
 
 		/**
-		 Reads the Mesh definition and imports the mesh corresponding to the 
-		 model.
+		 Post-processes after reading the current file of this MDL reader.
 
 		 @throws		Exception
-						Failed to read the Mesh definition.
-		 @throws		Exception
-						Failed to import the mesh.
+						Failed to finish post-processing successfully.
 		 */
-		void ImportMesh();
+		virtual void Postprocess() override;
 
 		/**
 		 Reads a Submodel definition.
@@ -150,7 +141,7 @@ namespace mage::rendering::loader {
 		void ReadMDLSubModel();
 
 		/**
-		 Reads a Material Library definition and imports the materials 
+		 Reads a Material Library definition and imports the materials
 		 corresponding to the model.
 
 		 @throws		Exception
@@ -170,7 +161,7 @@ namespace mage::rendering::loader {
 		ResourceManager& m_resource_manager;
 
 		/**
-		 A reference to the model output containing the model data of this MDL 
+		 A reference to the model output containing the model data of this MDL
 		 reader.
 		 */
 		ModelOutput< VertexT, IndexT >& m_model_output;

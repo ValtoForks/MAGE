@@ -27,7 +27,7 @@ namespace mage::rendering {
 					A reference to the (texture) shader resource view.
 	 @return		The size [width, height] of the given 2D texture.
 	 @throws		Exception
-					The resource of the given shader resource view must be 
+					The resource of the given shader resource view must be
 					convertible to a @c ID3D11Texture2D.
 	 */
 	[[nodiscard]]
@@ -64,19 +64,19 @@ namespace mage::rendering {
 		/**
 		 Constructs a texture.
 
-		 @param[in]		device
+		 @param[in,out]	device
 						A reference to the device.
 		 @param[in]		fname
 						The filename (the globally unique identifier).
 		 @throws		Exception
 						Failed to construct the texture.
 		 */
-		explicit Texture(ID3D11Device& device, wstring fname);
+		explicit Texture(ID3D11Device& device, std::wstring fname);
 
 		/**
 		 Constructs a 2D texture.
 
-		 @param[in]		device
+		 @param[in,out]	device
 						A reference to the device.
 		 @param[in]		guid
 						The globally unique identifier.
@@ -88,7 +88,7 @@ namespace mage::rendering {
 						Failed to construct the texture.
 		 */
 		explicit Texture(ID3D11Device& device,
-						 wstring guid, 
+						 std::wstring guid,
 			             const D3D11_TEXTURE2D_DESC& desc,
 			             const D3D11_SUBRESOURCE_DATA& initial_data);
 
@@ -115,14 +115,14 @@ namespace mage::rendering {
 
 		//---------------------------------------------------------------------
 		// Assignment Operators
-		//---------------------------------------------------------------------	
+		//---------------------------------------------------------------------
 
 		/**
 		 Copies the given texture to this texture.
 
 		 @param[in]		texture
 						A reference to the texture to copy.
-		 @return		A reference to the copy of the given texture (i.e. this 
+		 @return		A reference to the copy of the given texture (i.e. this
 						texture).
 		 */
 		Texture& operator=(const Texture& texture) = delete;
@@ -149,18 +149,18 @@ namespace mage::rendering {
 		ID3D11ShaderResourceView* Get() const noexcept {
 			return m_texture_srv.Get();
 		}
-		
+
 		/**
 		 Binds this texture.
 
 		 @pre			@a slot < @c D3D11_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT.
 		 @tparam		PipelineStageT
 						The pipeline stage type.
-		 @param[in]		device_context
+		 @param[in,out]	device_context
 						A reference to the device context.
 		 @param[in]		slot
-						The index into the device's zero-based array to set 
-						the shader resource view to (ranges from 0 to 
+						The index into the device's zero-based array to set
+						the shader resource view to (ranges from 0 to
 						@c D3D11_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT - 1).
 		 */
 		template< typename PipelineStageT >

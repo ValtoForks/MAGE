@@ -6,11 +6,26 @@
 //-----------------------------------------------------------------------------
 // Defines			                        | Default
 //-----------------------------------------------------------------------------
+// AA_INVERSE_TONE_MAP_FUNCTION             | InverseToneMap_Max3
+// AA_TONE_MAP_FUNCTION                     | ToneMap_Max3
 // TONE_MAP_FUNCTION                        | ToneMap_Uncharted
+
+//-----------------------------------------------------------------------------
+// Engine Includes
+//-----------------------------------------------------------------------------
+#include "math.hlsli"
 
 //-----------------------------------------------------------------------------
 // Engine Defines
 //-----------------------------------------------------------------------------
+
+#ifndef AA_TONE_MAP_FUNCTION
+	#define AA_TONE_MAP_FUNCTION ToneMap_Max3
+#endif // AA_TONE_MAP_FUNCTION
+
+#ifndef AA_INVERSE_TONE_MAP_FUNCTION
+	#define AA_INVERSE_TONE_MAP_FUNCTION InverseToneMap_Max3
+#endif // AA_INVERSE_TONE_MAP_FUNCTION
 
 #ifndef TONE_MAP_FUNCTION
 	#define TONE_MAP_FUNCTION ToneMap_Uncharted
@@ -28,7 +43,8 @@
  @return		The luminance of the given RGB color.
  */
 float Luminance(float3 rgb) {
-	return max(dot(rgb, float3(0.212671f, 0.715160f, 0.072169f)), 0.0001f);
+	static const float3 rgb_to_y = { 0.212671f, 0.715160f, 0.072169f };
+	return dot(rgb, rgb_to_y);
 }
 
 //-----------------------------------------------------------------------------
@@ -42,7 +58,7 @@ float3 ToneMap_ACESFilmic(float3 hdr) {
 	static const float d = 0.59f;
 	static const float e = 0.14f;
 
-	return (hdr * (a * hdr + b)) 
+	return (hdr * (a * hdr + b))
 		 / (hdr * (c * hdr + d) + e);
 }
 
@@ -118,4 +134,4 @@ float4 ToneMap_Uncharted(float4 hdr) {
 	return float4(ToneMap_Uncharted(hdr.xyz), hdr.w);
 }
 
-#endif //MAGE_HEADER_TONE_MAPPING
+#endif // MAGE_HEADER_TONE_MAPPING

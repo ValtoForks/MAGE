@@ -6,7 +6,7 @@
 #pragma region
 
 #include "direct3d11.hpp"
-#include "transform\sprite_transform.hpp"
+#include "transform\transform.hpp"
 
 #pragma endregion
 
@@ -57,9 +57,9 @@ namespace mage::rendering {
 		Deferred,	 // Deferred, FIFO order of the sprites.
 		Immediate,   // Immediate, FIFO order of the sprites.
 		Texture,     // Deferred sorting based on the texture of the sprites.
-		BackToFront, // Deferred, back-to-front sorting based on the depth 
+		BackToFront, // Deferred, back-to-front sorting based on the depth
 		             // value of the sprites.
-		FrontToBack	 // Deferred, front-to-back sorting based on the depth 
+		FrontToBack	 // Deferred, front-to-back sorting based on the depth
 		             // value of the sprites.
 	};
 
@@ -73,7 +73,7 @@ namespace mage::rendering {
 	/**
 	 A class of sprite batches.
 	 */
-	class SpriteBatch final {
+	class SpriteBatch {
 
 	public:
 
@@ -84,9 +84,9 @@ namespace mage::rendering {
 		/**
 		 Constructs a sprite batch.
 
-		 @param[in]		device
+		 @param[in,out]	device
 						A reference to the device.
-		 @param[in]		device_context
+		 @param[in,out]	device_context
 						A reference to the device context.
 		 */
 		SpriteBatch(ID3D11Device& device, ID3D11DeviceContext& device_context);
@@ -106,7 +106,7 @@ namespace mage::rendering {
 						A reference to the sprite batch to move.
 		 */
 		SpriteBatch(SpriteBatch&& sprite_batch) noexcept;
-		
+
 		/**
 		 Destructs this sprite batch.
 		 */
@@ -121,7 +121,7 @@ namespace mage::rendering {
 
 		 @param[in]		sprite_batch
 						A reference to the sprite batch to copy.
-		 @return		A reference to the copy of the given sprite batch (i.e. 
+		 @return		A reference to the copy of the given sprite batch (i.e.
 						this sprite batch).
 		 */
 		SpriteBatch& operator=(const SpriteBatch& sprite_batch) = delete;
@@ -131,7 +131,7 @@ namespace mage::rendering {
 
 		 @param[in]		sprite_batch
 						A reference to the sprite batch to move.
-		 @return		A reference to the moved sprite batch (i.e. this sprite 
+		 @return		A reference to the moved sprite batch (i.e. this sprite
 						batch).
 		 */
 		SpriteBatch& operator=(SpriteBatch&& sprite_batch) noexcept;
@@ -145,17 +145,17 @@ namespace mage::rendering {
 
 		 @pre			This sprite batch is not inside a begin/end pair.
 		 @param[in]		sort_mode
-						A reference to the sprite sorting mode for the whole 
+						A reference to the sprite sorting mode for the whole
 						batch of sprites.
 		 */
 		void Begin(SpriteSortMode sort_mode = SpriteSortMode::Deferred);
-		
+
 		/**
 		 Draws a sprite.
 
 		 @pre			This sprite batch is inside a begin/end pair.
 		 @param[in]		texture
-						A pointer to the shader resource view of the texture to 
+						A pointer to the shader resource view of the texture to
 						draw.
 		 @param[in]		color
 						The (linear) RGBA color.
@@ -166,12 +166,12 @@ namespace mage::rendering {
 		 @param[in]		source
 						A pointer the rectangular subregion of the texture.
 		 */
-		void XM_CALLCONV Draw(ID3D11ShaderResourceView* texture, 
-			                  FXMVECTOR color, 
-			                  SpriteEffect effects, 
-			                  const SpriteTransform& transform, 
+		void XM_CALLCONV Draw(ID3D11ShaderResourceView* texture,
+			                  FXMVECTOR color,
+			                  SpriteEffect effects,
+			                  const SpriteTransform2D& transform,
 			                  const RECT* source = nullptr);
-		
+
 		/**
 		 Ends the processing of a batch of sprites.
 

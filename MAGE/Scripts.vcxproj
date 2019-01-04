@@ -18,34 +18,12 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="Scripts\src\character_motor_script.hpp" />
-    <ClInclude Include="Scripts\src\editor_script.hpp" />
-    <ClInclude Include="Scripts\src\manhattan_motor_script.hpp" />
-    <ClInclude Include="Scripts\src\mouse_look_script.hpp" />
-    <ClInclude Include="Scripts\src\rotation_script.hpp" />
-    <ClInclude Include="Scripts\src\stats_script.hpp" />
-    <ClInclude Include="Scripts\src\switch_scene_script.hpp" />
-    <ClInclude Include="Scripts\src\text_console_script.hpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Scripts\src\switch_scene_script.tpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="Scripts\src\character_motor_script.cpp" />
-    <ClCompile Include="Scripts\src\editor_script.cpp" />
-    <ClCompile Include="Scripts\src\manhattan_motor_script.cpp" />
-    <ClCompile Include="Scripts\src\mouse_look_script.cpp" />
-    <ClCompile Include="Scripts\src\rotation_script.cpp" />
-    <ClCompile Include="Scripts\src\stats_script.cpp" />
-    <ClCompile Include="Scripts\src\text_console_script.cpp" />
-  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{1C23D59A-7350-48AB-AD25-A5ECCDAE0BAE}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>Scripts</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.16299.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -74,6 +52,7 @@
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
+  <PropertyGroup Label="UserMacros" />
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
   </ImportGroup>
@@ -95,23 +74,46 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="Properties\x64_Release.props" />
   </ImportGroup>
-  <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>$(ProjectName)\src\;MAGE\src\;Rendering\src\;Input\src\;Core\src\;Math\src\;Utilities\src\;GSL\src\;ImGui\src\;stb\src\;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
-    <SourcePath>MAGE\src\;Rendering\src\;Input\src\;Core\src\;Math\src\;Utilities\src\;ImGui\src\;$(VC_SourcePath);</SourcePath>
+    <IncludePath>$(ProjectName)\src\;MAGE\src\;Rendering\src\;Input\src\;Core\src\;Math\src\;Utilities\src\;fmt\src\;GSL\src\;ImGui\src\;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
+    <SourcePath>MAGE\src\;Rendering\src\;Input\src\;Core\src\;Math\src\;Utilities\src\;ImGui\src\;fmt\src\;$(VC_SourcePath);</SourcePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>$(ProjectName)\src\;MAGE\src\;Rendering\src\;Input\src\;Core\src\;Math\src\;Utilities\src\;GSL\src\;ImGui\src\;stb\src\;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
-    <SourcePath>MAGE\src\;Rendering\src\;Input\src\;Core\src\;Math\src\;Utilities\src\;ImGui\src\;$(VC_SourcePath);</SourcePath>
+    <IncludePath>$(ProjectName)\src\;MAGE\src\;Rendering\src\;Input\src\;Core\src\;Math\src\;Utilities\src\;fmt\src\;GSL\src\;ImGui\src\;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
+    <SourcePath>MAGE\src\;Rendering\src\;Input\src\;Core\src\;Math\src\;Utilities\src\;ImGui\src\;fmt\src\;$(VC_SourcePath);</SourcePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>$(ProjectName)\src\;MAGE\src\;Rendering\src\;Input\src\;Core\src\;Math\src\;Utilities\src\;GSL\src\;ImGui\src\;stb\src\;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
-    <SourcePath>MAGE\src\;Rendering\src\;Input\src\;Core\src\;Math\src\;Utilities\src\;ImGui\src\;$(VC_SourcePath);</SourcePath>
+    <IncludePath>$(ProjectName)\src\;MAGE\src\;Rendering\src\;Input\src\;Core\src\;Math\src\;Utilities\src\;fmt\src\;GSL\src\;ImGui\src\;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
+    <SourcePath>MAGE\src\;Rendering\src\;Input\src\;Core\src\;Math\src\;Utilities\src\;ImGui\src\;fmt\src\;$(VC_SourcePath);</SourcePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>$(ProjectName)\src\;MAGE\src\;Rendering\src\;Input\src\;Core\src\;Math\src\;Utilities\src\;GSL\src\;ImGui\src\;stb\src\;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
-    <SourcePath>MAGE\src\;Rendering\src\;Input\src\;Core\src\;Math\src\;Utilities\src\;ImGui\src\;$(VC_SourcePath);</SourcePath>
+    <IncludePath>$(ProjectName)\src\;MAGE\src\;Rendering\src\;Input\src\;Core\src\;Math\src\;Utilities\src\;fmt\src\;GSL\src\;ImGui\src\;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
+    <SourcePath>MAGE\src\;Rendering\src\;Input\src\;Core\src\;Math\src\;Utilities\src\;ImGui\src\;fmt\src\;$(VC_SourcePath);</SourcePath>
   </PropertyGroup>
+  <ItemGroup>
+    <ClInclude Include="Scripts\src\character_motor_script.hpp" />
+    <ClInclude Include="Scripts\src\editor_script.hpp" />
+    <ClInclude Include="Scripts\src\manhattan_motor_script.hpp" />
+    <ClInclude Include="Scripts\src\mouse_look_script.hpp" />
+    <ClInclude Include="Scripts\src\rotation_script.hpp" />
+    <ClInclude Include="Scripts\src\stats_script.hpp" />
+    <ClInclude Include="Scripts\src\switch_scene_script.hpp" />
+    <ClInclude Include="Scripts\src\text_console_script.hpp" />
+    <ClInclude Include="Scripts\src\voxel_grid_anchor_script.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Scripts\src\switch_scene_script.tpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Scripts\src\character_motor_script.cpp" />
+    <ClCompile Include="Scripts\src\editor_script.cpp" />
+    <ClCompile Include="Scripts\src\manhattan_motor_script.cpp" />
+    <ClCompile Include="Scripts\src\mouse_look_script.cpp" />
+    <ClCompile Include="Scripts\src\rotation_script.cpp" />
+    <ClCompile Include="Scripts\src\stats_script.cpp" />
+    <ClCompile Include="Scripts\src\text_console_script.cpp" />
+    <ClCompile Include="Scripts\src\voxel_grid_anchor_script.cpp" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

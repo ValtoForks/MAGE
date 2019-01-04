@@ -3,17 +3,8 @@
 //-----------------------------------------------------------------------------
 #pragma region
 
-#include "system\system_time.hpp"
 #include "parallel\parallel.hpp"
-
-#pragma endregion
-
-//-----------------------------------------------------------------------------
-// System Includes
-//-----------------------------------------------------------------------------
-#pragma region
-
-#include <iterator>
+#include "system\system_time.hpp"
 
 #pragma endregion
 
@@ -61,40 +52,40 @@ namespace mage {
 			GetSystemTimeAsFileTime(&ftime);
 
 			FILETIME local_ftime;
-			return (FALSE == FileTimeToLocalFileTime(&ftime, &local_ftime)) 
-				   ? 0ull : ConvertTimestamp(local_ftime);
+			return (FALSE == FileTimeToLocalFileTime(&ftime, &local_ftime))
+				   ? 0u : ConvertTimestamp(local_ftime);
 		}
 	}
 
 	[[nodiscard]]
-	const wstring GetLocalSystemDateAsString() {
+	const std::wstring GetLocalSystemDateAsString() {
 		FILETIME ftime;
 		GetSystemTimeAsFileTime(&ftime);
 
 		FILETIME local_ftime;
 		if (FALSE == FileTimeToLocalFileTime(&ftime, &local_ftime)) {
-			return wstring();
+			return {};
 		}
 
 		SYSTEMTIME local_stime;
 		if (FALSE == FileTimeToSystemTime(&local_ftime, &local_stime)) {
-			return wstring();
+			return {};
 		}
 
 		wchar_t str_date[255];
 
-		const int result = GetDateFormat(LOCALE_USER_DEFAULT, 
+		const int result = GetDateFormat(LOCALE_USER_DEFAULT,
 			                             0,
-			                             &local_stime, 
-			                             L"yyyy-MM-dd", 
-			                             str_date, 
+			                             &local_stime,
+			                             L"yyyy-MM-dd",
+			                             str_date,
 			                             static_cast< int >(std::size(str_date)));
-		
-		return (result) ? wstring(str_date) : wstring();
+
+		return (result) ? std::wstring(str_date) : std::wstring();
 	}
 
 	[[nodiscard]]
-	const wstring GetLocalSystemTimeAsString() {
+	const std::wstring GetLocalSystemTimeAsString() {
 		// Retrieves the current system date and time.
 		// The information is in Coordinated Universal Time (UTC) format.
 		FILETIME ftime;
@@ -102,28 +93,28 @@ namespace mage {
 
 		FILETIME local_ftime;
 		if (FALSE == FileTimeToLocalFileTime(&ftime, &local_ftime)) {
-			return wstring();
+			return {};
 		}
 
 		SYSTEMTIME local_stime;
 		if (FALSE == FileTimeToSystemTime(&local_ftime, &local_stime)) {
-			return wstring();
+			return {};
 		}
 
 		wchar_t str_time[255];
 
-		const int result = GetTimeFormat(LOCALE_USER_DEFAULT, 
-			                             0, 
-			                             &local_stime, 
-			                             L"HH-mm-ss", 
-			                             str_time, 
+		const int result = GetTimeFormat(LOCALE_USER_DEFAULT,
+			                             0,
+			                             &local_stime,
+			                             L"HH-mm-ss",
+			                             str_time,
 			                             static_cast< int >(std::size(str_time)));
-		
-		return (result) ? wstring(str_time) : wstring();
+
+		return (result) ? std::wstring(str_time) : std::wstring();
 	}
 
 	[[nodiscard]]
-	const wstring GetLocalSystemDateAndTimeAsString() {
+	const std::wstring GetLocalSystemDateAndTimeAsString() {
 		// Retrieves the current system date and time.
 		// The information is in Coordinated Universal Time (UTC) format.
 		FILETIME ftime;
@@ -131,38 +122,38 @@ namespace mage {
 
 		FILETIME local_ftime;
 		if (FALSE == FileTimeToLocalFileTime(&ftime, &local_ftime)) {
-			return wstring();
+			return {};
 		}
 
 		SYSTEMTIME local_stime;
 		if (FALSE == FileTimeToSystemTime(&local_ftime, &local_stime)) {
-			return wstring();
+			return {};
 		}
 
 		wchar_t str_date[255];
 		wchar_t str_time[255];
 
-		if (!GetDateFormat(LOCALE_USER_DEFAULT, 
-			               0, 
-			               &local_stime, 
-			               L"yyyy-MM-dd", 
-			               str_date, 
+		if (!GetDateFormat(LOCALE_USER_DEFAULT,
+			               0,
+			               &local_stime,
+			               L"yyyy-MM-dd",
+			               str_date,
 			               static_cast< int >(std::size(str_date)))) {
 
-			return wstring();
+			return {};
 		}
-		
-		if (!GetTimeFormat(LOCALE_USER_DEFAULT, 
-			               0, 
-			               &local_stime, 
-			               L"HH-mm-ss", 
-			               str_time, 
+
+		if (!GetTimeFormat(LOCALE_USER_DEFAULT,
+			               0,
+			               &local_stime,
+			               L"HH-mm-ss",
+			               str_time,
 			               static_cast< int >(std::size(str_time)))) {
 
-			return wstring();
+			return {};
 		}
 
-		return wstring(str_date) + L'-' + wstring(str_time);
+		return std::wstring(str_date) + L'-' + std::wstring(str_time);
 	}
 
 	[[nodiscard]]
@@ -182,101 +173,77 @@ namespace mage {
 		/**
 		 The number of system cores.
 		 */
-		const U16 g_nb_system_cores = NumberOfSystemCores();
+		const FU16 g_nb_system_cores = NumberOfSystemCores();
 
 		/**
-		 Returns the current core timestamp (in 100 ns).
+		 Returns the current core timestamps (in 100 ns).
 
-		 @param[out]	kernel_mode_timestamp
-						A reference to the current kernel mode timestamp of the 
-						calling process.
-		 @param[out]	user_mode_timestamp
-						A reference to the current user mode timestamp of the 
-						calling process.
-		 @note			If the retrieval fails, both @a kernel_mode_timestamp and 
-						@a user_mode_timestamp are zero. To get extended error 
-						information, call @c GetLastError.
+		 @return		A pair containing the current kernel and user mode
+						timestamp of the calling process.
+		 @note			If the retrieval fails, both the kernel and user mode
+						timestamp are zero. To get extended error information,
+						call @c GetLastError.
 		 */
-		void GetCoreTimestamp(U64& kernel_mode_timestamp, 
-							  U64& user_mode_timestamp) noexcept {
-		
+		[[nodiscard]]
+		const std::pair< U64, U64 > GetCoreTimestamps() noexcept {
 			FILETIME ftime;
 			FILETIME kernel_mode_ftime;
 			FILETIME user_mode_ftime;
-			// Retrieves timing information for the specified process.
-			// 1. A handle to the process whose timing information is sought.
-			// 2. A pointer to a FILETIME structure that receives the creation time 
-			//    of the process.
-			// 3. A pointer to a FILETIME structure that receives the exit time of 
-			//    the process.
-			// 4. A pointer to a FILETIME structure that receives the amount of time 
-			//    that the process has executed in kernel mode.
-			// 5. A pointer to a FILETIME structure that receives the amount of time 
-			//    that the process has executed in user mode.
+			// Retrieve timing information for the process.
 			const BOOL result = GetProcessTimes(GetCurrentProcess(),
-												&ftime, 
-												&ftime, 
-												&kernel_mode_ftime, 
+												&ftime,
+												&ftime,
+												&kernel_mode_ftime,
 												&user_mode_ftime);
-		
-			if (TRUE == result) {
-				kernel_mode_timestamp = ConvertTimestamp(kernel_mode_ftime);
-				user_mode_timestamp   = ConvertTimestamp(user_mode_ftime);
+			if (FALSE == result) {
+				return {};
 			}
-			else {
-				kernel_mode_timestamp = 0ull;
-				user_mode_timestamp   = 0ull;
-			}
+
+			return {
+				ConvertTimestamp(kernel_mode_ftime),
+				ConvertTimestamp(user_mode_ftime)
+			};
 		}
 
 		/**
 		 Returns the current core timestamp (in 100 ns).
-	 
+
 		 @return		The current core timestamp of the calling process.
 		 */
 		[[nodiscard]]
 		inline U64 GetCoreTimestamp() noexcept {
-			U64 kernel_mode_timestamp = 0ull;
-			U64 user_mode_timestamp   = 0ull;
-			GetCoreTimestamp(kernel_mode_timestamp, user_mode_timestamp);
-		
-			return kernel_mode_timestamp + user_mode_timestamp;
+			const auto timestamps = GetCoreTimestamps();
+			return timestamps.first + timestamps.second;
 		}
 
 		/**
 		 Returns the current kernel mode core timestamp (in 100 ns).
-	 
-		 @return		The current kernel mode core timestamp of the calling 
+
+		 @return		The current kernel mode core timestamp of the calling
 						process.
 		 */
 		[[nodiscard]]
 		inline U64 GetKernelModeCoreTimestamp() noexcept {
-			U64 kernel_mode_timestamp = 0ull;
-			U64 user_mode_timestamp   = 0ull;
-			GetCoreTimestamp(kernel_mode_timestamp, user_mode_timestamp);
-		
-			return kernel_mode_timestamp;
+			const auto timestamps = GetCoreTimestamps();
+			return timestamps.first;
 		}
 
 		/**
 		 Returns the current user mode core timestamp (in 100 ns).
-	 
-		 @return		The current user mode core timestamp of the calling 
+
+		 @return		The current user mode core timestamp of the calling
 						process.
 		 */
 		[[nodiscard]]
 		inline U64 GetUserModeCoreTimestamp() noexcept {
-			U64 kernel_mode_timestamp = 0ull;
-			U64 user_mode_timestamp   = 0ull;
-			GetCoreTimestamp(kernel_mode_timestamp, user_mode_timestamp);
-		
-			return user_mode_timestamp;
+			const auto timestamps = GetCoreTimestamps();
+			return timestamps.second;
 		}
 
 		/**
 		 Returns the current core timestamp per system core (in 100 ns).
-	 
-		 @return		The current core timestamp of the calling process per 
+
+		 @return		The current core timestamp of the calling process per
 						system core.
 		 */
 		[[nodiscard]]
@@ -286,8 +253,8 @@ namespace mage {
 
 		/**
 		 Returns the current kernel mode core timestamp per system core (in 100 ns).
-	 
-		 @return		The current kernel mode core timestamp of the calling 
+
+		 @return		The current kernel mode core timestamp of the calling
 						process per system core.
 		 */
 		[[nodiscard]]
@@ -297,8 +264,8 @@ namespace mage {
 
 		/**
 		 Returns the current user mode core timestamp per system core (in 100 ns).
-	 
-		 @return		The current user mode core timestamp of the calling 
+
+		 @return		The current user mode core timestamp of the calling
 						process per system core.
 		 */
 		[[nodiscard]]

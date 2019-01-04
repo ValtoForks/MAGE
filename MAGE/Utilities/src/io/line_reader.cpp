@@ -4,7 +4,7 @@
 #pragma region
 
 #include "io\line_reader.hpp"
-#include "string\string_utils.hpp"
+#include "logging\logging.hpp"
 
 #pragma endregion
 
@@ -13,7 +13,8 @@
 //-----------------------------------------------------------------------------
 #pragma region
 
-#include <iterator>
+#include <fstream>
+#include <sstream>
 
 #pragma endregion
 
@@ -22,140 +23,121 @@
 //-----------------------------------------------------------------------------
 namespace mage {
 
+	const std::regex LineReader::s_default_regex
+		= std::regex(R"((\"([^\"]*)\")|(\S+))");
+
+	const LineReader::SelectionFunction LineReader::s_default_selection_function
+		= [](const std::smatch& match) {
+		return match[2].length() ? match[2] : match[3];
+	};
+
 	LineReader::LineReader()
-		: m_context(nullptr), 
-		m_file_stream(nullptr), 
-		m_fname(),
-		m_delimiters(g_default_delimiters), 
+		: m_regex(),
+		m_selection_function(),
+		m_path(),
+		m_iterator(),
 		m_line_number(0) {}
 
-	LineReader::LineReader(LineReader&& reader) noexcept = default;
+	LineReader::LineReader(LineReader&& reader) noexcept
+		: m_regex(std::move(reader.m_regex)),
+		m_selection_function(std::move(reader.m_selection_function)),
+		m_path(std::move(reader.m_path)),
+		m_iterator(reader.m_iterator),
+		m_line_number(reader.m_line_number) {}
 
 	LineReader::~LineReader() = default;
 
-	LineReader& LineReader::operator=(LineReader&& reader) noexcept = default;
+	LineReader& LineReader::operator=(LineReader&& reader) noexcept {
+		m_regex              = std::move(reader.m_regex);
+		m_selection_function = std::move(reader.m_selection_function);
+		m_path               = std::move(reader.m_path);
+		m_iterator           = reader.m_iterator;
+		m_line_number        = reader.m_line_number;
+		return *this;
+	}
 
-	void LineReader::ReadFromFile(wstring fname, string delimiters) {
-		m_fname      = std::move(fname);
-		m_delimiters = std::move(delimiters);
-		
-		// Open the file.
-		FILE* file;
-		{
-			const errno_t result = _wfopen_s(&file, m_fname.c_str(), L"r");
-			ThrowIfFailed((0 == result), 
-						  "%ls: could not open file.", m_fname.c_str());
-		}
+	void LineReader::ReadFromFile(std::filesystem::path path,
+								  std::regex regex,
+								  SelectionFunction selection_function) {
 
-		m_file_stream.reset(file);
+		m_path               = std::move(path);
+		m_regex              = std::move(regex);
+		m_selection_function = std::move(selection_function);
 
+		// Preprocessing
 		Preprocess();
 
-		char current_line[MAX_PATH];
-		m_line_number = 1;
-		// Continue reading from the file until the eof is reached.
-		while (fgets(current_line, 
-			         static_cast< int >(std::size(current_line)), 
-			         m_file_stream.get())) {
+		// Processing
+		std::ifstream stream(m_path.c_str());
+		ThrowIfFailed(stream.is_open(), "{}: could not open file.", m_path);
+		Process(stream);
 
-			ReadLine(current_line);
+		// Postprocessing
+		Postprocess();
+	}
+
+	void LineReader::ReadFromMemory(const std::string &input,
+									std::regex regex,
+									SelectionFunction selection_function) {
+
+		m_path               = L"input string";
+		m_regex              = std::move(regex);
+		m_selection_function = std::move(selection_function);
+
+		// Preprocessing
+		Preprocess();
+
+		// Processing
+		std::istringstream stream(input);
+		Process(stream);
+
+		// Postprocessing
+		Postprocess();
+	}
+
+	void LineReader::Preprocess() {}
+
+	void LineReader::Process(std::istream& stream) {
+		m_line_number = 0u;
+
+		std::string line;
+		while (std::getline(stream, line)) {
+			m_iterator = std::sregex_iterator(line.cbegin(), line.cend(), m_regex);
+			if (ContainsTokens()) {
+				ReadLine();
+			}
+
 			++m_line_number;
 		}
 
-		Postprocess();
-
-		m_context = nullptr;
+		m_iterator = {};
 	}
 
-	void LineReader::ReadFromMemory(NotNull< const_zstring > input, string delimiters) {
-		m_fname      = L"input string";
-		m_delimiters = std::move(delimiters);
-		
-		m_file_stream.reset(nullptr);
+	void LineReader::Postprocess() {}
 
-		Preprocess();
-
-		char current_line[MAX_PATH];
-		m_line_number = 1;
-		// Continue reading from the input until the null-terminating character 
-		// is reached.
-		while (str_gets(current_line, 
-			            std::size(current_line), 
-			            &input)) {
-
-			ReadLine(current_line);
-			++m_line_number;
+	void LineReader::ReadRemainingTokens() {
+		while (ContainsTokens()) {
+			const auto token = Read< std::string_view >();
+			Warning("{}: line {}: unused token: {}.",
+					GetPath(), GetCurrentLineNumber(), token);
 		}
-
-		Postprocess();
-
-		m_context = nullptr;
 	}
 
-	void LineReader::ReadLineRemaining() {
-		auto next_token = strtok_s(nullptr, GetDelimiters().c_str(), &m_context);
-		while (next_token) {
-			Warning("%ls: line %u: unused token: %s.", 
-				    GetFilename().c_str(), GetCurrentLineNumber(), next_token);
-			next_token = strtok_s(nullptr, GetDelimiters().c_str(), &m_context);
-		}
-	}
-	
-	NotNull< const_zstring > LineReader::ReadChars() {
-		zstring result = nullptr;
-		const auto token_result = mage::ReadChars(nullptr, 
-												  &m_context, 
-												  &result, 
-												  GetDelimiters().c_str());
-		switch (token_result) {
-		
-		case TokenResult::Valid: {
-			return result;
-		}
-		
-		default: {
-			throw Exception("%ls: line %u: no char string value found.",
-				            GetFilename().c_str(), 
-				            GetCurrentLineNumber());
-		}
-		}
-	}
-	
-	const string LineReader::ReadQuotedString() {
-		string result;
-		const auto token_result = mage::ReadQuotedString(nullptr, 
-														 &m_context, 
-														 result, 
-														 GetDelimiters().c_str());
-		switch (token_result) {
-		
-		case TokenResult::Valid: {
-			return result;
-		}
-		
-		case TokenResult::None: {
-			throw Exception("%ls: line %u: no quoted string value found.", 
-				            GetFilename().c_str(), 
-				            GetCurrentLineNumber());
-		}
-		
-		default: {
-			throw Exception("%ls: line %u: invalid quoted string value found.", 
-				            GetFilename().c_str(), 
-				            GetCurrentLineNumber());
-		}
-		}
-	}
-	
 	[[nodiscard]]
-	bool LineReader::ContainsChars() const {
-		return mage::ContainsChars(m_context, GetDelimiters().c_str()) 
-			   == TokenResult::Valid;
+	bool LineReader::ContainsTokens() const noexcept {
+		static const std::sregex_iterator end_iterator;
+		return end_iterator != m_iterator;
 	}
-	
+
 	[[nodiscard]]
-	bool LineReader::ContainsQuotedString() const {
-		return mage::ContainsQuotedString(m_context, GetDelimiters().c_str()) 
-			   == TokenResult::Valid;
+	const std::string_view LineReader::GetCurrentToken() const noexcept {
+		const auto token = m_selection_function(*m_iterator);
+		if (token.matched) {
+			return { &*token.first,
+				     static_cast< std::size_t >(token.second - token.first) };
+		}
+		else {
+			return {};
+		}
 	}
 }

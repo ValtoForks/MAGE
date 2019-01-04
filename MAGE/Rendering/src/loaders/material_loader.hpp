@@ -29,18 +29,18 @@ namespace mage::rendering {
 namespace mage::rendering::loader {
 
 	/**
-	 Imports the materials from the given file.
+	 Imports the materials from the file associated with the given path.
 
-	 @param[in]		fname
-					A reference to the filename.
-	 @param[in]		resource_manaer
+	 @param[in]		path
+					A reference to the path.
+	 @param[in,out]	resource_manaer
 					A reference to the resource manager.
-	 @param[out]	materials
+	 @param[in,out]	materials
 					A reference to a vector containing the materials.
 	 @throws		Exception
 					Failed to import the materials from file.
 	 */
-	void ImportMaterialFromFile(const wstring& fname, 
-								ResourceManager &resource_manaer, 
+	void ImportMaterialFromFile(const std::filesystem::path& path,
+								ResourceManager &resource_manaer,
 		                        std::vector< Material >& materials);
 }

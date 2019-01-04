@@ -14,7 +14,7 @@
 //-----------------------------------------------------------------------------
 namespace mage::script {
 
-	class EditorScript final : public BehaviorScript {
+	class EditorScript : public BehaviorScript {
 
 	public:
 
@@ -39,9 +39,7 @@ namespace mage::script {
 		//---------------------------------------------------------------------
 
 		virtual void Load([[maybe_unused]] Engine& engine) override;
-
-		virtual void Update([[maybe_unused]] Engine& engine,
-							[[maybe_unused]] F64 delta_time) override;
+		virtual void Update([[maybe_unused]] Engine& engine) override;
 
 	private:
 
@@ -49,6 +47,7 @@ namespace mage::script {
 		// Member Variables
 		//---------------------------------------------------------------------
 
+		bool m_visible;
 		ProxyPtr< Node > m_selected;
 	};
 }

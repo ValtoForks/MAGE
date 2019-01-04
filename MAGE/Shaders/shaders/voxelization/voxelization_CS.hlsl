@@ -29,16 +29,19 @@ RW_TEXTURE_3D(voxel_texture,     float4, SLOT_UAV_VOXEL_TEXTURE);
 void CS(uint3 thread_id : SV_DispatchThreadID) {
 
 	[branch]
-	if (any(thread_id >= g_voxel_grid_resolution)) {
+	if (any(g_voxel_grid_resolution <= thread_id)) {
 		return;
 	}
 
 	const uint flat_index = FlattenIndex(thread_id, g_voxel_grid_resolution);
-	const uint encoded_L  = voxel_grid[flat_index].encoded_L;
-	voxel_grid[flat_index].encoded_L = 0u;
-	voxel_grid[flat_index].encoded_n = 0u;
+	const uint encoded_L  = voxel_grid[flat_index].m_encoded_L;
+	voxel_grid[flat_index].m_encoded_L = 0u;
+	voxel_grid[flat_index].m_encoded_n = 0u;
 
-	const float3 L    = DecodeRadiance(encoded_L);
-	const float alpha = (0u != encoded_L) ? 1.0f : 0.0f;
-	voxel_texture[thread_id] = float4(L, alpha);
+	// If encoded_L is equal to the special value 0, representing an empty
+	// voxel, DecodeRadiance may not be called due to potential divisions by 0.
+	const float4 L = (0u != encoded_L)
+		? float4(DecodeRadiance(encoded_L), 1.0f) : 0.0f;
+
+	voxel_texture[thread_id] = L;
 }

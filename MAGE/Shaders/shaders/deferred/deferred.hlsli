@@ -3,17 +3,16 @@
 //-----------------------------------------------------------------------------
 // Defines			                        | Default
 //-----------------------------------------------------------------------------
-// BRDF_DOT_EPSILON                         | 0.00001f
+// BRDF_DOT_EPSILON                         | 1e-5f
 // BRDF_D_FUNCTION                          | D_GGX
-// BRDF_FUNCTION                            | not defined
 // BRDF_F_FUNCTION                          | F_Schlick
-// BRDF_G_FUNCTION                          | G_GXX
-// BRDF_MINIMUM_ALPHA                       | 0.1f
+// BRDF_FUNCTION                            | not defined
+// BRDF_MINIMUM_ALPHA                       | 1e-1f
+// BRDF_V_FUNCTION                          | G_GXX
 // DISABLE_BRDF_DIFFUSE                     | not defined
 // DISABLE_BRDF_SPECULAR                    | not defined
 // DISABLE_FOG                              | not defined
-// DISABLE_ILLUMINATION_DIRECT              | not defined
-// DISABLE_ILLUMINATION_INDIRECT            | not defined
+// DISABLE_LIGHTS_AMBIENT                   | not defined
 // DISABLE_LIGHTS_DIRECTIONAL               | not defined
 // DISABLE_LIGHTS_OMNI                      | not defined
 // DISABLE_LIGHTS_SPOT                      | not defined
@@ -21,12 +20,8 @@
 // DISABLE_LIGHTS_SHADOW_MAPPED_DIRECTIONAL | not defined
 // DISABLE_LIGHTS_SHADOW_MAPPED_OMNI        | not defined
 // DISABLE_LIGHTS_SHADOW_MAPPED_SPOT        | not defined
-// DISABLE_LIGHT_AMBIENT                    | not defined
 // DISABLE_VCT                              | not defined
-// FOG_FACTOR_FUNCTION                      | FogFactor_Exponential
 // GROUP_SIZE                               | GROUP_SIZE_2D_DEFAULT (CS only)
-// LIGHT_ANGULAR_ATTENUATION_FUNCTION       | AngularAttenuation
-// LIGHT_DISTANCE_ATTENUATION_FUNCTION      | DistanceAttenuation
 // MSAA                                     | not defined (PS only)
 
 //-----------------------------------------------------------------------------
@@ -41,10 +36,10 @@
 // Pixel Shader
 //-----------------------------------------------------------------------------
 
-float4 PS(float4 input : SV_POSITION, 
+float4 PS(float4 input : SV_POSITION,
 		  uint index : SV_SampleIndex) : SV_Target {
 
-	const uint2 p_ss_display = input.xy;
+	const float2 p_ss_display = input.xy;
 
 	// Obtain the base color of the material.
 	const float3 base_color = GetGBufferMaterialBaseColor(p_ss_display, index);
@@ -55,13 +50,15 @@ float4 PS(float4 input : SV_POSITION,
 	// Obtain the surface position expressed in world space.
 	const float3 p_world = GetGBufferPosition(p_ss_display, index);
 
-	Material material;
-	material.base_color = base_color;
-	material.roughness  = material_params.x;
-	material.metalness  = material_params.y;
+	const Material material = {
+		base_color,
+		material_params.x,
+		material_params.y
+	};
 
 	// Calculate the pixel radiance.
 	const float3 L = GetRadiance(p_world, n_world, material);
+
 	return float4(L, 1.0f);
 }
 
@@ -72,7 +69,8 @@ float4 PS(float4 input : SV_POSITION,
 //-----------------------------------------------------------------------------
 
 float4 PS(float4 input : SV_POSITION) : SV_Target {
-	const uint2 p_ss_display = input.xy;
+
+	const float2 p_ss_display = input.xy;
 
 	// Obtain the base color of the material.
 	const float3 base_color = GetGBufferMaterialBaseColor(p_ss_display);
@@ -83,13 +81,15 @@ float4 PS(float4 input : SV_POSITION) : SV_Target {
 	// Obtain the surface position expressed in world space.
 	const float3 p_world = GetGBufferPosition(p_ss_display);
 
-	Material material;
-	material.base_color = base_color;
-	material.roughness  = material_params.x;
-	material.metalness  = material_params.y;
+	const Material material = {
+		base_color,
+		material_params.x,
+		material_params.y
+	};
 
 	// Calculate the pixel radiance.
 	const float3 L = GetRadiance(p_world, n_world, material);
+
 	return float4(L, 1.0f);
 }
 
@@ -97,7 +97,7 @@ float4 PS(float4 input : SV_POSITION) : SV_Target {
 // Compute Shader
 //-----------------------------------------------------------------------------
 
-// MSAA_AS_SSAA is not possible for deferred shading in the compute shader 
+// MSAA_AS_SSAA is not possible for deferred shading in the compute shader
 // without knowing the positioning of the subpixels inside the pixel.
 
 #ifndef GROUP_SIZE
@@ -107,10 +107,11 @@ float4 PS(float4 input : SV_POSITION) : SV_Target {
 [numthreads(GROUP_SIZE, GROUP_SIZE, 1)]
 void CS(uint3 thread_id : SV_DispatchThreadID) {
 
-	const uint2 p_ss_display = g_ss_viewport_top_left + thread_id.xy;
-	
+	const uint2 p_ss_viewport = thread_id.xy;
+	uint2 p_ss_display;
+
 	[branch]
-	if (any(p_ss_display >= g_ss_display_resolution)) {
+	if (IsSSViewportOutOfBounds(p_ss_viewport, p_ss_display)) {
 		return;
 	}
 
@@ -123,13 +124,15 @@ void CS(uint3 thread_id : SV_DispatchThreadID) {
 	// Obtain the surface position expressed in world space.
 	const float3 p_world = GetGBufferPosition(p_ss_display);
 
-	Material material;
-	material.base_color = base_color;
-	material.roughness  = material_params.x;
-	material.metalness  = material_params.y;
+	const Material material = {
+		base_color,
+		material_params.x,
+		material_params.y
+	};
 
 	// Calculate the pixel radiance.
 	const float3 L = GetRadiance(p_world, n_world, material);
+
 	// Store the pixel color.
 	g_output[p_ss_display] = float4(L, 1.0f);
 }

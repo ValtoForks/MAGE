@@ -1,11 +1,9 @@
-#pragma once
-
 //-----------------------------------------------------------------------------
 // Engine Includes
 //-----------------------------------------------------------------------------
 #pragma region
 
-#include "math_utils.hpp"
+#include "transform\transform_utils.hpp"
 
 #pragma endregion
 
@@ -13,11 +11,12 @@
 // Engine Declarations and Definitions
 //-----------------------------------------------------------------------------
 namespace mage {
-
+	
 	/**
-	 A class of sprite transforms.
+	 A class of 2D sprite transforms supporting non-uniform scaling, rotation
+	 and translation (incl. depth).
 	 */
-	class SpriteTransform final {
+	class SpriteTransform2D {
 
 	public:
 
@@ -40,16 +39,19 @@ namespace mage {
 		 @param[in]		scale
 						The scale component.
 		 */
-		explicit SpriteTransform(F32x2 translation     = { 0.0f, 0.0f },
-			                     F32   depth           =   0.0f,
-			                     F32   rotation        =   0.0f,
-			                     F32x2 rotation_origin = { 0.0f, 0.0f },
-			                     F32x2 scale           = { 1.0f, 1.0f }) noexcept
+		explicit SpriteTransform2D(F32x2 translation     = { 0.0f, 0.0f },
+			                       F32   depth           =   0.0f,
+			                       F32   rotation        =   0.0f,
+			                       F32x2 rotation_origin = { 0.0f, 0.0f },
+			                       F32x2 scale           = { 1.0f, 1.0f }) noexcept
 			: m_translation(std::move(translation)),
 			m_depth(depth),
-			m_rotation(rotation),
+			m_rotation(),
 			m_rotation_origin(std::move(rotation_origin)),
-			m_scale(std::move(scale)) {}
+			m_scale(std::move(scale)) {
+
+			SetRotation(rotation);
+		}
 
 		/**
 		 Constructs a sprite transform from the given translation, depth,
@@ -66,21 +68,15 @@ namespace mage {
 		 @param[in]		scale
 						The scale component.
 		 */
-		explicit SpriteTransform(FXMVECTOR translation,
-			                     F32       depth,
-			                     F32       rotation,
-			                     FXMVECTOR rotation_origin,
-			                     FXMVECTOR scale) noexcept
-			: m_translation(),
-			m_depth(depth),
-			m_rotation(rotation),
-			m_rotation_origin(),
-			m_scale() {
-
-			SetTranslation(translation);
-			SetRotationOrigin(rotation_origin);
-			SetScale(scale);
-		}
+		explicit SpriteTransform2D(FXMVECTOR translation,
+			                       F32       depth,
+			                       F32       rotation,
+			                       FXMVECTOR rotation_origin,
+			                       FXMVECTOR scale) noexcept
+			: SpriteTransform2D(XMStore< F32x2 >(translation),
+								depth, rotation,
+								XMStore< F32x2 >(rotation_origin),
+								XMStore< F32x2 >(scale)) {}
 
 		/**
 		 Constructs a sprite transform from the given sprite transform.
@@ -88,7 +84,7 @@ namespace mage {
 		 @param[in]		transform
 						A reference to the sprite transform to copy.
 		 */
-		SpriteTransform(const SpriteTransform& transform) noexcept = default;
+		SpriteTransform2D(const SpriteTransform2D& transform) noexcept = default;
 
 		/**
 		 Constructs a sprite transform by moving the given sprite transform.
@@ -96,12 +92,12 @@ namespace mage {
 		 @param[in]		transform
 						A reference to the sprite transform to move.
 		 */
-		SpriteTransform(SpriteTransform&& transform) noexcept = default;
+		SpriteTransform2D(SpriteTransform2D&& transform) noexcept = default;
 
 		/**
 		 Destructs this sprite transform.
 		 */
-		~SpriteTransform() = default;
+		~SpriteTransform2D() = default;
 
 		//---------------------------------------------------------------------
 		// Assignment Operators
@@ -115,7 +111,8 @@ namespace mage {
 		 @return		A reference to the copy of the given sprite transform
 						(i.e. this sprite transform).
 		 */
-		SpriteTransform& operator=(const SpriteTransform& transform) = default;
+		SpriteTransform2D& operator=(
+			const SpriteTransform2D& transform) noexcept = default;
 
 		/**
 		 Moves the given sprite transform to this sprite transform.
@@ -125,7 +122,8 @@ namespace mage {
 		 @return		A reference to the moved sprite transform (i.e. this
 						sprite transform).
 		 */
-		SpriteTransform& operator=(SpriteTransform&& transform) = default;
+		SpriteTransform2D& operator=(
+			SpriteTransform2D&& transform) noexcept = default;
 
 		//---------------------------------------------------------------------
 		// Member Methods: Translation
@@ -140,7 +138,7 @@ namespace mage {
 						The x-value of the translation component.
 		 */
 		void SetTranslationX(F32 x) noexcept {
-			m_translation.m_x = x;
+			m_translation[0u] = x;
 		}
 
 		/**
@@ -151,7 +149,7 @@ namespace mage {
 						The y-value of the translation component.
 		 */
 		void SetTranslationY(F32 y) noexcept {
-			m_translation.m_y = y;
+			m_translation[1u] = y;
 		}
 
 		/**
@@ -164,8 +162,7 @@ namespace mage {
 						The y-value of the translation component.
 		 */
 		void SetTranslation(F32 x, F32 y) noexcept {
-			SetTranslationX(x);
-			SetTranslationY(y);
+			SetTranslation(F32x2(x, y));
 		}
 
 		/**
@@ -187,7 +184,7 @@ namespace mage {
 						The translation component.
 		 */
 		void XM_CALLCONV SetTranslation(FXMVECTOR translation) noexcept {
-			m_translation = XMStore< F32x2 >(translation);
+			SetTranslation(XMStore< F32x2 >(translation));
 		}
 
 		/**
@@ -198,7 +195,7 @@ namespace mage {
 						The x-value of the translation component to add.
 		 */
 		void AddTranslationX(F32 x) noexcept {
-			m_translation.m_x += x;
+			SetTranslationX(GetTranslationX() + x);
 		}
 
 		/**
@@ -209,7 +206,7 @@ namespace mage {
 						The y-value of the translation component to add.
 		 */
 		void AddTranslationY(F32 y) noexcept {
-			m_translation.m_y += y;
+			SetTranslationY(GetTranslationY() + y);
 		}
 
 		/**
@@ -222,8 +219,7 @@ namespace mage {
 						The y-value of the translation component to add.
 		 */
 		void AddTranslation(F32 x, F32 y) noexcept {
-			AddTranslationX(x);
-			AddTranslationY(y);
+			AddTranslation(F32x2(x, y));
 		}
 
 		/**
@@ -234,7 +230,7 @@ namespace mage {
 						A reference to the translation component to add.
 		 */
 		void AddTranslation(const F32x2& translation) noexcept {
-			AddTranslation(translation.m_x, translation.m_y);
+			AddTranslation(XMLoad(translation));
 		}
 
 		/**
@@ -245,8 +241,7 @@ namespace mage {
 						The translation component to add.
 		 */
 		void XM_CALLCONV AddTranslation(FXMVECTOR translation) noexcept {
-			AddTranslation(XMVectorGetX(translation),
-				           XMVectorGetY(translation));
+			SetTranslation(GetTranslation() + translation);
 		}
 
 		/**
@@ -258,7 +253,7 @@ namespace mage {
 		 */
 		[[nodiscard]]
 		F32 GetTranslationX() const noexcept {
-			return m_translation.m_x;
+			return m_translation[0u];
 		}
 
 		/**
@@ -270,7 +265,7 @@ namespace mage {
 		 */
 		[[nodiscard]]
 		F32 GetTranslationY() const noexcept {
-			return m_translation.m_y;
+			return m_translation[1u];
 		}
 
 		/**
@@ -279,7 +274,7 @@ namespace mage {
 		 @return		The translation component of this sprite transform.
 		 */
 		[[nodiscard]]
-		const F32x2 GetTranslation() const noexcept {
+		const F32x2 GetTranslationView() const noexcept {
 			return m_translation;
 		}
 
@@ -289,7 +284,7 @@ namespace mage {
 		 @return		The translation component of this sprite transform.
 		 */
 		[[nodiscard]]
-		const XMVECTOR XM_CALLCONV GetTranslationV() const noexcept {
+		const XMVECTOR XM_CALLCONV GetTranslation() const noexcept {
 			return XMLoad(m_translation);
 		}
 
@@ -319,7 +314,7 @@ namespace mage {
 						The depth component to add.
 		 */
 		void AddDepth(F32 depth) noexcept {
-			m_depth += depth;
+			SetDepth(GetDepth() + depth);
 		}
 
 		/**
@@ -347,7 +342,7 @@ namespace mage {
 						The rotation component.
 		 */
 		void SetRotation(F32 rotation) noexcept {
-			m_rotation = rotation;
+			m_rotation = WrapAngleRadians(rotation);
 		}
 
 		/**
@@ -358,7 +353,7 @@ namespace mage {
 						The rotation component to add.
 		 */
 		void AddRotation(F32 rotation) noexcept {
-			m_rotation += rotation;
+			SetRotation(GetRotation() + rotation);
 		}
 
 		/**
@@ -376,13 +371,9 @@ namespace mage {
 		 @param[in]		max_angle
 						The maximum angle (in radians).
 		 */
-		void AddAndClampRotation(F32 rotation,
-			                     F32 min_angle,
-			                     F32 max_angle) noexcept {
-
-			m_rotation = ClampAngleRadians(m_rotation + rotation,
-				                           min_angle,
-				                           max_angle);
+		void AddRotation(F32 rotation, F32 min_angle, F32 max_angle) noexcept {
+			m_rotation = ClampAngleRadians(GetRotation() + rotation,
+										   min_angle, max_angle);
 		}
 
 		/**
@@ -410,7 +401,7 @@ namespace mage {
 						The x-value of the rotation origin.
 		 */
 		void SetRotationOriginX(F32 x) noexcept {
-			m_rotation_origin.m_x = x;
+			m_rotation_origin[0u] = x;
 		}
 
 		/**
@@ -421,7 +412,7 @@ namespace mage {
 						The y-value of the rotation origin.
 		 */
 		void SetRotationOriginY(F32 y) noexcept {
-			m_rotation_origin.m_y = y;
+			m_rotation_origin[1u] = y;
 		}
 
 		/**
@@ -434,8 +425,7 @@ namespace mage {
 						The y-value of the rotation origin.
 		 */
 		void SetRotationOrigin(F32 x, F32 y) noexcept {
-			SetRotationOriginX(x);
-			SetRotationOriginY(y);
+			SetRotationOrigin(F32x2(x, y));
 		}
 
 		/**
@@ -457,7 +447,7 @@ namespace mage {
 						The rotation origin.
 		 */
 		void XM_CALLCONV SetRotationOrigin(FXMVECTOR rotation_origin) noexcept {
-			m_rotation_origin = XMStore< F32x2 >(rotation_origin);
+			SetRotationOrigin(XMStore< F32x2 >(rotation_origin));
 		}
 
 		/**
@@ -465,10 +455,10 @@ namespace mage {
 		 transform.
 
 		 @param[in]		x
-						The x-value of the rotation origin to add.
+						The x-value of the offset to add.
 		 */
 		void AddRotationOriginX(F32 x) noexcept {
-			m_rotation_origin.m_x += x;
+			SetRotationOriginX(GetRotationOriginX() + x);
 		}
 
 		/**
@@ -476,47 +466,43 @@ namespace mage {
 		 transform.
 
 		 @param[in]		y
-						The y-value of the rotation origin to add.
+						The y-value of the offset to add.
 		 */
 		void AddRotationOriginY(F32 y) noexcept {
-			m_rotation_origin.m_y += y;
+			SetRotationOriginY(GetRotationOriginY() + y);
 		}
 
 		/**
-		 Adds the given rotation origin to the rotation origin of this sprite
+		 Adds the given offsets to the rotation origin of this sprite
 		 transform.
 
 		 @param[in]		x
-						The x-value of the rotation origin to add.
+						The x-value of the offset to add.
 		 @param[in]		y
-						The y-value of the rotation origin to add.
+						The y-value of the offset to add.
 		 */
 		void AddRotationOrigin(F32 x, F32 y) noexcept {
-			AddRotationOriginX(x);
-			AddRotationOriginY(y);
+			AddRotationOrigin(F32x2(x, y));
 		}
 
 		/**
-		 Adds the given rotation origin to the rotation origin of this sprite
-		 transform.
+		 Adds the given offset to the rotation origin of this sprite transform.
 
-		 @param[in]		rotation_origin
-						A reference to the rotation origin to add.
+		 @param[in]		offset
+						The offset to add.
 		 */
-		void AddRotationOrigin(const F32x2& rotation_origin) noexcept {
-			AddRotationOrigin(rotation_origin.m_x, rotation_origin.m_y);
+		void AddRotationOrigin(const F32x2& offset) noexcept {
+			AddRotationOrigin(XMLoad(offset));
 		}
 
 		/**
-		 Adds the given rotation origin to the rotation origin of this sprite
-		 transform.
+		 Adds the given offset to the rotation origin of this sprite transform.
 
-		 @param[in]		rotation_origin
-						The rotation origin to add.
+		 @param[in]		offset
+						The offset to add.
 		 */
-		void XM_CALLCONV AddRotationOrigin(FXMVECTOR rotation_origin) noexcept {
-			AddRotationOrigin(XMVectorGetX(rotation_origin),
-				              XMVectorGetY(rotation_origin));
+		void XM_CALLCONV AddRotationOrigin(FXMVECTOR offset) noexcept {
+			SetRotationOrigin(GetRotationOrigin() + offset);
 		}
 
 		/**
@@ -527,7 +513,7 @@ namespace mage {
 		 */
 		[[nodiscard]]
 		F32 GetRotationOriginX() const noexcept {
-			return m_rotation_origin.m_x;
+			return m_rotation_origin[0u];
 		}
 
 		/**
@@ -538,7 +524,7 @@ namespace mage {
 		 */
 		[[nodiscard]]
 		F32 GetRotationOriginY() const noexcept {
-			return m_rotation_origin.m_y;
+			return m_rotation_origin[1u];
 		}
 
 		/**
@@ -547,7 +533,7 @@ namespace mage {
 		 @return		The rotation origin of this sprite transform.
 		 */
 		[[nodiscard]]
-		const F32x2 GetRotationOrigin() const noexcept {
+		const F32x2 GetRotationOriginView() const noexcept {
 			return m_rotation_origin;
 		}
 
@@ -557,7 +543,7 @@ namespace mage {
 		 @return		The rotation origin of this sprite transform.
 		 */
 		[[nodiscard]]
-		const XMVECTOR XM_CALLCONV GetRotationOriginV() const noexcept {
+		const XMVECTOR XM_CALLCONV GetRotationOrigin() const noexcept {
 			return XMLoad(m_rotation_origin);
 		}
 
@@ -576,7 +562,7 @@ namespace mage {
 						The x-value of the scale component.
 		 */
 		void SetScaleX(F32 x) noexcept {
-			m_scale.m_x = x;
+			m_scale[0u] = x;
 		}
 
 		/**
@@ -587,7 +573,7 @@ namespace mage {
 						The y-value of the scale component.
 		 */
 		void SetScaleY(F32 y) noexcept {
-			m_scale.m_y = y;
+			m_scale[1u] = y;
 		}
 
 		/**
@@ -611,8 +597,7 @@ namespace mage {
 						The y-value of the scale component.
 		 */
 		void SetScale(F32 x, F32 y) noexcept {
-			SetScaleX(x);
-			SetScaleY(y);
+			SetScale(F32x2(x, y));
 		}
 
 		/**
@@ -634,7 +619,7 @@ namespace mage {
 						The scale component.
 		 */
 		void XM_CALLCONV SetScale(FXMVECTOR scale) noexcept {
-			m_scale = XMStore< F32x2 >(scale);
+			SetScale(XMStore< F32x2 >(scale));
 		}
 
 		/**
@@ -645,7 +630,7 @@ namespace mage {
 						The x-value of the scale component to add.
 		 */
 		void AddScaleX(F32 x) noexcept {
-			m_scale.m_x += x;
+			SetScaleX(GetScaleX() + x);
 		}
 
 		/**
@@ -656,7 +641,7 @@ namespace mage {
 						The y-value of the scale component to add.
 		 */
 		void AddScaleY(F32 y) noexcept {
-			m_scale.m_y += y;
+			SetScaleY(GetScaleY() + y);
 		}
 
 		/**
@@ -680,8 +665,7 @@ namespace mage {
 						The y-value of the scale component to add.
 		 */
 		void AddScale(F32 x, F32 y) noexcept {
-			AddScaleX(x);
-			AddScaleY(y);
+			AddScale(F32x2(x, y));
 		}
 
 		/**
@@ -692,7 +676,7 @@ namespace mage {
 						A reference to the scale component to add.
 		 */
 		void AddScale(const F32x2& scale) noexcept {
-			AddScale(scale.m_x, scale.m_y);
+			AddScale(XMLoad(scale));
 		}
 
 		/**
@@ -703,8 +687,7 @@ namespace mage {
 						The scale component to add.
 		 */
 		void XM_CALLCONV AddScale(FXMVECTOR scale) noexcept {
-			AddScale(XMVectorGetX(scale),
-				     XMVectorGetY(scale));
+			SetScale(GetScale() + scale);
 		}
 
 		/**
@@ -715,7 +698,7 @@ namespace mage {
 		 */
 		[[nodiscard]]
 		F32 GetScaleX() const noexcept {
-			return m_scale.m_x;
+			return m_scale[0u];
 		}
 
 		/**
@@ -726,7 +709,7 @@ namespace mage {
 		 */
 		[[nodiscard]]
 		F32 GetScaleY() const noexcept {
-			return m_scale.m_y;
+			return m_scale[1u];
 		}
 
 		/**
@@ -735,7 +718,7 @@ namespace mage {
 		 @return		The scale component of this sprite transform.
 		 */
 		[[nodiscard]]
-		const F32x2 GetScale() const noexcept {
+		const F32x2 GetScaleView() const noexcept {
 			return m_scale;
 		}
 
@@ -745,7 +728,7 @@ namespace mage {
 		 @return		The scale component of this sprite transform.
 		 */
 		[[nodiscard]]
-		const XMVECTOR XM_CALLCONV GetScaleV() const noexcept {
+		const XMVECTOR XM_CALLCONV GetScale() const noexcept {
 			return XMLoad(m_scale);
 		}
 
@@ -754,6 +737,7 @@ namespace mage {
 		//---------------------------------------------------------------------
 		// Member Methods: Transformation
 		//---------------------------------------------------------------------
+		#pragma region
 
 		/**
 		 Returns the transformation matrix of this sprite transform.
@@ -762,12 +746,16 @@ namespace mage {
 		 */
 		[[nodiscard]]
 		const XMMATRIX XM_CALLCONV GetTransformMatrix() const noexcept {
-			auto transformation = XMMatrixOffsetAffineTransformation2D(
-				GetRotationOriginV(), GetScaleV(), GetRotation(), GetTranslationV());
-			transformation.r[3] = XMVectorSetZ(transformation.r[3], GetDepth());
-			
+			auto transformation = GetAffineTransformationMatrix(GetRotationOrigin(),
+																GetScale(),
+																GetRotation(),
+																GetTranslation());
+			transformation.r[3u] = XMVectorSetZ(transformation.r[3], GetDepth());
+
 			return transformation;
 		}
+
+		#pragma endregion
 
 	private:
 
@@ -801,5 +789,5 @@ namespace mage {
 		F32x2 m_scale;
 	};
 
-	static_assert(32 == sizeof(SpriteTransform));
+	static_assert(32u == sizeof(SpriteTransform2D));
 }

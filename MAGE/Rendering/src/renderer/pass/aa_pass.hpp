@@ -19,7 +19,7 @@ namespace mage::rendering {
 	/**
 	 A class of AA passes for performing AA.
 	 */
-	class AAPass final {
+	class AAPass {
 
 	public:
 
@@ -30,19 +30,19 @@ namespace mage::rendering {
 		/**
 		 Constructs a AA pass.
 
-		 @param[in]		device_context
+		 @param[in,out]	device_context
 						A reference to the device context.
-		 @param[in]		state_manager
+		 @param[in,out]	state_manager
 						A reference to the state manager.
-		 @param[in]		resource_manager
+		 @param[in,out]	resource_manager
 						A reference to the resource manager.
 		 */
-		explicit AAPass(ID3D11DeviceContext& device_context, 
+		explicit AAPass(ID3D11DeviceContext& device_context,
 						StateManager& state_manager,
 						ResourceManager& resource_manager);
 
 		/**
-		 Constructs a AA pass from the given AA 
+		 Constructs a AA pass from the given AA
 		 pass.
 
 		 @param[in]		pass
@@ -51,7 +51,7 @@ namespace mage::rendering {
 		AAPass(const AAPass& pass) = delete;
 
 		/**
-		 Constructs a AA pass by moving the given AA 
+		 Constructs a AA pass by moving the given AA
 		 shading pass.
 
 		 @param[in]		pass
@@ -73,7 +73,7 @@ namespace mage::rendering {
 
 		 @param[in]		pass
 						A reference to the AA pass to copy.
-		 @return		A reference to the copy of the given AA pass (i.e. 
+		 @return		A reference to the copy of the given AA pass (i.e.
 						this AA pass).
 		 */
 		AAPass& operator=(const AAPass& pass) = delete;

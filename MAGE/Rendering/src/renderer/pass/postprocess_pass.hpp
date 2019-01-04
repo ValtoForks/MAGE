@@ -19,7 +19,7 @@ namespace mage::rendering {
 	/**
 	 A class of post-process passes for performing post-processing.
 	 */
-	class PostProcessPass final {
+	class PostProcessPass {
 
 	public:
 
@@ -30,15 +30,15 @@ namespace mage::rendering {
 		/**
 		 Constructs a post-process pass.
 
-		 @param[in]		device_context
+		 @param[in,out]	device_context
 						A reference to the device context.
-		 @param[in]		state_manager
+		 @param[in,out]	state_manager
 						A reference to the state manager.
-		 @param[in]		resource_manager
+		 @param[in,out]	resource_manager
 						A reference to the resource manager.
 		 */
-		explicit PostProcessPass(ID3D11DeviceContext& device_context, 
-								 StateManager& state_manager, 
+		explicit PostProcessPass(ID3D11DeviceContext& device_context,
+								 StateManager& state_manager,
 								 ResourceManager& resource_manager);
 
 		/**
@@ -50,7 +50,7 @@ namespace mage::rendering {
 		PostProcessPass(const PostProcessPass& pass) = delete;
 
 		/**
-		 Constructs a post-process pass by moving the given post-process 
+		 Constructs a post-process pass by moving the given post-process
 		 shading pass.
 
 		 @param[in]		pass
@@ -72,7 +72,7 @@ namespace mage::rendering {
 
 		 @param[in]		pass
 						A reference to the post-process pass to copy.
-		 @return		A reference to the copy of the given post-process pass 
+		 @return		A reference to the copy of the given post-process pass
 						(i.e. this post-process pass).
 		 */
 		PostProcessPass& operator=(const PostProcessPass& pass) = delete;
@@ -82,7 +82,7 @@ namespace mage::rendering {
 
 		 @param[in]		pass
 						A reference to the post-process pass to move.
-		 @return		A reference to the moved DOF pass (i.e. this 
+		 @return		A reference to the moved DOF pass (i.e. this
 						post-process pass).
 		 */
 		PostProcessPass& operator=(PostProcessPass&& pass) noexcept;
@@ -107,7 +107,7 @@ namespace mage::rendering {
 		 @param[in]		tone_mapping
 						The tone mapping type.
 		 */
-		void DispatchLDR(const U32x2& viewport_size, 
+		void DispatchLDR(const U32x2& viewport_size,
 						 ToneMapping tone_mapping) const noexcept;
 
 	private:

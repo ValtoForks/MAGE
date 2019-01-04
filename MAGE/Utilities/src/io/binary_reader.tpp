@@ -1,55 +1,40 @@
 #pragma once
 
 //-----------------------------------------------------------------------------
-// Engine Includes
-//-----------------------------------------------------------------------------
-#pragma region
-
-#include "exception\exception.hpp"
-
-#pragma endregion
-
-//-----------------------------------------------------------------------------
 // Engine Definitions
 //-----------------------------------------------------------------------------
 namespace mage {
 
-	template< typename DataT >
-	const DataT BinaryReader::Read() {
+	template< typename T >
+	const T BinaryReader::Read() {
 		const auto old_pos = m_pos;
-		const auto new_pos = m_pos + sizeof(DataT);
-		
-		ThrowIfFailed((m_pos <= new_pos), 
-					  "%ls: overflow: no value found.", 
-					  GetFilename().c_str());
-		ThrowIfFailed((new_pos <= m_end), 
-					  "%ls: end of file: no value found.", 
-					  GetFilename().c_str());
+		const auto new_pos = m_pos + sizeof(T);
+
+		ThrowIfFailed((m_pos <= new_pos),
+					  "{}: overflow: no value found.", GetPath());
+		ThrowIfFailed((new_pos <= m_end),
+					  "{}: end of file: no value found.", GetPath());
 
 		m_pos = new_pos;
-		return BytesTo< DataT >(old_pos, m_big_endian);
+		return BytesTo< T >(old_pos, m_big_endian);
 	}
 
-	template< typename DataT >
-	inline const DataT BigEndianBinaryReader::Read() {
-		return *ReadArray< DataT >(1);
+	template< typename T >
+	inline const T BigEndianBinaryReader::Read() {
+		return *ReadArray< T >(1u);
 	}
 
-	template< typename DataT >
-	const DataT* BigEndianBinaryReader::ReadArray(size_t count) {
+	template< typename T >
+	const T* BigEndianBinaryReader::ReadArray(std::size_t count) {
 		const auto old_pos = m_pos;
-		const auto new_pos = m_pos + sizeof(DataT) * count;
-		
-		ThrowIfFailed((m_pos <= new_pos), 
-					  "%ls: overflow: no %llu values found.", 
-					  GetFilename().c_str(), 
-					  static_cast< U64 >(count));
-		ThrowIfFailed((new_pos <= m_end), 
-					  "%ls: end of file: no %llu values found.", 
-					  GetFilename().c_str(), 
-					  static_cast< U64 >(count));
+		const auto new_pos = m_pos + sizeof(T) * count;
+
+		ThrowIfFailed((m_pos <= new_pos),
+					  "{}: overflow: no {} values found.", GetPath(), count);
+		ThrowIfFailed((new_pos <= m_end),
+					  "{}: end of file: no {} values found.", GetPath(), count);
 
 		m_pos = new_pos;
-		return reinterpret_cast< const DataT* >(old_pos);
+		return reinterpret_cast< const T* >(old_pos);
 	}
 }

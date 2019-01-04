@@ -8,6 +8,7 @@
 #include "renderer\swap_chain.hpp"
 #include "resource\rendering_resource_manager.hpp"
 #include "scene\rendering_world.hpp"
+#include "system\game_timer.hpp"
 
 #pragma endregion
 
@@ -19,7 +20,7 @@ namespace mage::rendering {
 	/**
 	 A class of rendering managers.
 	 */
-	class Manager final {
+	class Manager {
 
 	public:
 
@@ -32,10 +33,10 @@ namespace mage::rendering {
 
 		 @param[in]		window
 						The main window handle.
-		 @param[in]		configuration
+		 @param[in,out]	configuration
 						The display configuration.
 		 */
-		explicit Manager(NotNull< HWND > window, 
+		explicit Manager(NotNull< HWND > window,
 						 DisplayConfiguration configuration);
 
 		/**
@@ -68,7 +69,7 @@ namespace mage::rendering {
 
 		 @param[in]		manager
 						A reference to a rendering manager to copy.
-		 @return		A reference to the copy of the given rendering manager 
+		 @return		A reference to the copy of the given rendering manager
 						(i.e. this rendering manager).
 		 */
 		Manager& operator=(const Manager& manager) = delete;
@@ -78,7 +79,7 @@ namespace mage::rendering {
 
 		 @param[in]		manager
 						A reference to a rendering manager to move.
-		 @return		A reference to the moved rendering manager (i.e. this 
+		 @return		A reference to the moved rendering manager (i.e. this
 						rendering manager).
 		 */
 		Manager& operator=(Manager&& manager) = delete;
@@ -90,7 +91,7 @@ namespace mage::rendering {
 		/**
 		 Returns the display configuration of this rendering manager.
 
-		 @return		A reference to the display configuration of this 
+		 @return		A reference to the display configuration of this
 						rendering manager.
 		 */
 		[[nodiscard]]
@@ -115,7 +116,7 @@ namespace mage::rendering {
 		/**
 		 Returns the resource manager of this rendering manager.
 
-		 @return		A reference to the state manager of this 
+		 @return		A reference to the state manager of this
 						rendering manager.
 		 */
 		[[nodiscard]]
@@ -133,10 +134,10 @@ namespace mage::rendering {
 		 Binds the persistent state of this rendering manager.
 
 		 @throws		Exception
-						Failed to bind the persistent state of this rendering 
+						Failed to bind the persistent state of this rendering
 						manager.
 		 @throws		Exception
-						Failed to bind the persistent state of this rendering 
+						Failed to bind the persistent state of this rendering
 						manager.
 		 */
 		void BindPersistentState();
@@ -149,10 +150,12 @@ namespace mage::rendering {
 		/**
 		 Renders.
 
+		 @param[in]		time
+						A reference to the game time.
 		 @throws		Exception
 						Failed to render the world of this rendering manager.
 		 */
-		void Render();
+		void Render(const GameTime& time);
 
 	private:
 

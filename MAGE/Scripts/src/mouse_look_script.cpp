@@ -27,7 +27,7 @@ namespace mage::script {
 
 	MouseLookScript::MouseLookScript(
 		MouseLookScript&& script) noexcept = default;
-	
+
 	MouseLookScript::~MouseLookScript() = default;
 
 	MouseLookScript& MouseLookScript::operator=(
@@ -37,60 +37,51 @@ namespace mage::script {
 		MouseLookScript&& script) noexcept = default;
 
 	void MouseLookScript::Load([[maybe_unused]] Engine& engine) {
-		ThrowIfFailed(HasOwner(), 
+		ThrowIfFailed(HasOwner(),
 					  "This script needs to be attached to a node.");
 	}
 
-	void MouseLookScript::Update([[maybe_unused]] Engine& engine,
-								 [[maybe_unused]] F64 delta_time) {
-		
+	void MouseLookScript::Update([[maybe_unused]] Engine& engine) {
+		const auto delta_time
+			= static_cast< F32 >(engine.GetTime().GetWallClockDeltaTime().count());
 		const auto& input_manager = engine.GetInputManager();
 		const auto& keyboard      = input_manager.GetKeyboard();
 
-		if (keyboard.GetKeyPress(DIK_F2)) {
+		if (keyboard.IsActivated(DIK_F2)) {
 			m_locked = !m_locked;
 		}
 		if (m_locked) {
 			return;
 		}
-		
+
 		const auto& mouse         = input_manager.GetMouse();
 		auto& transform           = GetOwner()->GetTransform();
 
+		const auto rotation = XMLoad(m_sensitivity) * XMLoad(m_direction) * delta_time
+			                * XMVectorSwizzle< 1u, 0u, 1u, 0u >(XMLoad(mouse.GetDelta()));
 		switch (m_axes) {
 
 		case RotationAxes::MouseXAndY: {
-			
-			const auto rotation_x = m_direction.m_x * mouse.GetDeltaY() * delta_time 
-				                  * m_sensitivity.m_x;
-			const auto rotation_y = m_direction.m_y * mouse.GetDeltaX() * delta_time 
-				                  * m_sensitivity.m_y;
-			transform.AddAndClampRotationX(static_cast< F32 >(rotation_x),
-				                           m_minimum_rotation.m_x,
-				                           m_maximum_rotation.m_x);
-			transform.AddAndClampRotationY(static_cast< F32 >(rotation_y),
-				                           m_minimum_rotation.m_y,
-				                           m_maximum_rotation.m_y);
+			transform.AddRotationX(XMVectorGetX(rotation),
+								   m_minimum_rotation[0u],
+								   m_maximum_rotation[0u]);
+			transform.AddRotationY(XMVectorGetY(rotation),
+								   m_minimum_rotation[1u],
+								   m_maximum_rotation[1u]);
 			break;
 		}
-		
+
 		case RotationAxes::MouseX: {
-			
-			const auto rotation_y = m_direction.m_y * mouse.GetDeltaX() * delta_time
-				                  * m_sensitivity.m_y;
-			transform.AddAndClampRotationY(static_cast< F32 >(rotation_y),
-				                           m_minimum_rotation.m_y,
-				                           m_maximum_rotation.m_y);
+			transform.AddRotationY(XMVectorGetY(rotation),
+								   m_minimum_rotation[1u],
+								   m_maximum_rotation[1u]);
 			break;
 		}
-		
+
 		case RotationAxes::MouseY: {
-			
-			const auto rotation_x = m_direction.m_x * mouse.GetDeltaY() * delta_time
-				                  * m_sensitivity.m_x;
-			transform.AddAndClampRotationX(static_cast< F32 >(rotation_x),
-				                           m_minimum_rotation.m_x,
-				                           m_maximum_rotation.m_x);
+			transform.AddRotationX(XMVectorGetX(rotation),
+								   m_minimum_rotation[0u],
+								   m_maximum_rotation[0u]);
 			break;
 		}
 		}

@@ -5,25 +5,26 @@
 //-----------------------------------------------------------------------------
 #pragma region
 
+#include <gsl\pointers>
+#include <gsl\string_span>
 #include <string>
-namespace mage {
-	using std::string;
-	using std::wstring;
-}
+#include <string_view>
 
-#include <gsl/pointers>
-#include <gsl/string_span>
+#pragma endregion
+
+//-----------------------------------------------------------------------------
+// Type Declarations and Definitions
+//-----------------------------------------------------------------------------
 namespace mage {
+
 	using zstring        = gsl::zstring<>;
 	using wzstring       = gsl::wzstring<>;
 	using const_zstring  = gsl::czstring<>;
 	using const_wzstring = gsl::cwzstring<>;
 
 	/**
-	 A class of not-null values.
+	 A type for representing not-null values.
 	 */
 	template< typename T >
 	using NotNull = gsl::not_null< T >;
 }
-
-#pragma endregion

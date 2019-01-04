@@ -54,10 +54,10 @@
 #define SLOT_SAMPLER_PCF                          13
 
 //-----------------------------------------------------------------------------
-// Engine Includes: Constant Buffers 
+// Engine Includes: Constant Buffers
 //-----------------------------------------------------------------------------
 
-#define SLOT_CBUFFER_GAME                          0
+#define SLOT_CBUFFER_WORLD                         0
 #define SLOT_CBUFFER_PRIMARY_CAMERA                1
 #define SLOT_CBUFFER_LIGHTING                      2
 #define SLOT_CBUFFER_MODEL                         3

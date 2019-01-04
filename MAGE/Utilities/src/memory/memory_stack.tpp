@@ -5,11 +5,10 @@
 //-----------------------------------------------------------------------------
 namespace mage {
 
-	template< typename DataT >
-	DataT* SingleEndedMemoryStack::AllocData(size_t count, 
-											 bool initialization) noexcept {
+	template< typename T >
+	T* SingleEndedMemoryStack::AllocData(std::size_t count, bool initialization) {
 		// Allocation
-		const auto ptr = static_cast< DataT* >(Alloc(count * sizeof(DataT)));
+		const auto ptr = static_cast< T* >(Alloc(count * sizeof(T)));
 
 		if (!ptr) {
 			// The allocation failed.
@@ -18,19 +17,18 @@ namespace mage {
 
 		// Initialization
 		if (initialization) {
-			for (size_t i = 0; i < count; ++i) {
-				new (&ptr[i]) DataT();
+			for (std::size_t i = 0u; i < count; ++i) {
+				new (&ptr[i]) T{};
 			}
 		}
 
 		return ptr;
 	}
 
-	template< typename DataT >
-	DataT* DoubleEndedMemoryStack::AllocDataLow(size_t count, 
-												bool initialization) noexcept {
+	template< typename T >
+	T* DoubleEndedMemoryStack::AllocDataLow(std::size_t count, bool initialization) {
 		// Allocation
-		const auto ptr = static_cast< DataT* >(AllocLow(count * sizeof(DataT)));
+		const auto ptr = static_cast< T* >(AllocLow(count * sizeof(T)));
 
 		if (!ptr) {
 			// The allocation failed.
@@ -39,19 +37,18 @@ namespace mage {
 
 		// Initialization
 		if (initialization) {
-			for (size_t i = 0; i < count; ++i) {
-				new (&ptr[i]) DataT();
+			for (std::size_t i = 0u; i < count; ++i) {
+				new (&ptr[i]) T{};
 			}
 		}
 
 		return ptr;
 	}
 
-	template< typename DataT >
-	DataT* DoubleEndedMemoryStack::AllocDataHigh(size_t count, 
-												 bool initialization) noexcept {
+	template< typename T >
+	T* DoubleEndedMemoryStack::AllocDataHigh(std::size_t count, bool initialization) {
 		// Allocation
-		const auto ptr = static_cast< DataT* >(AllocHigh(count * sizeof(DataT)));
+		const auto ptr = static_cast< T* >(AllocHigh(count * sizeof(T)));
 
 		if (!ptr) {
 			// The allocation failed.
@@ -60,8 +57,8 @@ namespace mage {
 
 		// Initialization
 		if (initialization) {
-			for (size_t i = 0; i < count; ++i) {
-				new (&ptr[i]) DataT();
+			for (std::size_t i = 0u; i < count; ++i) {
+				new (&ptr[i]) T{};
 			}
 		}
 

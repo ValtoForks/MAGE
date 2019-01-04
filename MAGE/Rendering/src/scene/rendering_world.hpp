@@ -28,10 +28,10 @@ namespace mage::rendering {
 	/**
 	 A class of world.
 	 */
-	class World final {
+	class World {
 
 	public:
-	
+
 		//---------------------------------------------------------------------
 		// Constructors and Destructors
 		//---------------------------------------------------------------------
@@ -39,14 +39,14 @@ namespace mage::rendering {
 		/**
 		 Constructs a world.
 
-		 @param[in]		device
+		 @param[in,out]	device
 						A reference to the device.
-		 @param[in]		display_configuration
+		 @param[in,out]	display_configuration
 						A reference to the display configuration.
-		 @param[in]		resource_manager
+		 @param[in,out]	resource_manager
 						A reference to the resource manager.
 		 */
-		explicit World(ID3D11Device& device, 
+		explicit World(ID3D11Device& device,
 					   DisplayConfiguration& display_configuration,
 					   ResourceManager& resource_manager);
 
@@ -73,14 +73,14 @@ namespace mage::rendering {
 
 		//---------------------------------------------------------------------
 		// Assignment Operators
-		//---------------------------------------------------------------------	
+		//---------------------------------------------------------------------
 
 		/**
 		 Copies the given world to this world.
 
 		 @param[in]		world
 						A reference to the world to copy.
-		 @return		A reference to the copy of the given world (i.e. this 
+		 @return		A reference to the copy of the given world (i.e. this
 						world).
 		 */
 		World& operator=(const World& world) = delete;
@@ -103,30 +103,30 @@ namespace mage::rendering {
 
 		template< typename ComponentT >
 		[[nodiscard]]
-		size_t GetNumberOf() const noexcept;
+		std::size_t GetNumberOf() const noexcept;
 
 		template< typename ComponentT, typename ActionT >
-		void ForEach(ActionT action);
+		void ForEach(ActionT&& action);
 
 		template< typename ComponentT, typename ActionT >
-		void ForEach(ActionT action) const;
-		
+		void ForEach(ActionT&& action) const;
+
 		/**
 		 Clears this world.
 		 */
 		void Clear() noexcept;
-		
+
 	private:
 
 		//---------------------------------------------------------------------
 		// Member Variables
 		//---------------------------------------------------------------------
-		
+
 		/**
 		 A reference to the device of this world.
 		 */
 		std::reference_wrapper< ID3D11Device > m_device;
-		
+
 		/**
 		 A reference to the display configuration manager of this world.
 		 */
@@ -136,11 +136,11 @@ namespace mage::rendering {
 		 A reference to the resource manager of this world.
 		 */
 		std::reference_wrapper< ResourceManager > m_resource_manager;
-		
+
 		//---------------------------------------------------------------------
 		// Member Variables
 		//---------------------------------------------------------------------
-		
+
 		/**
 		 A vector containing the perspective cameras of this world.
 		 */

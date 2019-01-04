@@ -5,7 +5,7 @@
 //-----------------------------------------------------------------------------
 #pragma region
 
-#include "type\types.hpp"
+#include "logging\logging.hpp"
 
 #pragma endregion
 
@@ -47,20 +47,15 @@ namespace mage {
 		/**
 		 Constructs a formatted exception.
 
-		 @param[in]		format
-						Pointer to the message format.
-		 */
-		explicit Exception(NotNull< const_zstring > format, ...);
-
-		/**
-		 Constructs a formatted exception.
-
-		 @param[in]		format
-						Pointer to the message format.
+		 @tparam		ArgsT
+						The format argument types.
+		 @param[in]		format_str
+						The format string.
 		 @param[in]		args
-						The variable argument list.
+						A reference to the format arguments.
 		 */
-		explicit Exception(NotNull< const_zstring > format, va_list args);
+		template< typename... ArgsT >
+		explicit Exception(std::string_view format_str, const ArgsT&... args);
 
 		/**
 		 Constructs a formatted exception from the given formatted exception.
@@ -71,14 +66,14 @@ namespace mage {
 		Exception(const Exception& exception);
 
 		/**
-		 Constructs a formatted exception by moving the given formatted 
+		 Constructs a formatted exception by moving the given formatted
 		 exception.
 
 		 @param[in]		exception
 						A reference to a formatted exception to move.
 		 */
 		Exception(Exception&& exception);
-		
+
 		/**
 		 Destructs this formatted exception.
 		 */
@@ -87,23 +82,23 @@ namespace mage {
 		//---------------------------------------------------------------------
 		// Assignment Operators
 		//---------------------------------------------------------------------
-		
+
 		/**
 		 Copies the given formatted exception to this formatted exception.
 
 		 @param[in]		exception
 						A reference to a formatted exception to copy.
-		 @return		A reference to the copy of the given formatted 
+		 @return		A reference to the copy of the given formatted
 						exception (i.e. this formatted exception).
 		 */
 		Exception& operator=(const Exception& exception);
-		
+
 		/**
 		 Moves the given formatted exception to this formatted exception.
 
 		 @param[in]		exception
 						A reference to a formatted exception to move.
-		 @return		A reference to the moved formatted exception (i.e. 
+		 @return		A reference to the moved formatted exception (i.e.
 						this formatted exception).
 		 */
 		Exception& operator=(Exception&& exception);
@@ -113,10 +108,10 @@ namespace mage {
 		//---------------------------------------------------------------------
 
 		/**
-		 Returns a null-terminated byte string that may be used to identify the 
+		 Returns a null-terminated byte string that may be used to identify the
 		 exception.
 
-		 @return		A null-terminated byte string that may be used to 
+		 @return		A null-terminated byte string that may be used to
 						identify the exception.
 		 */
 		virtual const char* what() const noexcept override;
@@ -130,7 +125,7 @@ namespace mage {
 		/**
 		 The buffer size of exceptions.
 		 */
-		static constexpr size_t s_buffer_size = 2048;
+		static constexpr std::size_t s_buffer_size = 2048u;
 
 		//---------------------------------------------------------------------
 		// Member Variables
@@ -149,9 +144,9 @@ namespace mage {
 	//-------------------------------------------------------------------------
 	#pragma region
 
-	static_assert(!std::is_same< bool, BOOL >::value, 
+	static_assert(!std::is_same< bool, BOOL >::value,
 				  "MAGE/Windows primitive type mismatch");
-	static_assert(!std::is_same< BOOL, HRESULT >::value, 
+	static_assert(!std::is_same< BOOL, HRESULT >::value,
 				  "MAGE/Windows primitive type mismatch");
 
 	/**
@@ -160,21 +155,27 @@ namespace mage {
 	 @param[in]		result
 					The result value.
 	 @throws		Exception
-					The given results correspond to a failure.
+					@a result is @c false.
 	 */
 	void ThrowIfFailed(bool result);
 
 	/**
 	 Throws if the given result correspond to a failure.
 
+	 @tparam		ArgsT
+					The format argument types.
 	 @param[in]		result
 					The result value.
-	 @param[in]		format
-					Pointer to the message format.
+	 @param[in]		format_str
+					The format string.
+	 @param[in]		args
+					A reference to the format arguments.
 	 @throws		Exception
-					The given results correspond to a failure.
+					@a result is @c false.
 	 */
-	void ThrowIfFailed(bool result, NotNull< const_zstring > format, ...);
+	template< typename... ArgsT >
+	void ThrowIfFailed(bool result,
+					   std::string_view format_str, const ArgsT&... args);
 
 	/**
 	 Throws if the given result correspond to a failure.
@@ -182,21 +183,27 @@ namespace mage {
 	 @param[in]		result
 					The result value.
 	 @throws		Exception
-					The given results correspond to a failure.
+					@a result is @c FALSE.
 	 */
 	void ThrowIfFailed(BOOL result);
 
 	/**
 	 Throws if the given result correspond to a failure.
 
+	 @tparam		ArgsT
+					The format argument types.
 	 @param[in]		result
 					The result value.
-	 @param[in]		format
-					Pointer to the message format.
+	 @param[in]		format_str
+					The format string.
+	 @param[in]		args
+					A reference to the format arguments.
 	 @throws		Exception
-					The given results correspond to a failure.
+					@a result is @c FALSE.
 	 */
-	void ThrowIfFailed(BOOL result, NotNull< const_zstring > format, ...);
+	template< typename... ArgsT >
+	void ThrowIfFailed(BOOL result,
+					   std::string_view format_str, const ArgsT&... args);
 
 	/**
 	 Throws if the given result correspond to a failure.
@@ -204,21 +211,36 @@ namespace mage {
 	 @param[in]		result
 					The result value.
 	 @throws		Exception
-					The given results correspond to a failure.
+					The given result corresponds to a failure.
 	 */
 	void ThrowIfFailed(HRESULT result);
 
 	/**
 	 Throws if the given result correspond to a failure.
 
+	 @tparam		ArgsT
+					The format argument types.
 	 @param[in]		result
 					The result value.
-	 @param[in]		format
-					Pointer to the message format.
+	 @param[in]		format_str
+					The format string.
+	 @param[in]		args
+					A reference to the format arguments.
 	 @throws		Exception
-					The given results correspond to a failure.
+					The given result corresponds to a failure.
 	 */
-	void ThrowIfFailed(HRESULT result, NotNull< const_zstring > format, ...);
+	template< typename... ArgsT >
+	void ThrowIfFailed(HRESULT result,
+					   std::string_view format_str, const ArgsT&... args);
 
 	#pragma endregion
 }
+
+//-----------------------------------------------------------------------------
+// Engine Includes
+//-----------------------------------------------------------------------------
+#pragma region
+
+#include "exception\exception.tpp"
+
+#pragma endregion

@@ -10,15 +10,6 @@
 #pragma endregion
 
 //-----------------------------------------------------------------------------
-// System Includes
-//-----------------------------------------------------------------------------
-#pragma region
-
-#include <iterator>
-
-#pragma endregion
-
-//-----------------------------------------------------------------------------
 // Engine Definitions
 //-----------------------------------------------------------------------------
 namespace mage::script {
@@ -26,18 +17,18 @@ namespace mage::script {
 	StatsScript::StatsScript()
 		: BehaviorScript(),
 		m_text(),
-		m_accumulated_time(0.0), 
-		m_accumulated_nb_frames(0),
-		m_last_frames_per_second(0), 
-		m_last_milliseconds_per_frame(0.0),
-		m_last_cpu_usage(0.0), 
-		m_last_ram_usage(0),
-		m_monitor() {}
+		m_accumulated_nb_frames(0u),
+		m_prev_wall_clock_time(0.0),
+		m_prev_core_clock_time(0.0),
+		m_fps(0u),
+		m_spf(0.0f),
+		m_cpu(0.0f),
+		m_ram(0u) {}
 
 	StatsScript::StatsScript(const StatsScript& script) noexcept = default;
 
 	StatsScript::StatsScript(StatsScript&& script) noexcept = default;
-	
+
 	StatsScript::~StatsScript() = default;
 
 	StatsScript& StatsScript
@@ -47,53 +38,40 @@ namespace mage::script {
 		::operator=(StatsScript&& script) noexcept = default;
 
 	void StatsScript::Load([[maybe_unused]] Engine& engine) {
-		ThrowIfFailed(HasOwner(), 
+		ThrowIfFailed(HasOwner(),
 					  "This script needs to be attached to a node.");
-		
-		m_text = GetOwner()->Get< rendering::SpriteText >();
-		ThrowIfFailed((nullptr != m_text), 
-					  "This script needs a sprite text component.");
 
-		m_monitor.Start();
+		m_text = GetOwner()->Get< rendering::SpriteText >();
+		ThrowIfFailed((nullptr != m_text),
+					  "This script needs a sprite text component.");
 	}
 
-	void StatsScript::Update([[maybe_unused]] Engine& engine, 
-							 [[maybe_unused]] F64 delta_time) {
+	void StatsScript::Update([[maybe_unused]] Engine& engine) {
+		static constexpr auto s_resource_fetch_period = 1.0;
 
-		m_accumulated_time += delta_time;
 		++m_accumulated_nb_frames;
+		const auto wall_clock_time  = engine.GetTime().GetWallClockTotalDeltaTime();
+		const auto wall_clock_delta = wall_clock_time - m_prev_wall_clock_time;
 
-		if (m_accumulated_time > s_resource_fetch_period) {
-			// FPS + SPF
-			m_last_frames_per_second 
-				= static_cast< U32 >(m_accumulated_nb_frames / m_accumulated_time);
-			m_last_milliseconds_per_frame 
-				= 1000.0 * m_accumulated_time / m_accumulated_nb_frames;
-			m_accumulated_time      = 0.0;
-			m_accumulated_nb_frames = 0;
-			
-			// CPU
-			m_last_cpu_usage = m_monitor.GetCPUDeltaPercentage();
-			
-			// MEM
-			m_last_ram_usage 
-				= static_cast< U32 >(GetVirtualMemoryUsage() >> 20);
+		if (s_resource_fetch_period <= wall_clock_delta.count()) {
+			const auto core_clock_time  = engine.GetTime().GetCoreClockTotalDeltaTime();
+			const auto core_clock_delta = core_clock_time - m_prev_core_clock_time;
+
+			m_fps = static_cast< U32 >(m_accumulated_nb_frames / wall_clock_delta.count());
+			m_spf = 1000.0 * wall_clock_delta.count() / m_accumulated_nb_frames;
+			m_cpu =  100.0 * core_clock_delta.count() / wall_clock_delta.count();
+			m_ram = GetVirtualMemoryUsage() >> 20u;
+
+			m_accumulated_nb_frames = 0u;
+			m_prev_wall_clock_time  = wall_clock_time;
+			m_prev_core_clock_time  = core_clock_time;
 		}
 
-		RGBA color = (m_last_frames_per_second > 120) ? color::Green : color::Red;
+		RGBA color = (120u <= m_fps) ? color::Green : color::Red;
 
-		m_text->SetText(wstring(L"FPS: "));
-		m_text->AppendText(rendering::ColorString(
-			std::to_wstring(m_last_frames_per_second), 
-			std::move(color)));
-		
-		wchar_t buffer[64];
-		_snwprintf_s(buffer, std::size(buffer), 
-			         L"\nSPF: %.2lfms\nCPU: %.1lf%%\nRAM: %uMB\nDCs: %u", 
-			         m_last_milliseconds_per_frame, 
-			         m_last_cpu_usage, 
-			         m_last_ram_usage, 
-			         rendering::Pipeline::s_nb_draws);
-		m_text->AppendText(wstring(buffer));
+		m_text->SetText(L"FPS: ");
+		m_text->AppendText({ std::to_wstring(m_fps), std::move(color) });
+		m_text->AppendText(Format(L"\nSPF: {:.2f}ms\nCPU: {:.1f}%\nRAM: {}MB\nDCs: {}",
+								  m_spf, m_cpu, m_ram, rendering::Pipeline::s_nb_draws));
 	}
 }
